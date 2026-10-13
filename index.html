@@ -15,8 +15,8 @@
   --wcols:6ch 6ch minmax(96px,1fr) 8ch 7ch 9ch;
   --paper:#ffffff;
   --ink:#000000;
-  --ink-2:color-mix(in srgb,var(--ink) 68%,var(--paper));
-  --ink-3:color-mix(in srgb,var(--ink) 42%,var(--paper));
+  --ink-2:color-mix(in srgb,var(--ink) 88%,var(--paper));
+  --ink-3:color-mix(in srgb,var(--ink) 72%,var(--paper));
   --rule:color-mix(in srgb,var(--ink) 14%,var(--paper));
   --track:color-mix(in srgb,var(--ink) 8%,var(--paper));
   --norm:color-mix(in srgb,var(--ink) 22%,var(--paper));
@@ -63,7 +63,16 @@ main{max-width:1040px;margin:0 auto;padding:20px 32px 72px}
 .swatch{width:20px;height:20px;display:inline-block;border:1px solid color-mix(in srgb,var(--ink) 25%,transparent);flex:none}
 .theme-controls{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .theme-control{display:flex;flex-direction:column;gap:4px;font-size:var(--s);color:var(--ink-2)}
-.theme-control input[type=color]{width:100%;height:32px;padding:2px;border:1px solid var(--rule);background:var(--paper);cursor:pointer}
+.theme-control{min-width:0;color:var(--ink)}
+.hex-entry{display:flex;align-items:center;gap:6px;border:1px solid var(--rule-fixed);padding:4px 6px;min-width:0}
+.color-chip{width:18px;height:18px;border:1px solid var(--rule-fixed);background:#fff;flex:none}
+.hex-entry input{width:100%;min-width:0;border:0;outline:none;background:transparent;color:var(--ink);font:inherit;font-size:var(--s);text-transform:uppercase}
+.color-swatches{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px;margin-top:7px}
+.color-swatch{height:19px;min-width:0;border:1px solid var(--rule-fixed);padding:0;cursor:pointer;background:var(--swatch)}
+.color-swatch[aria-pressed="true"]{outline:2px solid var(--ink);outline-offset:1px}
+.theme-share{display:flex;justify-content:space-between;align-items:center;gap:8px;border-top:1px solid var(--rule);padding-top:9px;margin-top:12px;font-size:var(--s);color:var(--ink-2)}
+.theme-share button{border:1px solid var(--rule-fixed);background:transparent;color:var(--ink);font:inherit;font-size:var(--s);padding:3px 7px;cursor:pointer}
+.theme-share button:hover{background:var(--ink);color:var(--paper)}
 .theme-weight{margin-top:12px;font-size:var(--s);color:var(--ink-2)}
 .theme-weight input{width:100%;accent-color:var(--ink)}
 @media(max-width:680px){#themePanel{position:fixed;top:58px;right:12px;max-height:calc(100dvh - 72px);overflow:auto}.theme-controls{grid-template-columns:1fr 1fr}}
@@ -193,12 +202,12 @@ ul.list{list-style:none;margin:0;padding:0}
 .cell:hover:not(.blank){background:#f8f8f8}
 .cell[aria-pressed="true"]{background:var(--wash);box-shadow:inset 0 0 0 1px var(--ink)}
 .cell:focus-visible{outline-offset:-2px}
-.cell .d{font-size:var(--s);color:#333;line-height:18px;padding:0 4px;margin-left:-4px;white-space:nowrap}
+.cell .d{font-size:var(--s);color:var(--ink-2);line-height:18px;padding:0 4px;margin-left:-4px;white-space:nowrap}
 .cell.today .d{background:var(--ink);color:var(--paper)}
 .cell .v{opacity:var(--o,1)}
 .cell .hi{font-size:var(--l);font-weight:400;line-height:1.2;margin-top:4px}
-.cell .lo{font-size:var(--s);color:#444;line-height:1.35}
-.cell .rn{margin-top:auto;padding-top:4px;font-size:var(--s);line-height:14px;color:#333;white-space:nowrap}
+.cell .lo{font-size:var(--s);color:var(--ink-2);line-height:1.35}
+.cell .rn{margin-top:auto;padding-top:4px;font-size:var(--s);line-height:14px;color:var(--ink-2);white-space:nowrap}
 .cell .rn.wet{font-weight:600;color:var(--ink)}
 
 /* trend chart */
@@ -550,10 +559,11 @@ footer{border-top:1px dashed var(--rule-fixed)}
         <button class="theme-preset" type="button" data-theme="plum"><span class="swatch" style="background:#251d2d;border-color:#e6c9ff"></span>plum terminal</button>
       </div>
       <div class="theme-controls">
-        <label class="theme-control">background <input id="themeBg" type="color" value="#ffffff"></label>
-        <label class="theme-control">font color <input id="themeInk" type="color" value="#000000"></label>
+        <div class="theme-control"><label for="themeBg">background</label><div class="hex-entry"><span class="color-chip" id="bgChip" aria-hidden="true"></span><input id="themeBg" type="text" value="#ffffff" maxlength="7" spellcheck="false" aria-label="Background hex color"></div><div class="color-swatches" id="bgSwatches" aria-label="Background color choices"></div></div>
+        <div class="theme-control"><label for="themeInk">font color</label><div class="hex-entry"><span class="color-chip" id="inkChip" aria-hidden="true"></span><input id="themeInk" type="text" value="#000000" maxlength="7" spellcheck="false" aria-label="Font hex color"></div><div class="color-swatches" id="inkSwatches" aria-label="Font color choices"></div></div>
       </div>
       <label class="theme-weight">font weight <output id="weightValue">400</output><input id="themeWeight" type="range" min="200" max="600" step="50" value="400"></label>
+      <div class="theme-share"><span>shareable appearance URL</span><button type="button" id="copyThemeUrl">copy URL</button></div>
     </section>
   </header>
 
@@ -1322,7 +1332,7 @@ async function run(zip) {
   const my = ++runId;
   autoZip = zip;
   store.set('lc:last', zip);
-  try { history.replaceState(null, '', '#' + zip); } catch (e) {}
+  try { const th=(location.hash||'').match(/~[0-9a-f]{6}-[0-9a-f]{6}-\d{3}$/i); history.replaceState(null, '', '#' + zip + (th ? th[0] : '')); } catch (e) {}
   zipEl.value = zip;
   moveCur();
   body.classList.remove('idle', 'ready');
@@ -1493,13 +1503,15 @@ document.addEventListener('keydown', (e) => {
 let rt;
 window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if (st.model) renderChart(); }, 120); });
 
-// Theme controls: presets plus editable background/foreground and typography weight.
+// Theme controls: high-contrast derived text colors, in-page swatches, and shareable URL settings.
 const themeButton = document.getElementById('themeButton');
 const themePanel = document.getElementById('themePanel');
 const themeBg = document.getElementById('themeBg');
 const themeInk = document.getElementById('themeInk');
 const themeWeight = document.getElementById('themeWeight');
 const weightValue = document.getElementById('weightValue');
+const bgChip = document.getElementById('bgChip');
+const inkChip = document.getElementById('inkChip');
 const themes = {
   mono: {bg:'#ffffff',ink:'#000000',weight:400},
   dark: {bg:'#101419',ink:'#e7edf2',weight:400},
@@ -1508,32 +1520,74 @@ const themes = {
   blueyellow: {bg:'#173b70',ink:'#ffe66d',weight:450},
   plum: {bg:'#251d2d',ink:'#e6c9ff',weight:400}
 };
-function applyTheme(bg, ink, weight, name='custom', save=true) {
+const palette = ['#ffffff','#f3ead7','#d9eee5','#b9d5f0','#173b70','#101419','#251d2d','#000000','#352c20','#174d43','#ffe66d','#e6c9ff'];
+function currentZipFromHash(){ const m=(location.hash||'').match(/^#(\d{5})/); return m ? m[1] : ''; }
+function updateShareHash(bg, ink, weight){
+  const zip=currentZipFromHash();
+  const suffix=`~${bg.slice(1).toLowerCase()}-${ink.slice(1).toLowerCase()}-${weight}`;
+  try { history.replaceState(null,'',location.pathname+location.search+'#'+(zip||'')+suffix); } catch(e) {}
+}
+function validHex(v){ return /^#[0-9a-f]{6}$/i.test(v); }
+function rgb(hex){return [1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255).map(v=>v<=.04045?v/12.92:Math.pow((v+.055)/1.055,2.4));}
+function contrast(a,b){const l=c=>{const v=rgb(c);return .2126*v[0]+.7152*v[1]+.0722*v[2];};const x=l(a),y=l(b);return (Math.max(x,y)+.05)/(Math.min(x,y)+.05);}
+function accessibleInk(bg,ink){
+  if(contrast(bg,ink)>=4.5)return ink;
+  const black='#000000',white='#ffffff',target=contrast(bg,black)>=contrast(bg,white)?black:white;
+  let lo=0,hi=1,best=target;
+  for(let i=0;i<18;i++){const t=(lo+hi)/2;const c='#'+[1,3,5].map(k=>Math.round(parseInt(ink.slice(k,k+2),16)*(1-t)+parseInt(target.slice(k,k+2),16)*t).toString(16).padStart(2,'0')).join('');if(contrast(bg,c)>=4.5){best=c;hi=t;}else lo=t;}
+  return best;
+}
+function syncColorUI(bg,ink){
+  bgChip.style.background=bg; inkChip.style.background=ink;
+  document.querySelectorAll('#bgSwatches .color-swatch').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.color===bg.toLowerCase())));
+  document.querySelectorAll('#inkSwatches .color-swatch').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.color===ink.toLowerCase())));
+}
+function applyTheme(bg, ink, weight, name='custom', save=true, share=true) {
+  if(!validHex(bg)||!validHex(ink)) return;
+  bg=bg.toLowerCase(); ink=accessibleInk(bg,ink.toLowerCase()); weight=Math.max(200,Math.min(600,Number(weight)||400));
   document.documentElement.style.setProperty('--paper', bg);
   document.documentElement.style.setProperty('--ink', ink);
-  document.documentElement.style.setProperty("--base-weight", String(weight));
-  document.body.style.fontWeight = String(weight);
-  themeBg.value = bg; themeInk.value = ink; themeWeight.value = String(weight); weightValue.value = String(weight);
-  document.querySelectorAll('.theme-preset').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.theme === name)));
-  if (save) { try { localStorage.setItem('lc:appearance', JSON.stringify({bg,ink,weight,name})); } catch(e) {} }
+  // Secondary text remains close to the chosen foreground, avoiding washed-out gray on saturated themes.
+  document.documentElement.style.setProperty('--ink-2','color-mix(in srgb,var(--ink) 88%,var(--paper))');
+  document.documentElement.style.setProperty('--ink-3','color-mix(in srgb,var(--ink) 72%,var(--paper))');
+  document.documentElement.style.setProperty('--base-weight', String(weight));
+  document.body.style.fontWeight=String(weight);
+  themeBg.value=bg; themeInk.value=ink; themeWeight.value=String(weight); weightValue.value=String(weight);
+  document.querySelectorAll('.theme-preset').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.theme===name)));
+  syncColorUI(bg,ink);
+  if(save){try{localStorage.setItem('lc:appearance',JSON.stringify({bg,ink,weight,name}));}catch(e){}}
+  if(share) updateShareHash(bg,ink,weight);
 }
-themeButton.addEventListener('click', () => {
-  const opening = themePanel.hidden;
-  themePanel.hidden = !opening;
-  themeButton.setAttribute('aria-expanded', String(opening));
-  themeButton.textContent = opening ? 'theme −' : 'theme +';
+function makeSwatches(id, target){
+  const holder=document.getElementById(id);
+  palette.forEach(color=>{
+    const b=document.createElement('button'); b.type='button'; b.className='color-swatch'; b.style.setProperty('--swatch',color); b.dataset.color=color; b.setAttribute('aria-label',color); b.title=color;
+    b.addEventListener('click',()=>applyTheme(target==='bg'?color:themeBg.value,target==='ink'?color:themeInk.value,Number(themeWeight.value)));
+    holder.appendChild(b);
+  });
+}
+makeSwatches('bgSwatches','bg'); makeSwatches('inkSwatches','ink');
+themeButton.addEventListener('click',()=>{
+  const opening=themePanel.hidden; themePanel.hidden=!opening;
+  themeButton.setAttribute('aria-expanded',String(opening)); themeButton.textContent=opening?'theme −':'theme +';
 });
-document.querySelectorAll('.theme-preset').forEach(b => b.addEventListener('click', () => {
-  const t = themes[b.dataset.theme]; applyTheme(t.bg,t.ink,t.weight,b.dataset.theme);
-}));
-themeBg.addEventListener('input', () => applyTheme(themeBg.value,themeInk.value,Number(themeWeight.value)));
-themeInk.addEventListener('input', () => applyTheme(themeBg.value,themeInk.value,Number(themeWeight.value)));
-themeWeight.addEventListener('input', () => applyTheme(themeBg.value,themeInk.value,Number(themeWeight.value)));
-document.addEventListener('keydown', e => { if (e.key === 'Escape' && !themePanel.hidden) { themePanel.hidden=true; themeButton.setAttribute('aria-expanded','false'); themeButton.textContent='theme +'; themeButton.focus(); } });
-try { const saved = JSON.parse(localStorage.getItem('lc:appearance') || 'null'); if (saved && /^#[0-9a-f]{6}$/i.test(saved.bg) && /^#[0-9a-f]{6}$/i.test(saved.ink)) applyTheme(saved.bg,saved.ink,Math.max(200,Math.min(600,Number(saved.weight)||400)),saved.name||'custom',false); } catch(e) {}
-
+document.querySelectorAll('.theme-preset').forEach(b=>b.addEventListener('click',()=>{const t=themes[b.dataset.theme];applyTheme(t.bg,t.ink,t.weight,b.dataset.theme);}));
+function editColor(which){const el=which==='bg'?themeBg:themeInk; if(validHex(el.value)) applyTheme(which==='bg'?el.value:themeBg.value,which==='ink'?el.value:themeInk.value,Number(themeWeight.value)); else el.setAttribute('aria-invalid','true');}
+[themeBg,themeInk].forEach((el,i)=>{el.addEventListener('change',()=>{editColor(i===0?'bg':'ink');el.removeAttribute('aria-invalid');});el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();editColor(i===0?'bg':'ink');}});});
+themeWeight.addEventListener('input',()=>applyTheme(themeBg.value,themeInk.value,Number(themeWeight.value)));
+document.getElementById('copyThemeUrl').addEventListener('click',async()=>{
+  const url=location.href;
+  try{await navigator.clipboard.writeText(url);document.getElementById('copyThemeUrl').textContent='copied';}
+  catch(e){const temp=document.createElement('textarea');temp.value=url;temp.style.position='fixed';temp.style.opacity='0';document.body.appendChild(temp);temp.select();try{document.execCommand('copy');document.getElementById('copyThemeUrl').textContent='copied';}catch(er){document.getElementById('copyThemeUrl').textContent='select URL';}temp.remove();}
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!themePanel.hidden){themePanel.hidden=true;themeButton.setAttribute('aria-expanded','false');themeButton.textContent='theme +';themeButton.focus();}});
+// Restore explicit theme settings from the URL first, then local preference if no URL theme exists.
+const hashTheme=(location.hash||'').match(/~([0-9a-f]{6})-([0-9a-f]{6})-(\d{3})$/i);
+if(hashTheme){applyTheme('#'+hashTheme[1],'#'+hashTheme[2],Number(hashTheme[3]),'custom',false,false);}
+else {try{const saved=JSON.parse(localStorage.getItem('lc:appearance')||'null');if(saved&&validHex(saved.bg)&&validHex(saved.ink))applyTheme(saved.bg,saved.ink,Math.max(200,Math.min(600,Number(saved.weight)||400)),saved.name||'custom',false,true);}catch(e){}}
 document.querySelectorAll('.units button[data-u]').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.u === st.unit)));
-const fromHash = (location.hash || '').replace(/\D/g, '').slice(0, 5);
+const hashZipMatch = (location.hash || '').match(/^#(\d{5})/);
+const fromHash = hashZipMatch ? hashZipMatch[1] : '';
 const first = /^\d{5}$/.test(fromHash) ? fromHash : store.get('lc:last');
 if (first && /^\d{5}$/.test(first)) run(first);
 else zipEl.focus();

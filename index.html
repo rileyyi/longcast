@@ -15,12 +15,12 @@
   --wcols:6ch 6ch minmax(96px,1fr) 8ch 7ch 9ch;
   --paper:#ffffff;
   --ink:#000000;
-  --ink-2:#5c5c5c;
-  --ink-3:#9a9a9a;
-  --rule:#e6e6e6;
-  --track:#ededed;
-  --norm:#c9c9c9;
-  --wash:#f3f3f3;
+  --ink-2:color-mix(in srgb,var(--ink) 68%,var(--paper));
+  --ink-3:color-mix(in srgb,var(--ink) 42%,var(--paper));
+  --rule:color-mix(in srgb,var(--ink) 14%,var(--paper));
+  --track:color-mix(in srgb,var(--ink) 8%,var(--paper));
+  --norm:color-mix(in srgb,var(--ink) 22%,var(--paper));
+  --wash:color-mix(in srgb,var(--ink) 4%,var(--paper));
   --mono:"M PLUS 1 Code", ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
   box-sizing:border-box;
   padding-top:env(safe-area-inset-top,0px);
@@ -45,12 +45,26 @@ button{font:inherit;color:inherit}
 main{max-width:1040px;margin:0 auto;padding:20px 32px 72px}
 
 /* header: mark, prompt (once loaded), units */
-.top{display:flex;align-items:center;gap:24px;min-height:44px;padding-bottom:8px;border-bottom:1px solid var(--ink)}
+.top{position:relative;display:flex;align-items:center;gap:24px;min-height:44px;padding-bottom:8px;border-bottom:1px solid var(--ink)}
 .mark{font-weight:600;text-decoration:none}
 .units{display:flex;margin-left:auto}
 .units button{background:none;border:1px solid var(--ink);padding:0 9px;line-height:22px;cursor:pointer;font-size:var(--s)}
 .units button + button{border-left:0}
 .units button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.theme-toggle{background:transparent;border:1px solid var(--rule);padding:2px 8px;font-size:var(--s);cursor:pointer}
+.theme-toggle:hover,.theme-toggle:focus-visible{background:var(--wash)}
+#themePanel{position:absolute;z-index:20;right:32px;top:54px;width:min(360px,calc(100vw - 24px));padding:14px;background:var(--paper);border:1px solid var(--ink);box-shadow:0 8px 28px color-mix(in srgb,var(--ink) 12%,transparent)}
+#themePanel[hidden]{display:none}
+.theme-presets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:10px 0 14px}
+.theme-preset{display:flex;align-items:center;gap:8px;text-align:left;border:1px solid var(--rule);background:var(--paper);color:var(--ink);padding:7px;cursor:pointer;font-size:var(--s)}
+.theme-preset[aria-pressed="true"]{border-color:var(--ink);outline:1px solid var(--ink);outline-offset:-3px}
+.swatch{width:20px;height:20px;display:inline-block;border:1px solid color-mix(in srgb,var(--ink) 25%,transparent);flex:none}
+.theme-controls{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.theme-control{display:flex;flex-direction:column;gap:4px;font-size:var(--s);color:var(--ink-2)}
+.theme-control input[type=color]{width:100%;height:32px;padding:2px;border:1px solid var(--rule);background:var(--paper);cursor:pointer}
+.theme-weight{margin-top:12px;font-size:var(--s);color:var(--ink-2)}
+.theme-weight input{width:100%;accent-color:var(--ink)}
+@media(max-width:680px){#themePanel{position:fixed;top:58px;right:12px}.theme-controls{grid-template-columns:1fr 1fr}}
 
 /* prompt */
 #ask{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin:0}
@@ -469,7 +483,24 @@ footer{border-top:1px dashed #bdbdbd}
     <div class="units" role="group" aria-label="Temperature unit">
       <button type="button" data-u="f" aria-pressed="true">°F</button>
       <button type="button" data-u="c" aria-pressed="false">°C</button>
+      <button type="button" id="themeButton" class="theme-toggle" aria-expanded="false" aria-controls="themePanel">theme +</button>
     </div>
+    <section id="themePanel" hidden aria-label="Appearance settings">
+      <div class="module-title">appearance <small>color / type</small></div>
+      <div class="theme-presets" id="themePresets">
+        <button class="theme-preset" type="button" data-theme="mono"><span class="swatch" style="background:#fff;border-color:#000"></span>paper / ink</button>
+        <button class="theme-preset" type="button" data-theme="dark"><span class="swatch" style="background:#101419;border-color:#e7edf2"></span>night console</button>
+        <button class="theme-preset" type="button" data-theme="cream"><span class="swatch" style="background:#f3ead7;border-color:#352c20"></span>warm cream</button>
+        <button class="theme-preset" type="button" data-theme="seafoam"><span class="swatch" style="background:#d9eee5;border-color:#174d43"></span>seafoam</button>
+        <button class="theme-preset" type="button" data-theme="blueyellow"><span class="swatch" style="background:#173b70;border-color:#ffe66d"></span>signal / yellow</button>
+        <button class="theme-preset" type="button" data-theme="plum"><span class="swatch" style="background:#251d2d;border-color:#e6c9ff"></span>plum terminal</button>
+      </div>
+      <div class="theme-controls">
+        <label class="theme-control">background <input id="themeBg" type="color" value="#ffffff"></label>
+        <label class="theme-control">font color <input id="themeInk" type="color" value="#000000"></label>
+      </div>
+      <label class="theme-weight">font weight <output id="weightValue">400</output><input id="themeWeight" type="range" min="200" max="600" step="50" value="400"></label>
+    </section>
   </header>
 
   <section class="ask" id="askwrap">
@@ -1384,7 +1415,45 @@ $('#week').addEventListener('click', (e) => {
 document.querySelectorAll('.units button').forEach((b) => b.addEventListener('click', () => {
   st.unit = b.dataset.u;
   store.set('lc:unit', st.unit);
-  document.querySelectorAll('.units button').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.u === st.unit)));
+  // Theme controls: presets plus editable background/foreground and typography weight.
+const themeButton = document.getElementById('themeButton');
+const themePanel = document.getElementById('themePanel');
+const themeBg = document.getElementById('themeBg');
+const themeInk = document.getElementById('themeInk');
+const themeWeight = document.getElementById('themeWeight');
+const weightValue = document.getElementById('weightValue');
+const themes = {
+  mono: {bg:'#ffffff',ink:'#000000',weight:400},
+  dark: {bg:'#101419',ink:'#e7edf2',weight:400},
+  cream: {bg:'#f3ead7',ink:'#352c20',weight:400},
+  seafoam: {bg:'#d9eee5',ink:'#174d43',weight:400},
+  blueyellow: {bg:'#173b70',ink:'#ffe66d',weight:450},
+  plum: {bg:'#251d2d',ink:'#e6c9ff',weight:400}
+};
+function applyTheme(bg, ink, weight, name='custom', save=true) {
+  document.documentElement.style.setProperty('--paper', bg);
+  document.documentElement.style.setProperty('--ink', ink);
+  document.body.style.fontWeight = String(weight);
+  themeBg.value = bg; themeInk.value = ink; themeWeight.value = String(weight); weightValue.value = String(weight);
+  document.querySelectorAll('.theme-preset').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.theme === name)));
+  if (save) { try { localStorage.setItem('lc:appearance', JSON.stringify({bg,ink,weight,name})); } catch(e) {} }
+}
+themeButton.addEventListener('click', () => {
+  const opening = themePanel.hidden;
+  themePanel.hidden = !opening;
+  themeButton.setAttribute('aria-expanded', String(opening));
+  themeButton.textContent = opening ? 'theme −' : 'theme +';
+});
+document.querySelectorAll('.theme-preset').forEach(b => b.addEventListener('click', () => {
+  const t = themes[b.dataset.theme]; applyTheme(t.bg,t.ink,t.weight,b.dataset.theme);
+}));
+themeBg.addEventListener('input', () => applyTheme(themeBg.value,themeInk.value,Number(themeWeight.value)));
+themeInk.addEventListener('input', () => applyTheme(themeBg.value,themeInk.value,Number(themeWeight.value)));
+themeWeight.addEventListener('input', () => applyTheme(themeBg.value,themeInk.value,Number(themeWeight.value)));
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !themePanel.hidden) { themePanel.hidden=true; themeButton.setAttribute('aria-expanded','false'); themeButton.textContent='theme +'; themeButton.focus(); } });
+try { const saved = JSON.parse(localStorage.getItem('lc:appearance') || 'null'); if (saved && /^#[0-9a-f]{6}$/i.test(saved.bg) && /^#[0-9a-f]{6}$/i.test(saved.ink)) applyTheme(saved.bg,saved.ink,Math.max(200,Math.min(600,Number(saved.weight)||400)),saved.name||'custom',false); } catch(e) {}
+
+document.querySelectorAll('.units button[data-u]').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.u === st.unit)));
   renderAll();
 }));
 $('#home').addEventListener('click', (e) => {
@@ -1407,7 +1476,45 @@ document.addEventListener('keydown', (e) => {
 let rt;
 window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if (st.model) renderChart(); }, 120); });
 
-document.querySelectorAll('.units button').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.u === st.unit)));
+// Theme controls: presets plus editable background/foreground and typography weight.
+const themeButton = document.getElementById('themeButton');
+const themePanel = document.getElementById('themePanel');
+const themeBg = document.getElementById('themeBg');
+const themeInk = document.getElementById('themeInk');
+const themeWeight = document.getElementById('themeWeight');
+const weightValue = document.getElementById('weightValue');
+const themes = {
+  mono: {bg:'#ffffff',ink:'#000000',weight:400},
+  dark: {bg:'#101419',ink:'#e7edf2',weight:400},
+  cream: {bg:'#f3ead7',ink:'#352c20',weight:400},
+  seafoam: {bg:'#d9eee5',ink:'#174d43',weight:400},
+  blueyellow: {bg:'#173b70',ink:'#ffe66d',weight:450},
+  plum: {bg:'#251d2d',ink:'#e6c9ff',weight:400}
+};
+function applyTheme(bg, ink, weight, name='custom', save=true) {
+  document.documentElement.style.setProperty('--paper', bg);
+  document.documentElement.style.setProperty('--ink', ink);
+  document.body.style.fontWeight = String(weight);
+  themeBg.value = bg; themeInk.value = ink; themeWeight.value = String(weight); weightValue.value = String(weight);
+  document.querySelectorAll('.theme-preset').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.theme === name)));
+  if (save) { try { localStorage.setItem('lc:appearance', JSON.stringify({bg,ink,weight,name})); } catch(e) {} }
+}
+themeButton.addEventListener('click', () => {
+  const opening = themePanel.hidden;
+  themePanel.hidden = !opening;
+  themeButton.setAttribute('aria-expanded', String(opening));
+  themeButton.textContent = opening ? 'theme −' : 'theme +';
+});
+document.querySelectorAll('.theme-preset').forEach(b => b.addEventListener('click', () => {
+  const t = themes[b.dataset.theme]; applyTheme(t.bg,t.ink,t.weight,b.dataset.theme);
+}));
+themeBg.addEventListener('input', () => applyTheme(themeBg.value,themeInk.value,Number(themeWeight.value)));
+themeInk.addEventListener('input', () => applyTheme(themeBg.value,themeInk.value,Number(themeWeight.value)));
+themeWeight.addEventListener('input', () => applyTheme(themeBg.value,themeInk.value,Number(themeWeight.value)));
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !themePanel.hidden) { themePanel.hidden=true; themeButton.setAttribute('aria-expanded','false'); themeButton.textContent='theme +'; themeButton.focus(); } });
+try { const saved = JSON.parse(localStorage.getItem('lc:appearance') || 'null'); if (saved && /^#[0-9a-f]{6}$/i.test(saved.bg) && /^#[0-9a-f]{6}$/i.test(saved.ink)) applyTheme(saved.bg,saved.ink,Math.max(200,Math.min(600,Number(saved.weight)||400)),saved.name||'custom',false); } catch(e) {}
+
+document.querySelectorAll('.units button[data-u]').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.u === st.unit)));
 const fromHash = (location.hash || '').replace(/\D/g, '').slice(0, 5);
 const first = /^\d{5}$/.test(fromHash) ? fromHash : store.get('lc:last');
 if (first && /^\d{5}$/.test(first)) run(first);

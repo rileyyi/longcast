@@ -289,9 +289,9 @@ footer p{margin:0 0 4px}
 .cell{border-bottom:1px dashed #bdbdbd}
 
 /* calendar: today in inverse like cal(1), selected day fully inverse */
-.cell[aria-pressed="true"]{background:var(--ink);color:var(--paper);box-shadow:none}
-.cell[aria-pressed="true"] .d,.cell[aria-pressed="true"] .lo,.cell[aria-pressed="true"] .rn{color:var(--paper)}
-.cell[aria-pressed="true"] .hi{color:var(--paper)}
+.cell[aria-pressed="true"]{background:#000 !important;color:#fff !important;box-shadow:none !important}
+.cell[aria-pressed="true"] *,.cell[aria-pressed="true"] .d,.cell[aria-pressed="true"] .lo,.cell[aria-pressed="true"] .rn,.cell[aria-pressed="true"] .hi,.cell.today[aria-pressed="true"] .d{color:#fff !important;background-color:transparent !important}
+.cell[aria-pressed="true"] .v{opacity:1 !important}
 .cell::before{display:none !important}
 .cell.today[aria-pressed="true"] .d{background:var(--paper);color:var(--ink)}
 .cell:hover:not(.blank):not([aria-pressed="true"]){background:#f2f2f2}
@@ -408,8 +408,6 @@ footer{border-top:1px dashed #bdbdbd}
 }
 
 /* command-center modules: compact grid, expandable panels, restrained motion */
-.ask #horizon{font:inherit;font-size:var(--s);border:0;border-bottom:1px dashed var(--ink);border-radius:0;background:transparent;padding:2px 18px 2px 4px;color:var(--ink);align-self:baseline;cursor:pointer}
-.horizon-label{font-size:var(--s);color:var(--ink-2);margin-left:4px}
 .out{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(14px,1.5vw,26px);align-items:start}
 .out[hidden]{display:none}
 .out>.hero{grid-column:1/-1;min-width:0}
@@ -434,7 +432,7 @@ footer{border-top:1px dashed #bdbdbd}
 .status .mode{animation:status-pulse 3.6s steps(1,end) infinite}
 @keyframes status-pulse{50%{opacity:.72}}
 @media(max-width:1100px){.out{grid-template-columns:repeat(2,minmax(0,1fr))}.out>.month,.out>.trend{grid-column:1/-1}.out>.srcs{grid-column:1/-1}}
-@media(max-width:680px){.out{grid-template-columns:minmax(0,1fr);gap:24px}.out>.month,.out>.trend,.out>.srcs{grid-column:1}.out>.cols{display:contents}.ask{gap:10px}.ask #horizon{max-width:6ch}.out>.hero{grid-column:1}.module.panel{padding:18px 8px 8px}.module-title{padding-bottom:8px}}
+@media(max-width:680px){.out{grid-template-columns:minmax(0,1fr);gap:24px}.out>.month,.out>.trend,.out>.srcs{grid-column:1}.out>.cols{display:contents}.ask{gap:10px}.out>.hero{grid-column:1}.module.panel{padding:18px 8px 8px}.module-title{padding-bottom:8px}}
 @media(prefers-reduced-motion:reduce){.top::after,.status .mode{animation:none}}
 
 </style>
@@ -453,9 +451,9 @@ footer{border-top:1px dashed #bdbdbd}
     <form id="ask" autocomplete="off" novalidate aria-label="Find a weather outlook">
       <label for="zip" class="gt" aria-hidden="true">&gt;</label>
       <span class="zipwrap"><input id="zip" name="zip" inputmode="numeric" maxlength="5" pattern="[0-9]{5}" autocomplete="postal-code" placeholder="zip code" aria-label="US ZIP code, five digits" aria-describedby="ziphelp" spellcheck="false" title="Press / to jump here"><span class="cur" aria-hidden="true"></span></span>
-      <label class="horizon-label" for="horizon">days</label><select id="horizon" aria-label="Outlook length"><option value="14">14</option><option value="21">21</option><option value="35" selected>35</option></select><button type="submit" class="go" aria-label="Get outlook">enter</button>
+      <button type="submit" class="go" aria-label="Get 35-day outlook">enter</button>
     </form>
-    <p class="intro" id="ziphelp">Choose 14, 21, or 35 days. Long-range daily forecast data beyond 35 days is not consistently available from these sources. Results compare available forecasts with 30 years of local climate.</p>
+    <p class="intro" id="ziphelp">A 35-day outlook, comparing available forecasts with 30 years of local climate.</p>
     <noscript><p class="intro" style="color:#000">This page needs JavaScript and network access. Download the file and open it in a web browser.</p></noscript>
     <div class="log" id="log" aria-live="polite"></div>
   </section>

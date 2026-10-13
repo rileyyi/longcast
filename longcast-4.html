@@ -1,0 +1,1286 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>longcast</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect x='3' y='3' width='10' height='10' fill='black'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+1+Code:wght@100..700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --s:12px;--m:14px;--l:20px;--xl:36px;--xxl:48px;
+  --dcols:6.5ch 6ch 3.5ch minmax(48px,1fr) 3.5ch 4ch;
+  --wcols:6ch 6ch minmax(96px,1fr) 8ch 7ch 9ch;
+  --paper:#ffffff;
+  --ink:#000000;
+  --ink-2:#5c5c5c;
+  --ink-3:#9a9a9a;
+  --rule:#e6e6e6;
+  --track:#ededed;
+  --norm:#c9c9c9;
+  --wash:#f3f3f3;
+  --mono:"M PLUS 1 Code", ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{
+  margin:0;min-height:100%;
+  background:var(--paper);color:var(--ink);
+  font:400 var(--m)/1.6 var(--mono);
+  font-variant-numeric:tabular-nums;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+a{color:var(--ink);text-underline-offset:3px;text-decoration-thickness:1px}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+main{max-width:1040px;margin:0 auto;padding:20px 32px 72px}
+
+/* header: mark, prompt (once loaded), units */
+.top{display:flex;align-items:center;gap:24px;min-height:44px;padding-bottom:8px;border-bottom:1px solid var(--ink)}
+.mark{font-weight:600;text-decoration:none}
+.units{display:flex;margin-left:auto}
+.units button{background:none;border:1px solid var(--ink);padding:0 9px;line-height:22px;cursor:pointer;font-size:var(--s)}
+.units button + button{border-left:0}
+.units button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+
+/* prompt */
+#ask{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin:0}
+.gt{font-weight:200;line-height:1.1}
+#zip{
+  font-family:var(--mono);font-weight:200;line-height:1.1;
+  padding:2px 0;border:0;border-radius:0;background:none;color:var(--ink);
+  box-shadow:inset 0 -1px 0 var(--ink);caret-color:var(--ink);
+}
+#zip::placeholder{color:var(--ink-3)}
+#zip:focus{outline:none;box-shadow:inset 0 -2px 0 var(--ink)}
+.go{background:var(--ink);color:var(--paper);border:0;padding:3px 10px;font-size:var(--s);cursor:pointer}
+.ask .gt,.ask #zip{font-size:var(--xxl)}
+.ask #zip{width:8.4ch}
+
+.ask{padding:120px 0 16px;transition:padding .3s ease}
+body:not(.idle) .ask{padding:28px 0 0}
+.intro{max-width:54ch;color:var(--ink-2);margin:28px 0 0}
+body:not(.idle) .intro{display:none}
+
+.log{margin:24px 0 0;font-size:var(--s);line-height:1.8;white-space:pre;overflow-x:auto;color:var(--ink-2)}
+.log:empty{display:none}
+.log b{font-weight:400;color:var(--ink)}
+.log .err{display:inline-block;white-space:normal;max-width:60ch;margin-top:6px;vertical-align:top;color:var(--ink)}
+.log .wait::after{content:"";display:inline-block;width:.62em;height:1.05em;background:var(--ink);vertical-align:-3px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+body.ready #log{display:none}
+
+/* output */
+.out[hidden]{display:none}
+.hero{margin-top:8px}
+.where{margin:0;font-size:var(--m);color:var(--ink-2)}
+.where span{margin-right:3ch;white-space:nowrap}
+.head{margin:26px 0 0;font-size:var(--xl);font-weight:300;line-height:1.2;letter-spacing:-.01em}
+.facts{display:flex;flex-wrap:wrap;gap:2px 28px;margin:10px 0 0;font-size:var(--m);color:var(--ink-2)}
+.facts span{white-space:nowrap}
+.facts b{font-weight:600;color:var(--ink)}
+
+.cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:56px;margin-top:44px}
+h2{margin:0;padding-top:8px;border-top:1px solid var(--ink);font-size:var(--m);font-weight:600;display:flex;justify-content:space-between;align-items:baseline}
+h2 small{font-size:var(--s);font-weight:400;color:var(--ink-2)}
+ul.list{list-style:none;margin:0;padding:0}
+
+/* this week */
+.drow{border-bottom:1px solid var(--rule)}
+.dbtn{
+  display:grid;grid-template-columns:var(--dcols);
+  align-items:center;column-gap:12px;width:100%;
+  padding:9px 0;border:0;background:none;text-align:left;cursor:pointer;
+}
+.dbtn > *{opacity:var(--o,1);line-height:20px}
+.dbtn:hover{background:linear-gradient(var(--wash),var(--wash)) no-repeat center/calc(100% + 16px) 100%}
+.drow.open .dbtn{background:linear-gradient(var(--wash),var(--wash)) no-repeat center/calc(100% + 16px) 100%}
+.dn{font-size:var(--m);white-space:nowrap}
+.drow:first-child .dn{font-weight:600}
+.dbtn .wx{font-size:var(--s);color:var(--ink-2);white-space:nowrap}
+.dbtn .lo{font-size:var(--m);color:var(--ink-2);text-align:right}
+.dbtn .hi{font-size:var(--m);font-weight:500;text-align:right}
+.dbtn .rain{font-size:var(--m);text-align:right;color:var(--ink-2)}
+.dbtn .rain.wet{color:var(--ink);font-weight:600}
+.rng{position:relative;height:12px}
+.rng::before{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:var(--rule)}
+.rng .nm{position:absolute;top:0;bottom:0;background:var(--norm)}
+.rng .fc{position:absolute;top:4px;bottom:4px;background:var(--ink);min-width:2px}
+.ddet{padding:2px 0 16px;font-size:var(--s);color:var(--ink-2)}
+.ddet p{margin:0}
+.ddet .src{margin-top:10px;white-space:pre;overflow-x:auto;line-height:1.8}
+.ddet .src b{font-weight:400;color:var(--ink)}
+
+/* weeks ahead */
+.wrow{
+  display:grid;grid-template-columns:var(--wcols);
+  align-items:center;column-gap:10px;padding:10px 0;border-bottom:1px solid var(--rule);
+}
+.wc{font-size:var(--m);text-align:right}
+.wc.low{color:var(--ink-2)}
+.wrow > *{opacity:var(--o,1)}
+.wd{font-size:var(--m);white-space:nowrap}
+.wa{font-size:var(--m);font-weight:500;text-align:right}
+.whl{font-size:var(--m);color:var(--ink-2);text-align:right;white-space:nowrap}
+.wr{font-size:var(--m);color:var(--ink-2)}
+.wr.wetter{color:var(--ink);font-weight:600}
+.dv{position:relative;height:8px}
+.dv::before{content:"";position:absolute;left:50%;top:-4px;bottom:-4px;width:1px;background:var(--ink-2);z-index:2}
+.dv::after{content:"";position:absolute;left:0;right:0;top:3px;height:1px;background:var(--rule)}
+.dv i{position:absolute;top:0;bottom:0;z-index:1}
+.dv .warm{background:var(--ink)}
+.dv .cool{border:1px solid var(--ink);background:var(--paper)}
+.conf{display:inline-flex;gap:3px;justify-content:flex-end}
+.conf i{width:6px;height:6px;border:1px solid var(--ink)}
+.conf i.on{background:var(--ink)}
+.note{margin:10px 0 0;font-size:var(--s);color:var(--ink-2);line-height:1.7}
+.sw{display:inline-block;width:16px;vertical-align:middle;margin-right:6px}
+.sw + .sw,.note .sw:not(:first-child){margin-left:14px}
+.sw-fc{height:4px;background:var(--ink)}
+.sw-nm{height:12px;background:var(--norm)}
+
+/* column labels */
+.dhead,.whead{display:grid;align-items:end;column-gap:10px;padding:8px 0 5px;font-size:var(--m);color:var(--ink-2);border-bottom:1px solid var(--rule)}
+.dhead > span,.whead > span{font-size:var(--s);line-height:1.3;white-space:nowrap}
+.dhead{grid-template-columns:var(--dcols)}
+.whead{grid-template-columns:var(--wcols)}
+.dhead .r,.whead .r{text-align:right}
+.whead .scale{display:flex;justify-content:space-between;gap:8px}
+.whead .vs{white-space:normal}
+
+/* month calendar */
+.dow,.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
+.month{margin-top:36px}
+.dow{margin-top:10px;font-size:var(--s);color:var(--ink-2);padding-bottom:5px;border-bottom:1px solid var(--ink)}
+.dow span{padding:0 8px}
+.cell{
+  position:relative;display:flex;flex-direction:column;align-items:flex-start;
+  min-height:80px;padding:6px 8px 7px;
+  border:0;border-bottom:1px solid #d6d6d6;background:none;text-align:left;cursor:pointer;
+}
+.cell.blank{cursor:default}
+.cell::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:radial-gradient(circle,var(--ink) .9px,transparent 1.3px);background-size:4px 4px;opacity:calc(var(--rp,0) * .42)}
+.cell > *{position:relative}
+.cell[aria-pressed="true"]::before{opacity:0}
+.cell:hover:not(.blank){background:#f8f8f8}
+.cell[aria-pressed="true"]{background:var(--wash);box-shadow:inset 0 0 0 1px var(--ink)}
+.cell:focus-visible{outline-offset:-2px}
+.cell .d{font-size:var(--s);color:#333;line-height:18px;padding:0 4px;margin-left:-4px;white-space:nowrap}
+.cell.today .d{background:var(--ink);color:var(--paper)}
+.cell .v{opacity:var(--o,1)}
+.cell .hi{font-size:var(--l);font-weight:400;line-height:1.2;margin-top:4px}
+.cell .lo{font-size:var(--s);color:#444;line-height:1.35}
+.cell .rn{margin-top:auto;padding-top:4px;font-size:var(--s);line-height:14px;color:#333;white-space:nowrap}
+.cell .rn.wet{font-weight:600;color:var(--ink)}
+
+/* trend chart */
+.trend{margin-top:48px}
+.readout{margin:12px 0 6px;font-size:var(--m);min-height:1.6em;color:var(--ink-2)}
+.hint{color:var(--ink-3)}
+.cdet{margin-top:12px}
+.cdet > .hint{margin:0;font-size:var(--s)}
+.cdet.open{border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);padding:12px 0 14px}
+.cdet-top{display:flex;align-items:baseline;gap:14px}
+.cdet-top b{font-size:var(--m);font-weight:600}
+.cdet-top .ago{font-size:var(--s);color:var(--ink-2)}
+.cdet-top .x{margin-left:auto;background:none;border:1px solid var(--ink);font-size:var(--s);padding:0 9px;line-height:20px;cursor:pointer}
+.cdet-body{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px 40px;margin-top:10px;align-items:start}
+.cdet-temp{display:flex;align-items:baseline;gap:10px;white-space:nowrap}
+.cdet-temp .h{font-size:var(--xl);font-weight:200;line-height:1}
+.cdet-temp .l{font-size:var(--l);font-weight:300;color:var(--ink-2)}
+.cdet-temp .r{font-size:var(--m);margin-left:10px}
+.cdet-temp .r.wet{font-weight:600}
+.cdet-text p{margin:0 0 3px;font-size:var(--m)}
+.cdet-text p.sub{color:var(--ink-2)}
+.cdet .src{margin-top:12px;font-size:var(--s);white-space:pre;overflow-x:auto;line-height:1.75;color:var(--ink-2)}
+.cdet .src b{font-weight:400;color:var(--ink)}
+.cdet .src .hd{color:var(--ink-3)}
+.readout b{font-weight:600;color:var(--ink);margin-right:2ch}
+.readout span{margin-right:2.4ch;white-space:nowrap;display:inline-block}
+.chart{width:100%}
+.chart svg{display:block;max-width:100%;touch-action:pan-y}
+.chart .g{stroke:var(--rule);stroke-width:1}
+.chart .band{fill:var(--wash)}
+.chart .norm{fill:none;stroke:var(--ink-3);stroke-width:1;stroke-dasharray:2 3}
+.chart .hi{stroke:var(--ink);stroke-width:1.75;stroke-linecap:round}
+.chart .lo{stroke:var(--ink);stroke-width:1;stroke-linecap:round}
+.chart .rain{fill:var(--ink)}
+.chart .base{stroke:var(--ink);stroke-width:1}
+.chart .sel{stroke:var(--ink);stroke-width:1;stroke-dasharray:1 2}
+.chart .hit{fill:transparent;cursor:crosshair}
+.chart text{font-family:var(--mono);font-size:var(--s);fill:var(--ink-2)}
+.legend{display:flex;flex-wrap:wrap;gap:4px 24px;margin:10px 0 0;font-size:var(--s);color:var(--ink-2)}
+.legend span{display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.legend i{display:inline-block;width:18px}
+.legend .l-fc{height:2px;background:var(--ink)}
+.legend .l-band{height:9px;background:var(--wash)}
+.legend .l-norm{height:0;border-top:1px dashed var(--ink-3)}
+.legend .l-rain{width:4px;height:9px;background:var(--ink)}
+
+/* sources */
+.srcs{margin-top:48px;border-top:1px solid var(--ink);padding-top:10px}
+.srcs summary{cursor:pointer;font-size:var(--m);font-weight:600;list-style:none;display:flex;align-items:baseline;gap:16px}
+.srcs summary::-webkit-details-marker{display:none}
+.srcs summary small{font-weight:400;font-size:var(--s);color:var(--ink-2);margin-left:auto}
+.srcs summary::after{content:"+";font-weight:400;margin-left:12px}
+.srcs[open] summary::after{content:"-"}
+.srcs .log{margin-top:14px}
+.cross{font-size:var(--s);color:var(--ink-2);margin:16px 0 0;max-width:72ch}
+
+footer{margin-top:40px;padding-top:12px;border-top:1px solid var(--rule);font-size:var(--s);color:var(--ink-2);max-width:72ch}
+footer p{margin:0 0 4px}
+
+
+/* ================= console layer ================= */
+.top{border-bottom:1px solid var(--ink)}
+.mark{background:var(--ink);color:var(--paper);padding:0 8px;font-weight:600}
+.tag{color:var(--ink-2);font-size:var(--s);margin-left:-12px}
+.units{gap:0;font-size:var(--s)}
+.units button{border:0;padding:0 7px}
+.units button::before{content:"["} .units button::after{content:"]"}
+.units button[aria-pressed="true"]::before,.units button[aria-pressed="true"]::after{content:" "}
+
+/* prompt with a terminal block cursor */
+.zipwrap{position:relative;display:inline-block}
+#zip,#zip:focus{box-shadow:none;caret-color:transparent}
+.cur{position:absolute;top:50%;left:calc(var(--n,0) * 1ch);width:1ch;height:1em;transform:translateY(-50%);
+  font-family:var(--mono);background:var(--ink);pointer-events:none;visibility:hidden}
+.ask .cur{font-size:var(--xxl)}
+.zipwrap:focus-within .cur{visibility:visible}
+.go{background:none;color:var(--ink);padding:0;font-size:var(--m)}
+.go::before{content:"[ "} .go::after{content:" ]"}
+.go:hover{background:var(--ink);color:var(--paper)}
+
+/* comments */
+.intro::before,.note::before,.cross::before,footer p::before{content:"# ";color:var(--ink-3)}
+
+/* hero */
+.head{text-transform:lowercase}
+.facts i{font-style:normal}
+.facts i::after{content:":";margin-right:1ch}
+
+/* framed panels with titles on the border */
+.panel{position:relative;border:1px solid var(--ink);padding:20px 14px 12px}
+.panel > h2{position:absolute;top:0;left:10px;transform:translateY(-55%);margin:0;padding:0 6px;border:0;
+  background:var(--paper);display:block;font-size:var(--m);font-weight:600;line-height:1.4}
+.panel > h2::before{content:"[ "} .panel > h2::after{content:" ]"}
+.month{margin-top:40px}
+.cols{margin-top:36px;gap:28px}
+.trend,.srcs{margin-top:36px}
+
+/* rules become dashed */
+.drow,.wrow,.dhead,.whead{border-bottom-style:dashed;border-bottom-color:#bdbdbd}
+.dow{margin-top:0;border-bottom:1px dashed var(--ink)}
+.cell{border-bottom:1px dashed #bdbdbd}
+
+/* calendar: today in inverse like cal(1), selected day fully inverse */
+.cell[aria-pressed="true"]{background:var(--ink);color:var(--paper);box-shadow:none}
+.cell[aria-pressed="true"] .d,.cell[aria-pressed="true"] .lo,.cell[aria-pressed="true"] .rn{color:var(--paper)}
+.cell.today[aria-pressed="true"] .d{background:var(--paper);color:var(--ink)}
+.cell:hover:not(.blank):not([aria-pressed="true"]){background:#f2f2f2}
+
+/* block-character bars */
+.rng::before{background:none;border-top:1px dashed #c4c4c4;height:0}
+.rng .nm,.sw-nm{background-color:transparent;background-image:radial-gradient(circle,#6e6e6e .85px,transparent 1.25px);background-size:3px 3px;background-position:0 0}
+.rng .fc,.sw-fc{background:repeating-linear-gradient(90deg,var(--ink) 0 5px,transparent 5px 7px)}
+.rng .fc{top:4px;bottom:4px;background:repeating-linear-gradient(90deg,var(--ink) 0 5px,var(--paper) 5px 7px);box-shadow:0 0 0 1px var(--paper)}
+.sw-fc{height:4px}
+.dv::after{background:none;border-top:1px dashed #c4c4c4;height:0}
+.dv .warm{background:repeating-linear-gradient(90deg,var(--ink) 0 5px,transparent 5px 7px)}
+.dv .cool{background-color:var(--paper);background-image:radial-gradient(circle,var(--ink) .85px,transparent 1.25px);background-size:3px 3px;border:1px solid var(--ink)}
+.drow.open .dbtn,.dbtn:hover{background:linear-gradient(#f2f2f2,#f2f2f2) no-repeat center/calc(100% + 16px) 100%}
+
+/* readouts and details as key: value */
+.readout i,.kv dt{font-style:normal;color:var(--ink-2)}
+.readout i::after{content:":";margin-right:.6ch}
+.cdet.open{border-top:1px dashed var(--ink);border-bottom:0;padding:12px 0 2px;margin-top:0}
+.kv{display:grid;grid-template-columns:12ch minmax(0,1fr);gap:3px 1.5ch;margin:0}
+.kv dt::after{content:":"}
+.kv dd{margin:0}
+
+/* chart */
+.chart .g{stroke:#bdbdbd;stroke-dasharray:1 3}
+.chart .band{fill:url(#dotband);opacity:.6}
+.legend .l-band{background:radial-gradient(circle,#000 .85px,transparent 1.25px) 0 0/3px 3px;opacity:.6}
+
+/* sources */
+.srcs{border:1px solid var(--ink);padding:10px 14px}
+.srcs summary{font-weight:600}
+.srcs summary::after{content:none}
+.srcs summary::before{content:"[+]";font-weight:400;margin-right:1ch}
+.srcs[open] summary::before{content:"[-]"}
+
+/* status line */
+.status{position:sticky;bottom:0;z-index:5;margin:40px -32px -72px;padding:3px 32px calc(3px + env(safe-area-inset-bottom,0px));
+  background:var(--ink);color:var(--paper);font-size:var(--s);display:flex;gap:3ch;white-space:nowrap;overflow:hidden}
+.status span{overflow:hidden;text-overflow:ellipsis;min-width:0}
+.status .mode,.status .r{flex-shrink:0}
+.status .r{margin-left:auto}
+.status .mode{background:var(--paper);color:var(--ink);padding:0 6px;margin-left:-6px}
+footer{border-top:1px dashed #bdbdbd}
+
+@media (max-width:860px){
+  .cols{grid-template-columns:minmax(0,1fr);gap:48px}
+}
+@media (max-width:560px){
+  :root{--s:11px;--m:13px;--l:17px;--xl:28px;--xxl:40px}
+  main{padding:16px 16px 72px}
+  .top{gap:14px}
+  .ask{padding:72px 0 12px}
+  body:not(.idle) .ask{padding:32px 0 0}
+  .ask .gt,.ask #zip{font-size:var(--xxl)}
+  .head{font-size:var(--xl);margin-top:20px}
+  .month{margin-top:28px}
+  .facts{gap:2px 20px;font-size:var(--m)}
+  .cols{margin-top:36px;gap:36px}
+  :root{--dcols:6ch 5.5ch 3.5ch minmax(36px,1fr) 3.5ch 4ch;--wcols:6.5ch 6ch minmax(44px,1fr) 7ch 8.5ch}
+  .dbtn,.dhead,.whead{column-gap:8px}
+  .dbtn .wx{font-size:var(--s)}
+  .wrow{column-gap:8px;font-size:var(--m)}
+  .whead{font-size:var(--m)}
+  .whead > span{font-size:var(--s)}
+  .wd{font-size:var(--m)}
+  .whl{display:none}
+  .trend,.srcs{margin-top:40px}
+  .dow span{padding:0 4px}
+  .cell{min-height:64px;padding:4px 4px 5px}
+  .cell .d{font-size:var(--s);margin-left:-2px;padding:0 2px}
+  .cell .hi{font-size:var(--l);margin-top:4px}
+  .cell .lo{font-size:var(--s)}
+  .cell .rn{font-size:var(--s)}
+  .cell .rl{display:none}
+  .cell.today .d{padding:0 1px;margin-left:-1px;letter-spacing:-.03em}
+  .cdet-body{grid-template-columns:minmax(0,1fr);gap:8px}
+    }
+@media (max-width:560px){
+  .panel{padding:18px 8px 8px}
+  .panel > h2{left:6px}
+  .cell{padding:4px 3px 5px}
+  .status{margin:32px -16px -72px;padding-left:16px;padding-right:16px;gap:2ch}
+  .status .hide-sm{display:none}
+  .kv{grid-template-columns:12.5ch minmax(0,1fr)}
+  .srcs{padding:10px 8px}
+  .tag{display:none}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none !important;animation:none !important}
+}
+</style>
+</head>
+<body class="idle">
+<main>
+  <header class="top" id="top">
+    <a class="mark" href="#" id="home">longcast</a><span class="tag">35-day outlook</span>
+    <div class="units" role="group" aria-label="Temperature unit">
+      <button type="button" data-u="f" aria-pressed="true">°F</button>
+      <button type="button" data-u="c" aria-pressed="false">°C</button>
+    </div>
+  </header>
+
+  <section class="ask" id="askwrap">
+    <form id="ask" autocomplete="off" novalidate>
+      <label for="zip" class="gt" aria-hidden="true">&gt;</label>
+      <span class="zipwrap"><input id="zip" name="zip" inputmode="numeric" maxlength="5" placeholder="zip code" aria-label="US zip code" spellcheck="false" title="Press / to jump here"><span class="cur" aria-hidden="true"></span></span>
+      <button type="submit" class="go" aria-label="Get outlook">enter</button>
+    </form>
+    <p class="intro">A 35-day outlook for any US zip code. It pools nine open forecast sources, including the National Weather Service, and sets them against 30 years of local climate.</p>
+    <noscript><p class="intro" style="color:#000">This page needs JavaScript and network access. Download the file and open it in a web browser.</p></noscript>
+    <div class="log" id="log" aria-live="polite"></div>
+  </section>
+
+  <section class="out" id="out" hidden>
+    <div class="hero">
+      <p class="where" id="where"></p>
+      <h1 class="head" id="head"></h1>
+      <p class="facts" id="facts"></p>
+    </div>
+
+    <section class="month panel">
+      <h2>next 35 days</h2>
+      <div class="dow" aria-hidden="true"><span>mo</span><span>tu</span><span>we</span><span>th</span><span>fr</span><span>sa</span><span>su</span></div>
+      <div class="cal" id="cal"></div>
+      <div class="cdet" id="cdet" aria-live="polite"></div>
+    </section>
+
+    <div class="cols">
+      <section class="panel">
+        <h2>this week</h2>
+        <div class="dhead" aria-hidden="true"><span></span><span></span><span class="r">low</span><span></span><span class="r">high</span><span class="r">rain</span></div>
+        <ul class="list" id="week"></ul>
+        <p class="note"><i class="sw sw-fc"></i>forecast low to high <i class="sw sw-nm"></i>average range for that date. Tap a day to compare sources.</p>
+      </section>
+      <section class="panel">
+        <h2>weeks ahead</h2>
+        <div class="whead" aria-hidden="true"><span>week of</span><span class="r vs">vs average</span><span class="scale"><span>cooler</span><span>warmer</span></span><span class="r whl">high/low</span><span>rain</span><span class="r">confidence</span></div>
+        <ul class="list" id="weeks"></ul>
+        <p class="note" id="wnote"></p>
+      </section>
+    </div>
+
+    <section class="trend panel">
+      <h2>temperature trend</h2>
+      <p class="readout" id="readout2"></p>
+      <div class="chart" id="chart"></div>
+      <p class="legend"><span><i class="l-fc"></i>forecast high and low</span><span><i class="l-band"></i>likely range of the high</span><span><i class="l-norm"></i>30-year average</span><span><i class="l-rain"></i>chance of rain</span></p>
+    </section>
+
+    <details class="srcs" id="srcs">
+      <summary>sources <small id="srcsum"></small></summary>
+      <div class="log" id="srclog"></div>
+      <p class="cross" id="cross"></p>
+    </details>
+  </section>
+
+  <footer>
+    <p>Forecast data from <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> (CC BY 4.0) and the <a href="https://www.weather.gov/" target="_blank" rel="noopener">National Weather Service</a>. Averages from ERA5 reanalysis via Open-Meteo.</p>
+    <p>Long-range forecasts show tendencies, not promises. Not for safety-critical decisions.</p>
+  </footer>
+  <div class="status" id="status" aria-hidden="true"><span class="mode">longcast</span><span id="st-mid">type a zip code</span><span class="r" id="st-r"></span></div>
+</main>
+
+<script>
+(() => {
+'use strict';
+
+const DAYS = 35;
+const WET = 0.04;            // inches, about 1 mm: a "wet day"
+const API = {
+  fc:  'https://api.open-meteo.com/v1/forecast',
+  ens: 'https://ensemble-api.open-meteo.com/v1/ensemble',
+  sea: 'https://seasonal-api.open-meteo.com/v1/seasonal',
+  arc: 'https://archive-api.open-meteo.com/v1/archive',
+  geo: 'https://geocoding-api.open-meteo.com/v1/search',
+  zip: 'https://api.zippopotam.us/us/',
+  nws: 'https://api.weather.gov/points/'
+};
+const DET = [
+  { key: 'gfs',   name: 'gfs',       id: 'gfs_seamless',  org: 'NOAA' },
+  { key: 'ecmwf', name: 'ecmwf',     id: 'ecmwf_ifs025',  org: 'ECMWF' },
+  { key: 'icon',  name: 'icon',      id: 'icon_seamless', org: 'DWD' },
+  { key: 'gem',   name: 'gem',       id: 'gem_seamless',  org: 'ECCC' }
+];
+const ENS = [
+  { key: 'gfse',   name: 'gfs ens',   id: 'gfs05',        days: 35 },
+  { key: 'ecmwfe', name: 'ecmwf ens', id: 'ecmwf_ifs025', days: 15 },
+  { key: 'geme',   name: 'gem ens',   id: 'gem_global',   days: 35 }
+];
+
+const $ = (s) => document.querySelector(s);
+const body = document.body;
+const BLOCKED = 'The weather services could not be reached from here. Previews inside apps (Claude, the iPhone Files app, email) block outside requests. Download the file and open it in Chrome, Safari, or Firefox. If it is already open in a browser, check your connection.';
+
+/* ---------- storage (per-browser conveniences only) ---------- */
+const store = {
+  get(k) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+};
+
+const st = { unit: store.get('lc:unit') === 'c' ? 'c' : 'f', model: null, sel: 0, open: null };
+
+/* ---------- small utils ---------- */
+const isNum = (x) => typeof x === 'number' && isFinite(x);
+const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+const mean = (a) => { const s = a.filter(isNum); return s.length ? s.reduce((x, y) => x + y, 0) / s.length : null; };
+const median = (a) => {
+  const s = a.filter(isNum).sort((x, y) => x - y);
+  if (!s.length) return null;
+  const m = s.length >> 1;
+  return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+};
+const quant = (sorted, p) => {
+  if (!sorted.length) return null;
+  const i = (sorted.length - 1) * p, lo = Math.floor(i), hi = Math.ceil(i);
+  return sorted[lo] + (sorted[hi] - sorted[lo]) * (i - lo);
+};
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+const MON = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+const DOW = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+const CUM = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+const parseD = (s) => { const [y, m, d] = s.split('-').map(Number); return new Date(Date.UTC(y, m - 1, d)); };
+const iso = (dt) => dt.toISOString().slice(0, 10);
+const addDays = (s, n) => { const d = parseD(s); d.setUTCDate(d.getUTCDate() + n); return iso(d); };
+const label = (s) => { const d = parseD(s); return MON[d.getUTCMonth()] + ' ' + d.getUTCDate(); };
+const dowOf = (s) => DOW[parseD(s).getUTCDay()];
+const doyOf = (s) => Math.min(364, CUM[+s.slice(5, 7) - 1] + (+s.slice(8, 10)) - 1);
+const rangeLabel = (a, b) => {
+  const A = parseD(a), B = parseD(b);
+  return A.getUTCMonth() === B.getUTCMonth() ? `${label(a)} to ${B.getUTCDate()}` : `${label(a)} to ${label(b)}`;
+};
+const localToday = () => { const d = new Date(); return iso(new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()))); };
+
+/* unit display. everything is stored in °F and inches */
+const cv = (f) => st.unit === 'c' ? (f - 32) * 5 / 9 : f;
+const T = (f) => isNum(f) ? String(Math.round(cv(f))) : '';
+const TD = (df) => { const r = Math.round(st.unit === 'c' ? df * 5 / 9 : df); return (r > 0 ? '+' : '') + r; };
+const TA = (df) => Math.round(Math.abs(st.unit === 'c' ? df * 5 / 9 : df));
+const P = (inch) => {
+  if (!isNum(inch)) return '';
+  if (st.unit === 'c') return Math.round(inch * 25.4) + ' mm';
+  if (inch > 0 && inch < 0.05) return '<0.1 in';
+  return inch.toFixed(1) + ' in';
+};
+const pct = (p) => isNum(p) ? Math.round(p * 10) * 10 + '%' : '';
+const confWord = (c) => c >= 0.6 ? 'high' : c >= 0.3 ? 'medium' : 'low';
+
+/* ---------- network ---------- */
+const qs = (base, p) => base + '?' + Object.entries(p)
+  .map(([k, v]) => k + '=' + encodeURIComponent(v).replace(/%2C/g, ','))
+  .join('&');
+
+async function getJSON(url, ms = 15000) {
+  const ctl = new AbortController();
+  const t = setTimeout(() => ctl.abort(), ms);
+  try {
+    const r = await fetch(url, { signal: ctl.signal });
+    if (!r.ok) {
+      let msg = 'http ' + r.status;
+      try { const j = await r.json(); if (j && j.reason) msg += ' ' + j.reason; } catch (e) {}
+      throw new Error(msg);
+    }
+    return await r.json();
+  } catch (e) {
+    if (e.name === 'AbortError') { const er = new Error('timed out'); er.network = true; throw er; }
+    if (e instanceof TypeError) { const er = new Error('blocked or offline'); er.network = true; throw er; }
+    throw e;
+  } finally { clearTimeout(t); }
+}
+
+async function locate(zip) {
+  const ck = 'lc:zip:' + zip;
+  const cached = store.get(ck);
+  if (cached) return cached;
+  let loc = null, netFails = 0;
+  try {
+    const j = await getJSON(API.zip + zip, 8000);
+    const p = j && j.places && j.places[0];
+    if (p) loc = { lat: +p.latitude, lon: +p.longitude, name: p['place name'], region: p['state abbreviation'], via: 'zippopotam.us' };
+  } catch (e) { if (e.network) netFails++; }
+  if (!loc) {
+    try {
+      const g = await getJSON(qs(API.geo, { name: zip, count: 10, country_code: 'US', language: 'en', format: 'json' }), 8000);
+      const hit = (g.results || []).find((r) => (r.postcodes || []).includes(zip));
+      if (hit) loc = { lat: hit.latitude, lon: hit.longitude, name: hit.name, region: hit.admin1 || '', via: 'open-meteo geocoding' };
+    } catch (e) { if (e.network) netFails++; else throw e; }
+  }
+  if (!loc && netFails === 2) { const er = new Error('network'); er.network = true; throw er; }
+  if (!loc || !isNum(loc.lat) || !isNum(loc.lon)) throw new Error('no match');
+  store.set(ck, loc);
+  return loc;
+}
+
+function fromDaily(j, kind, meta) {
+  const d = j && j.daily;
+  if (!d || !Array.isArray(d.time)) throw new Error('no daily data');
+  const pick = (base) => Object.keys(d).filter((k) => k === base || k.startsWith(base + '_')).map((k) => d[k]);
+  const src = { ...meta, kind, time: d.time, hi: pick('temperature_2m_max'), lo: pick('temperature_2m_min'), pr: pick('precipitation_sum') };
+  if (kind === 'det') {
+    src.pop = pick('precipitation_probability_max')[0] || null;
+    src.code = pick('weather_code')[0] || null;
+  }
+  let last = -1;
+  src.hi.forEach((arr) => arr.forEach((v, i) => { if (isNum(v) && i > last) last = i; }));
+  src.span = last + 1;
+  src.members = src.hi.filter((arr) => arr.some(isNum)).length;
+  if (!src.members) throw new Error('empty response');
+  return src;
+}
+
+async function fetchNWS(lat, lon) {
+  const p = await getJSON(API.nws + lat.toFixed(4) + ',' + lon.toFixed(4), 10000);
+  const url = p && p.properties && p.properties.forecast;
+  if (!url) throw new Error('outside nws coverage');
+  const f = await getJSON(url, 10000);
+  const periods = (f && f.properties && f.properties.periods) || [];
+  if (!periods.length) throw new Error('no periods');
+  const hi = {}, lo = {}, pop = {};
+  periods.forEach((per) => {
+    const date = String(per.startTime).slice(0, 10);
+    const t = per.temperatureUnit === 'C' ? per.temperature * 9 / 5 + 32 : per.temperature;
+    const pp = per.probabilityOfPrecipitation && per.probabilityOfPrecipitation.value;
+    if (isNum(pp)) pop[date] = Math.max(pop[date] || 0, pp);
+    if (!isNum(t)) return;
+    if (per.isDaytime) hi[date] = t;
+    else lo[addDays(date, 1)] = t;     // tonight's low lands on tomorrow morning
+  });
+  const days = new Set(Object.keys(hi).concat(Object.keys(lo))).size;
+  return { key: 'nws', name: 'nws', kind: 'nws', hi, lo, pop, office: p.properties.cwa || '', span: days };
+}
+
+function normalsFrom(arc) {
+  const d = arc && arc.daily;
+  if (!d || !d.time) throw new Error('no archive data');
+  const H = d.temperature_2m_max, L = d.temperature_2m_min, R = d.precipitation_sum;
+  const buckets = Array.from({ length: 365 }, () => []);
+  d.time.forEach((t, i) => { if (isNum(H[i]) && isNum(L[i])) buckets[doyOf(t)].push(i); });
+  const out = [];
+  for (let k = 0; k < 365; k++) {
+    const hs = [], ls = [], rs = [];
+    for (let w = -7; w <= 7; w++) {
+      buckets[(k + w + 365) % 365].forEach((i) => { hs.push(H[i]); ls.push(L[i]); if (isNum(R[i])) rs.push(R[i]); });
+    }
+    if (!hs.length) { out.push(null); continue; }
+    hs.sort((a, b) => a - b);
+    const r1 = (x) => Math.round(x * 10) / 10;
+    out.push({
+      hi: r1(mean(hs)), lo: r1(mean(ls)),
+      p10: r1(quant(hs, 0.1)), p90: r1(quant(hs, 0.9)),
+      pr: Math.round(mean(rs) * 1000) / 1000,
+      wet: Math.round(rs.filter((x) => x >= WET).length / Math.max(1, rs.length) * 100) / 100
+    });
+  }
+  return out;
+}
+
+/* ---------- console log ---------- */
+function makeLog(el) {
+  const lines = [];
+  const pad = (name) => name + ' ' + '.'.repeat(Math.max(2, 16 - name.length)) + ' ';
+  const draw = () => {
+    el.innerHTML = lines.map((l) => {
+      if (l.status === 'msg') return `  <span class="err">${esc(l.detail)}</span>`;
+      if (l.status === 'wait') return `  ${esc(pad(l.name))}<span class="wait" aria-label="loading"></span>`;
+      const s = l.status === 'ok' ? '<b>ok</b>  ' : '<b>fail</b>';
+      return `  ${esc(pad(l.name))}${s}${l.detail ? '  ' + esc(l.detail) : ''}`;
+    }).join('\n');
+  };
+  return {
+    add(id, name) { lines.push({ id, name, status: 'wait', detail: '' }); draw(); },
+    set(id, status, detail) { const l = lines.find((x) => x.id === id); if (l) { l.status = status; l.detail = detail || ''; draw(); } },
+    msg(text) { lines.push({ id: 'm' + lines.length, name: '', status: 'msg', detail: text }); draw(); },
+    clear() { lines.length = 0; el.innerHTML = ''; }
+  };
+}
+
+/* ---------- model ---------- */
+function assemble(dates, srcs, norms) {
+  const det = srcs.filter((s) => s.kind === 'det');
+  const ens = srcs.filter((s) => s.kind === 'ens');
+  const nws = srcs.find((s) => s.kind === 'nws');
+  srcs.forEach((s) => { if (s.time) s.idx = new Map(s.time.map((t, i) => [t, i])); });
+  const val = (s, key, m, date) => {
+    const i = s.idx.get(date);
+    if (i == null || !s[key][m]) return null;
+    const v = s[key][m][i];
+    return isNum(v) ? v : null;
+  };
+  const detVals = (key, date) => {
+    const v = det.map((s) => val(s, key, 0, date)).filter(isNum);
+    if (nws && key !== 'pr' && isNum(nws[key][date])) v.push(nws[key][date]);
+    return v;
+  };
+
+  /* Each ensemble gets a fixed offset so its median matches the higher-resolution
+     models over days 2 to 8. This removes sampling bias (3 or 6-hourly output
+     can miss the true afternoon peak) before the long-range days are pooled. */
+  ens.forEach((s) => {
+    s.off = { hi: 0, lo: 0 };
+    ['hi', 'lo'].forEach((key) => {
+      const diffs = [];
+      for (let k = 1; k <= 7 && k < dates.length; k++) {
+        const ref = median(detVals(key, dates[k]));
+        const med = median(s[key].map((_, m) => val(s, key, m, dates[k])));
+        if (isNum(ref) && isNum(med)) diffs.push(ref - med);
+      }
+      if (diffs.length >= 3) s.off[key] = clamp(mean(diffs), -8, 8);
+    });
+  });
+
+  const rows = dates.map((date, d) => {
+    const eh = [], el = [], ep = [];
+    ens.forEach((s) => {
+      for (let m = 0; m < s.hi.length; m++) {
+        const h = val(s, 'hi', m, date); if (h != null) eh.push(h + s.off.hi);
+        const l = val(s, 'lo', m, date); if (l != null) el.push(l + s.off.lo);
+        const p = val(s, 'pr', m, date); if (p != null) ep.push(p);
+      }
+    });
+    const dh = detVals('hi', date), dl = detVals('lo', date), dp = detVals('pr', date);
+    const blend = (dv, ev) => {
+      const a = median(dv), b = ev.length >= 5 ? median(ev) : null;
+      if (a == null) return b;
+      if (b == null) return a;
+      const w = dv.length >= 2 ? 0.5 : 0.3;
+      return w * a + (1 - w) * b;
+    };
+    const hi = blend(dh, eh), lo = blend(dl, el);
+    let p10 = null, p90 = null;
+    if (eh.length >= 8) { const s = eh.slice().sort((a, b) => a - b); p10 = quant(s, 0.1); p90 = quant(s, 0.9); }
+    else if (dh.length >= 2) { p10 = Math.min(...dh); p90 = Math.max(...dh); }
+
+    const parts = [];
+    if (ep.length >= 8) parts.push(ep.filter((x) => x >= WET).length / ep.length);
+    const dpop = det.map((s) => s.pop && s.idx.has(date) ? s.pop[s.idx.get(date)] : null).filter(isNum);
+    if (dpop.length) parts.push(mean(dpop) / 100);
+    if (nws && isNum(nws.pop[date])) parts.push(nws.pop[date] / 100);
+    if (!parts.length && dp.length) parts.push(dp.filter((x) => x >= WET).length / dp.length);
+    const pop = parts.length ? clamp(mean(parts), 0, 1) : null;
+    const rain = mean(ep.length >= 8 ? ep : dp);
+    const rainIf = mean((ep.length >= 8 ? ep : dp).filter((x) => x >= WET));
+
+    const codes = det.map((s) => s.code && s.idx.has(date) ? s.code[s.idx.get(date)] : null).filter(isNum);
+    const wx = codes.length >= 2 && d < 10 ? wxWord(codes) : null;
+
+    const n = norms ? norms[doyOf(date)] : null;
+    let conf;
+    if (n && isNum(p10) && isNum(p90) && n.p90 > n.p10) conf = clamp(1 - (p90 - p10) / (n.p90 - n.p10), 0, 1);
+    else conf = clamp(1 - d / 30, 0, 1);
+    if (d <= 2) conf = Math.max(conf, 0.85);
+
+    const reach = det.filter((s) => val(s, 'hi', 0, date) != null).length
+      + ens.filter((s) => s.hi.some((_, m) => val(s, 'hi', m, date) != null)).length
+      + (nws && (isNum(nws.hi[date]) || isNum(nws.lo[date])) ? 1 : 0);
+
+    return { date, d, hi, lo, p10, p90, pop, rain, rainIf, wx, n, conf, reach, members: eh.length };
+  });
+
+  // per-source readings, used by the day panel
+  const perSource = (date) => {
+    const out = [];
+    if (nws && (isNum(nws.hi[date]) || isNum(nws.lo[date]))) out.push({ name: 'nws', hi: nws.hi[date], lo: nws.lo[date], pop: isNum(nws.pop[date]) ? nws.pop[date] / 100 : null });
+    det.forEach((s) => {
+      const h = val(s, 'hi', 0, date), l = val(s, 'lo', 0, date);
+      if (h == null && l == null) return;
+      const pp = s.pop && s.idx.has(date) ? s.pop[s.idx.get(date)] : null;
+      out.push({ name: s.name, hi: h, lo: l, pop: isNum(pp) ? pp / 100 : null });
+    });
+    ens.forEach((s) => {
+      const hs = [], ls = [], ps = [];
+      for (let m = 0; m < s.hi.length; m++) {
+        const h = val(s, 'hi', m, date); if (h != null) hs.push(h + s.off.hi);
+        const l = val(s, 'lo', m, date); if (l != null) ls.push(l + s.off.lo);
+        const p = val(s, 'pr', m, date); if (p != null) ps.push(p);
+      }
+      if (!hs.length) return;
+      const sh = hs.slice().sort((a, b) => a - b);
+      out.push({ name: s.name, hi: median(hs), lo: median(ls), pop: ps.length ? ps.filter((x) => x >= WET).length / ps.length : null, n: hs.length, r10: quant(sh, 0.1), r90: quant(sh, 0.9) });
+    });
+    return out;
+  };
+
+  return { rows, perSource, srcCount: srcs.length };
+}
+
+function wxWord(codes) {
+  const cat = (c) => c >= 95 ? 'storm' : (c >= 71 && c <= 77) || c === 85 || c === 86 ? 'snow'
+    : (c >= 61 && c <= 67) || (c >= 80 && c <= 82) ? 'rain' : c >= 51 && c <= 57 ? 'drizzle'
+    : c === 45 || c === 48 ? 'fog' : c === 3 ? 'cloudy' : c === 2 ? 'partly' : 'clear';
+  const rank = ['clear', 'partly', 'cloudy', 'fog', 'drizzle', 'rain', 'snow', 'storm'];
+  const count = {};
+  codes.forEach((c) => { const k = cat(c); count[k] = (count[k] || 0) + 1; });
+  return Object.keys(count).sort((a, b) => count[b] - count[a] || rank.indexOf(b) - rank.indexOf(a))[0];
+}
+
+
+/* ---------- render ---------- */
+const ink = (c) => (0.55 + 0.45 * c).toFixed(2);
+const inkCal = (c) => (0.66 + 0.34 * c).toFixed(2);
+const anomOf = (r) => r.n && isNum(r.hi) ? r.hi - r.n.hi : null;
+
+function stretch(rows) {
+  const an = rows.map(anomOf);
+  let best = { v: -Infinity, i: 0 }, worst = { v: Infinity, i: 0 };
+  for (let i = 0; i + 5 <= an.length; i++) {
+    const v = mean(an.slice(i, i + 5));
+    if (!isNum(v)) continue;
+    if (v > best.v) best = { v, i };
+    if (v < worst.v) worst = { v, i };
+  }
+  const warm = best.v >= 4, cool = worst.v <= -4;
+  if (!warm && !cool) return null;
+  const useWarm = warm && (!cool || best.v >= -worst.v);
+  const w = useWarm ? best : worst;
+  return { word: useWarm ? 'warmest' : 'coolest', range: rangeLabel(rows[w.i].date, rows[w.i + 4].date) };
+}
+
+function renderHero() {
+  const { rows, loc } = st.model;
+  const valid = rows.map(anomOf).filter(isNum);
+  const avg = valid.length >= 7 ? mean(valid) : null;
+  $('#head').textContent = avg == null ? 'The next 35 days'
+    : Math.round(avg) >= 2 ? 'Warmer than average' : Math.round(avg) <= -2 ? 'Cooler than average' : 'Close to average';
+  $('#where').innerHTML = [`${loc.name}, ${loc.region}`, 'next 35 days'].map((t) => `<span>${esc(t)}</span>`).join('');
+
+  const f = [];
+  if (avg != null) {
+    const r = Math.round(st.unit === 'c' ? avg * 5 / 9 : avg);
+    f.push(r === 0 ? '<i>highs</i><b>at average</b>' : `<i>highs</i><b>${TD(avg)}°</b> vs average`);
+  }
+  const wet = Math.round(rows.reduce((a, r) => a + (r.pop || 0), 0));
+  const nwet = rows.every((r) => r.n) ? Math.round(rows.reduce((a, r) => a + r.n.wet, 0)) : null;
+  f.push(`<i>rainy days</i><b>${wet}</b>${nwet != null ? ` (average ${nwet})` : ''}`);
+  const s = stretch(rows);
+  if (s) f.push(`<i>${s.word}</i><b>${s.range}</b>`);
+  $('#facts').innerHTML = f.map((x) => `<span>${x}</span>`).join('');
+}
+
+function renderWeek() {
+  const rows = st.model.rows.slice(0, 7);
+  const vals = [];
+  rows.forEach((r) => [r.hi, r.lo, r.n && r.n.hi, r.n && r.n.lo].forEach((v) => { if (isNum(v)) vals.push(v); }));
+  const mn = Math.min(...vals), mx = Math.max(...vals), span = Math.max(1, mx - mn);
+  const pos = (v) => ((v - mn) / span * 100).toFixed(1);
+  const wid = (a, b) => ((b - a) / span * 100).toFixed(1);
+  $('#week').innerHTML = rows.map((r, i) => {
+    const open = st.open === i;
+    const name = i === 0 ? 'today' : `${dowOf(r.date)} ${parseD(r.date).getUTCDate()}`;
+    const nm = r.n ? `<i class="nm" style="left:${pos(r.n.lo)}%;width:${wid(r.n.lo, r.n.hi)}%"></i>` : '';
+    const fc = isNum(r.hi) && isNum(r.lo) ? `<i class="fc" style="left:${pos(r.lo)}%;width:${wid(r.lo, r.hi)}%"></i>` : '';
+    const rain = isNum(r.pop) && r.pop >= 0.2 ? pct(r.pop) : '';
+    const aria = `${i === 0 ? 'today' : dowOf(r.date) + ' ' + label(r.date)}: high ${T(r.hi)}, low ${T(r.lo)}${rain ? ', ' + rain + ' chance of rain' : ''}`;
+    return `<li class="drow${open ? ' open' : ''}">`
+      + `<button type="button" class="dbtn" data-i="${i}" aria-expanded="${open}" aria-label="${esc(aria)}" style="--o:${ink(r.conf)}">`
+      + `<span class="dn">${name}</span><span class="wx">${r.wx || ''}</span>`
+      + `<span class="lo">${T(r.lo)}°</span><span class="rng">${nm}${fc}</span><span class="hi">${T(r.hi)}°</span>`
+      + `<span class="rain${isNum(r.pop) && r.pop >= 0.5 ? ' wet' : ''}">${rain}</span></button>`
+      + (open ? dayDetail(r) : '') + '</li>';
+  }).join('');
+}
+
+function dayDetail(r) {
+  const parts = [];
+  if (r.n) parts.push(`Average ${T(r.n.hi)}° / ${T(r.n.lo)}°.`);
+  if (isNum(r.p10) && isNum(r.p90)) parts.push(`Likely high ${T(r.p10)}° to ${T(r.p90)}°.`);
+  parts.push(`${r.reach} of ${st.model.srcCount} sources.`);
+  const pad = (name) => name + ' ' + '.'.repeat(Math.max(2, 13 - name.length)) + ' ';
+  const lines = st.model.perSource(r.date).map((s) => {
+    const t = `${(T(s.hi) || '-').padStart(3)} / ${(T(s.lo) || '-').padEnd(3)}`;
+    const p = isNum(s.pop) ? pct(s.pop).padStart(5) : '     ';
+    const extra = s.n ? `   ${s.n} runs` : '';
+    return `${esc(pad(s.name))}<b>${t}</b>${p}${extra}`;
+  });
+  return `<div class="ddet"><p>${parts.join(' ')}</p>${lines.length ? `<div class="src">${lines.join('\n')}</div>` : ''}</div>`;
+}
+
+function renderWeeks() {
+  const all = st.model.rows;
+  const out = [];
+  for (let w = 1; w < 5; w++) {
+    const rs = all.slice(w * 7, w * 7 + 7).filter((r) => isNum(r.hi));
+    if (!rs.length) continue;
+    const hi = mean(rs.map((r) => r.hi)), lo = mean(rs.map((r) => r.lo));
+    const nh = rs.every((r) => r.n) ? mean(rs.map((r) => r.n.hi)) : null;
+    const wet = rs.reduce((a, r) => a + (r.pop || 0), 0);
+    const nwet = rs.every((r) => r.n) ? rs.reduce((a, r) => a + r.n.wet, 0) : null;
+    const c = mean(rs.map((r) => r.conf));
+    let rain = `${Math.round(wet)} wet`;
+    let rcls = '';
+    if (isNum(nwet)) {
+      if (wet >= nwet + 1 && wet >= nwet * 1.25) { rain = 'wetter'; rcls = 'wetter'; }
+      else if (wet <= nwet - 1 && wet <= nwet * 0.75) rain = 'drier';
+      else rain = 'typical';
+    }
+    const a = isNum(nh) ? hi - nh : null;
+    let bar = '';
+    if (isNum(a)) {
+      const w2 = Math.max(1.5, Math.min(50, Math.abs(a) / 6 * 50)).toFixed(1);
+      bar = a >= 0 ? `<i class="warm" style="left:50%;width:${w2}%"></i>` : `<i class="cool" style="right:50%;width:${w2}%"></i>`;
+    }
+    const range = rangeLabel(rs[0].date, rs[rs.length - 1].date);
+    const cw = confWord(c);
+    const aria = `${range}: highs ${isNum(a) ? TD(a) + ' degrees vs average' : T(hi)}, rain ${rain}, ${cw} confidence`;
+    out.push(`<li class="wrow" style="--o:${ink(c)}" aria-label="${esc(aria)}" title="${esc(range)}">`
+      + `<span class="wd">${label(rs[0].date)}</span>`
+      + `<span class="wa">${isNum(a) ? TD(a) + '°' : ''}</span>`
+      + `<span class="dv" aria-hidden="true">${bar}</span>`
+      + `<span class="whl">${T(hi)} / ${T(lo)}°</span>`
+      + `<span class="wr ${rcls}">${rain}</span>`
+      + `<span class="wc ${cw === 'low' ? 'low' : ''}">${cw}</span>`
+      + '</li>');
+  }
+  $('#weeks').innerHTML = out.join('');
+  const fade = all.find((r) => r.d >= 3 && r.conf < 0.3);
+  $('#wnote').textContent = 'Each week is compared with the 30-year average for the same dates. Confidence depends on how closely the forecasts agree.'
+    + (fade ? ` After ${label(addDays(fade.date, -1))}, read these as tendencies, not exact numbers.` : '');
+}
+
+function renderCal() {
+  const rows = st.model.rows;
+  const lead = (parseD(rows[0].date).getUTCDay() + 6) % 7;
+  let h = '';
+  for (let i = 0; i < lead; i++) h += '<div class="cell blank" aria-hidden="true"></div>';
+  rows.forEach((r, i) => {
+    const dn = parseD(r.date).getUTCDate();
+    const dl = i === 0 || dn === 1 ? label(r.date) : String(dn);
+    const p = isNum(r.pop) && r.pop >= 0.2 ? r.pop : 0;
+    const aria = `${dowOf(r.date)} ${label(r.date)}${i === 0 ? ', today' : ''}: high ${T(r.hi)}, low ${T(r.lo)}${p ? ', ' + pct(r.pop) + ' chance of rain' : ''}`;
+    h += `<button type="button" class="cell${i === 0 ? ' today' : ''}" data-i="${i}" aria-pressed="${st.sel === i}" aria-label="${esc(aria)}" style="--o:${inkCal(r.conf)};--rp:${p.toFixed(2)}">`
+      + `<span class="d">${dl}</span>`
+      + `<span class="hi v">${isNum(r.hi) ? T(r.hi) : '·'}</span>`
+      + `<span class="lo v">${T(r.lo)}</span>`
+      + `<span class="rn v${p >= 0.5 ? ' wet' : ''}">${p ? `<span class="rl">rain </span>${pct(p)}` : ''}</span>`
+      + '</button>';
+  });
+  const trail = (7 - ((lead + rows.length) % 7)) % 7;
+  for (let i = 0; i < trail; i++) h += '<div class="cell blank" aria-hidden="true"></div>';
+  $('#cal').innerHTML = h;
+}
+
+function readoutHTML(r) {
+  const name = r.d === 0 ? 'today' : `${dowOf(r.date)} ${label(r.date)}`;
+  const bits = [`<i>high</i>${T(r.hi)}°`, `<i>low</i>${T(r.lo)}°`];
+  if (isNum(r.pop)) bits.push(`<i>rain</i>${pct(r.pop)}`);
+  if (r.n) bits.push(`<i>average</i>${T(r.n.hi)}° / ${T(r.n.lo)}°`);
+  return `<b>${name}</b>` + bits.map((b) => `<span>${b}</span>`).join('');
+}
+
+function renderTrendReadout(hover) {
+  const k = hover != null ? hover : st.sel;
+  $('#readout2').innerHTML = k == null
+    ? '<span class="hint">Tap or hover the chart to read a date.</span>'
+    : readoutHTML(st.model.rows[k]);
+}
+
+function renderCalDetail() {
+  const el = $('#cdet');
+  const r = st.model.rows[st.sel];
+  el.className = 'cdet open';
+  const name = `${dowOf(r.date)} ${label(r.date)}`;
+  const when = r.d === 0 ? 'today' : r.d === 1 ? 'tomorrow' : `in ${r.d} days`;
+  const rainTxt = isNum(r.pop) ? `rain ${pct(r.pop)}` : '';
+
+  const kv = [];
+  if (r.n && isNum(r.hi)) {
+    const a = Math.round(cv(r.hi) - cv(r.n.hi));
+    kv.push(['vs average', a === 0 ? `right at the average high of ${T(r.n.hi)}°` : `${Math.abs(a)}° ${a > 0 ? 'warmer' : 'cooler'} than the average high of ${T(r.n.hi)}°`]);
+    kv.push(['average', `${T(r.n.hi)}° / ${T(r.n.lo)}°`]);
+  }
+  if (isNum(r.p10) && isNum(r.p90)) kv.push(['likely high', `${T(r.p10)}° to ${T(r.p90)}°`]);
+  if (isNum(r.pop) && r.pop >= 0.2 && isNum(r.rainIf)) kv.push(['rain', `${pct(r.pop)} chance, ${r.rainIf < 0.05 && st.unit !== 'c' ? 'light if it does' : 'about ' + P(r.rainIf) + ' if it does'}`]);
+  else if (isNum(r.pop)) kv.push(['rain', `${pct(r.pop)} chance, probably dry`]);
+  const cw = confWord(r.conf);
+  kv.push(['confidence', `${cw}, ${cw === 'high' ? 'the forecasts agree closely' : cw === 'medium' ? 'the forecasts roughly agree' : 'the forecasts disagree, treat it as a tendency'}`]);
+  const srcs = st.model.perSource(r.date);
+  const longOnly = srcs.length && srcs.every((s2) => s2.n);
+  kv.push(['sources', `${r.reach} of ${st.model.srcCount} reach this date${longOnly ? ', all long-range ensembles' : ''}`]);
+
+  const pad = (nm) => nm + ' ' + '.'.repeat(Math.max(2, 13 - nm.length)) + ' ';
+  const rowsTxt = srcs.map((s2) => {
+    const t = `${(T(s2.hi) || '-').padStart(3)} / ${(T(s2.lo) || '-').padEnd(3)}`;
+    const p = isNum(s2.pop) ? pct(s2.pop).padStart(6) : '      ';
+    const extra = s2.n ? `   ${s2.n} runs, high ${T(s2.r10)} to ${T(s2.r90)}` : '';
+    return `${esc(pad(s2.name))}<b>${t}</b>${p}${extra}`;
+  });
+  const head = `<span class="hd">${'source'.padEnd(15)}high / low  rain</span>`;
+
+  el.innerHTML = `<div class="cdet-top"><b>${name}</b><span class="ago">${when}</span></div>`
+    + `<div class="cdet-body">`
+    + `<div class="cdet-temp"><span class="h">${T(r.hi)}°</span><span class="l">${T(r.lo)}°</span>${rainTxt ? `<span class="r${r.pop >= 0.5 ? ' wet' : ''}">${rainTxt}</span>` : ''}</div>`
+    + `<dl class="kv">${kv.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl>`
+    + `</div>`
+    + (rowsTxt.length ? `<div class="src">${head}\n${rowsTxt.join('\n')}</div>` : '');
+}
+
+function setLine(i) {
+  const line = document.getElementById('selLine');
+  if (!line || !st.chartX) return;
+  if (i == null) { line.style.visibility = 'hidden'; return; }
+  const sx = st.chartX(i).toFixed(1);
+  line.setAttribute('x1', sx); line.setAttribute('x2', sx);
+  line.style.visibility = 'visible';
+}
+
+function renderChart() {
+  const rows = st.model.rows, el = $('#chart');
+  const W = Math.max(300, Math.round(el.clientWidth || 1000));
+  const H = W < 560 ? 200 : 240;
+  const m = { l: 34, r: 6, t: 8, b: 50 };
+  const pw = W - m.l - m.r, ph = H - m.t - m.b, n = rows.length;
+  const vals = [];
+  rows.forEach((r) => [r.hi, r.lo, r.p10, r.p90, r.n && r.n.hi, r.n && r.n.lo].forEach((v) => { if (isNum(v)) vals.push(cv(v)); }));
+  if (!vals.length) { el.innerHTML = ''; return; }
+  const step = st.unit === 'c' ? 5 : 10;
+  const lo = Math.floor((Math.min(...vals) - 1) / step) * step;
+  let hi = Math.ceil((Math.max(...vals) + 1) / step) * step;
+  if (hi - lo < step * 2) hi = lo + step * 2;
+  const x = (i) => m.l + (n > 1 ? i * pw / (n - 1) : pw / 2);
+  const yv = (v) => m.t + ph - (v - lo) / (hi - lo) * ph;
+  const y = (f) => yv(cv(f));
+  const f1 = (v) => v.toFixed(1);
+  const runs = (fn) => {
+    const out = []; let cur = [];
+    rows.forEach((r, i) => { if (fn(r)) cur.push(i); else if (cur.length) { out.push(cur); cur = []; } });
+    if (cur.length) out.push(cur);
+    return out;
+  };
+  let s = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Forecast high and low temperatures for the next ${n} days, with the likely range and the 30-year average">`
+    + '<defs><pattern id="dotband" width="3" height="3" patternUnits="userSpaceOnUse"><circle cx="1.5" cy="1.5" r="0.75" fill="#000"/></pattern></defs>';
+  for (let v = lo; v <= hi; v += step) {
+    s += `<line class="g" x1="${m.l}" x2="${W - m.r}" y1="${f1(yv(v))}" y2="${f1(yv(v))}"/><text x="${m.l - 6}" y="${f1(yv(v) + 4)}" text-anchor="end">${v}</text>`;
+  }
+  const ry = m.t + ph + 10, rh = 14;
+  rows.forEach((r, i) => {
+    if (parseD(r.date).getUTCDay() !== 1) return;
+    s += `<line class="g" x1="${f1(x(i))}" x2="${f1(x(i))}" y1="${m.t}" y2="${ry + rh}"/><text x="${f1(x(i))}" y="${H - 6}" text-anchor="middle">${label(r.date)}</text>`;
+  });
+  runs((r) => isNum(r.p10) && isNum(r.p90)).forEach((run) => {
+    const top = run.map((i) => `${f1(x(i))},${f1(y(rows[i].p90))}`);
+    const bot = run.slice().reverse().map((i) => `${f1(x(i))},${f1(y(rows[i].p10))}`);
+    s += `<polygon class="band" points="${top.concat(bot).join(' ')}"/>`;
+  });
+  runs((r) => r.n).forEach((run) => {
+    s += `<polyline class="norm" points="${run.map((i) => `${f1(x(i))},${f1(y(rows[i].n.hi))}`).join(' ')}"/>`;
+    s += `<polyline class="norm" points="${run.map((i) => `${f1(x(i))},${f1(y(rows[i].n.lo))}`).join(' ')}"/>`;
+  });
+  for (let i = 1; i < n; i++) {
+    const a = rows[i - 1], b = rows[i];
+    const op = (0.22 + 0.78 * (a.conf + b.conf) / 2).toFixed(2);
+    if (isNum(a.hi) && isNum(b.hi)) s += `<line class="hi" x1="${f1(x(i - 1))}" y1="${f1(y(a.hi))}" x2="${f1(x(i))}" y2="${f1(y(b.hi))}" stroke-opacity="${op}"/>`;
+    if (isNum(a.lo) && isNum(b.lo)) s += `<line class="lo" x1="${f1(x(i - 1))}" y1="${f1(y(a.lo))}" x2="${f1(x(i))}" y2="${f1(y(b.lo))}" stroke-opacity="${op}"/>`;
+  }
+  const bw = Math.max(2, Math.min(8, pw / n * 0.42));
+  rows.forEach((r, i) => {
+    if (!isNum(r.pop) || r.pop < 0.05) return;
+    const h = Math.max(1, r.pop * rh);
+    s += `<rect class="rain" x="${f1(x(i) - bw / 2)}" y="${f1(ry + rh - h)}" width="${f1(bw)}" height="${f1(h)}" fill-opacity="${(0.25 + 0.75 * r.conf).toFixed(2)}"/>`;
+  });
+  s += `<line class="base" x1="${m.l}" x2="${W - m.r}" y1="${ry + rh}" y2="${ry + rh}"/>`;
+  s += `<text x="${m.l - 6}" y="${ry + rh}" text-anchor="end">rain</text>`;
+  s += `<text x="${m.l + 4}" y="${m.t + 10}">°${st.unit.toUpperCase()}</text>`;
+  const sx = f1(x(st.sel == null ? 0 : st.sel));
+  s += `<line class="sel" id="selLine" x1="${sx}" x2="${sx}" y1="${m.t}" y2="${ry + rh}" style="visibility:${st.sel == null ? 'hidden' : 'visible'}"/>`;
+  s += `<rect class="hit" x="${m.l - 4}" y="0" width="${pw + 8}" height="${ry + rh}"/>`;
+  el.innerHTML = s + '</svg>';
+
+  const svg = el.querySelector('svg');
+  const pick = (ev) => {
+    const rect = svg.getBoundingClientRect();
+    const px = (ev.clientX - rect.left) * (W / rect.width);
+    return clamp(Math.round((px - m.l) / (pw / Math.max(1, n - 1))), 0, n - 1);
+  };
+  svg.addEventListener('pointermove', (ev) => { if (ev.pointerType === 'mouse') { const i = pick(ev); renderTrendReadout(i); setLine(i); } });
+  svg.addEventListener('pointerleave', () => { renderTrendReadout(); setLine(st.sel); });
+  svg.addEventListener('click', (ev) => { const i = pick(ev); if (i !== st.sel) select(i); });
+  st.chartX = x;
+}
+
+function renderSources() {
+  const pad = (name) => name + ' ' + '.'.repeat(Math.max(2, 16 - name.length)) + ' ';
+  const status = st.model.status;
+  $('#srclog').innerHTML = status.map((s) => {
+    let detail = s.detail || '';
+    if (s.ok && s.off && (TD(s.off.hi) !== '0' || TD(s.off.lo) !== '0')) detail += `  adjusted ${TD(s.off.hi)}° / ${TD(s.off.lo)}°`;
+    return `  ${esc(pad(s.name))}<b>${s.ok ? 'ok  ' : 'fail'}</b>${detail ? '  ' + esc(detail) : ''}`;
+  }).join('\n');
+  const okN = status.filter((s) => s.ok).length;
+  $('#srcsum').textContent = `${okN} of ${status.length} responded, updated ${st.model.updated}`;
+  const la = st.model.loc.lat.toFixed(4), lo = st.model.loc.lon.toFixed(4);
+  $('#cross').innerHTML = `Ensembles are shifted so their first week lines up with the higher-resolution models. Compare with the <a href="https://forecast.weather.gov/MapClick.php?lat=${la}&lon=${lo}" target="_blank" rel="noopener">NWS point forecast</a>, the <a href="https://www.cpc.ncep.noaa.gov/products/predictions/814day/" target="_blank" rel="noopener">CPC 8 to 14 day outlook</a>, or the <a href="https://www.cpc.ncep.noaa.gov/products/predictions/WK34/" target="_blank" rel="noopener">CPC week 3 to 4 outlook</a>.`;
+}
+
+function setStatus(mid, right) {
+  const m = document.getElementById('st-mid'), r = document.getElementById('st-r');
+  if (m) m.textContent = mid;
+  if (r) r.textContent = right || '';
+}
+
+function renderAll() {
+  if (!st.model) return;
+  const okN = st.model.status.filter((x) => x.ok).length;
+  setStatus(`${zipEl.value}  ${st.model.loc.name.toLowerCase()}, ${st.model.loc.region.toLowerCase()}`, `${okN}/${st.model.status.length} ok  ${st.model.updated}`);
+  renderHero();
+  renderWeek();
+  renderWeeks();
+  renderCal();
+  renderCalDetail();
+  renderTrendReadout();
+  renderChart();
+  renderSources();
+}
+
+function select(i) {
+  if (!st.model || i == null || i === st.sel) return;
+  st.sel = i;
+  document.querySelectorAll('#cal .cell[data-i]').forEach((c) => c.setAttribute('aria-pressed', String(+c.dataset.i === st.sel)));
+  renderCalDetail();
+  renderTrendReadout();
+  setLine(st.sel);
+}
+
+/* ---------- prompt placement ---------- */
+const form = $('#ask');
+
+/* ---------- run ---------- */
+let runId = 0;
+
+async function run(zip) {
+  const my = ++runId;
+  autoZip = zip;
+  store.set('lc:last', zip);
+  try { history.replaceState(null, '', '#' + zip); } catch (e) {}
+  zipEl.value = zip;
+  moveCur();
+  body.classList.remove('idle', 'ready');
+  body.classList.add('loading');
+  $('#out').hidden = true;
+  const L = makeLog($('#log'));
+  L.clear();
+  L.add('loc', 'locating');
+  setStatus(`${zip}  locating`, '');
+
+  let loc;
+  try { loc = await locate(zip); }
+  catch (e) {
+    if (my !== runId) return;
+    L.set('loc', 'fail', e.network ? 'blocked or offline' : '');
+    L.msg(e.network ? BLOCKED : `No place found for ${zip}. Check the 5-digit zip and try again.`);
+    setStatus(`${zip}  ${e.network ? 'offline' : 'no match'}`, '');
+    body.classList.remove('loading');
+    return;
+  }
+  if (my !== runId) return;
+  L.set('loc', 'ok', `${loc.name}, ${loc.region}`.toLowerCase());
+
+  const base = { latitude: loc.lat.toFixed(4), longitude: loc.lon.toFixed(4), timezone: 'auto', temperature_unit: 'fahrenheit', precipitation_unit: 'inch' };
+  const tasks = [];
+  let done = 0;
+  const tick = () => { done++; setStatus(`${zip}  loading`, `${done}/${tasks.length} sources`); };
+  const add = (key, name, fn, describe) => {
+    L.add(key, name);
+    tasks.push(fn().then(
+      (v) => { if (my === runId) { L.set(key, 'ok', describe(v)); tick(); } return { key, name, ok: true, v, detail: describe(v) }; },
+      (e) => { if (my === runId) { L.set(key, 'fail', e.message || 'error'); tick(); } return { key, name, ok: false, detail: e.message || 'error' }; }
+    ));
+  };
+
+  add('nws', 'nws', () => fetchNWS(loc.lat, loc.lon), (v) => `${v.span} days  office ${v.office.toLowerCase()}`);
+  DET.forEach((mdl) => add(mdl.key, mdl.name,
+    () => getJSON(qs(API.fc, { ...base, daily: 'temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,weather_code', forecast_days: 16, models: mdl.id }))
+      .then((j) => fromDaily(j, 'det', mdl)),
+    (v) => `${v.span} days`));
+  ENS.forEach((mdl) => add(mdl.key, mdl.name,
+    () => getJSON(qs(API.ens, { ...base, daily: 'temperature_2m_max,temperature_2m_min,precipitation_sum', forecast_days: mdl.days, models: mdl.id }))
+      .then((j) => fromDaily(j, 'ens', mdl)),
+    (v) => `${v.span} days  ${v.members} members`));
+  add('ec46', 'ecmwf ec46',
+    () => getJSON(qs(API.sea, { ...base, daily: 'temperature_2m_max,temperature_2m_min,precipitation_sum', forecast_days: DAYS + 1 }))
+      .then((j) => fromDaily(j, 'ens', { key: 'ec46', name: 'ecmwf ec46' })),
+    (v) => `${v.span} days  ${v.members} members`);
+
+  const nk = 'lc:norm:v1:' + loc.lat.toFixed(2) + ',' + loc.lon.toFixed(2);
+  const endY = new Date().getFullYear() - 1, startY = endY - 29;
+  add('norm', 'climate average', async () => {
+    const c = store.get(nk);
+    if (c && Array.isArray(c.n) && c.n.length === 365) return { n: c.n, cached: true };
+    const j = await getJSON(qs(API.arc, { ...base, start_date: `${startY}-01-01`, end_date: `${endY}-12-31`, daily: 'temperature_2m_max,temperature_2m_min,precipitation_sum' }), 30000);
+    const n = normalsFrom(j);
+    store.set(nk, { n });
+    return { n, cached: false };
+  }, (v) => v.cached ? '30 years  cached' : `30 years  ${startY} to ${endY}`);
+
+  const results = await Promise.all(tasks);
+  if (my !== runId) return;
+
+  const srcs = results.filter((r) => r.ok && r.key !== 'norm').map((r) => r.v);
+  const normR = results.find((r) => r.key === 'norm');
+  const norms = normR && normR.ok ? normR.v.n : null;
+  const timed = srcs.filter((s) => s.time && s.time.length);
+  if (!timed.length) {
+    L.msg(BLOCKED);
+    body.classList.remove('loading');
+    return;
+  }
+  const firsts = {};
+  timed.filter((s) => s.kind === 'det').concat(timed).forEach((s) => { firsts[s.time[0]] = (firsts[s.time[0]] || 0) + 1; });
+  const start = Object.keys(firsts).sort((a, b) => firsts[b] - firsts[a])[0] || localToday();
+  const dates = Array.from({ length: DAYS }, (_, i) => addDays(start, i));
+
+  const model = assemble(dates, srcs, norms);
+  model.loc = loc;
+  model.status = results.map((r) => ({ name: r.name, ok: r.ok, detail: r.detail, off: r.ok && r.v && r.v.off }));
+  model.updated = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).toLowerCase();
+  st.model = model;
+  st.sel = 0;
+  st.open = null;
+
+  body.classList.remove('loading');
+  body.classList.add('ready');
+  $('#out').hidden = false;
+  renderAll();
+}
+
+/* ---------- events ---------- */
+const zipEl = $('#zip');
+let autoZip = null;
+const curEl = document.querySelector('.cur');
+function moveCur() {
+  const n = typeof zipEl.selectionStart === 'number' && document.activeElement === zipEl ? zipEl.selectionStart : zipEl.value.length;
+  curEl.style.setProperty('--n', String(n));
+}
+['input', 'keyup', 'click', 'focus', 'blur', 'select'].forEach((ev) => zipEl.addEventListener(ev, () => requestAnimationFrame(moveCur)));
+zipEl.addEventListener('input', () => {
+  const v = zipEl.value.replace(/\D/g, '').slice(0, 5);
+  if (v !== zipEl.value) zipEl.value = v;
+  if (v.length < 5) autoZip = null;
+  else if (v !== autoZip) run(v);
+});
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const v = zipEl.value.replace(/\D/g, '');
+  if (/^\d{5}$/.test(v)) run(v);
+  else {
+    const L = makeLog($('#log'));
+    L.clear();
+    L.msg('Enter a 5-digit US zip code.');
+  }
+});
+$('#cal').addEventListener('click', (e) => {
+  const c = e.target.closest('.cell[data-i]');
+  if (!c) return;
+  select(+c.dataset.i);
+  {
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    $('#cdet').scrollIntoView({ block: 'nearest', behavior: reduce ? 'auto' : 'smooth' });
+  }
+});
+$('#week').addEventListener('click', (e) => {
+  const b = e.target.closest('.dbtn');
+  if (!b) return;
+  const i = +b.dataset.i;
+  st.open = st.open === i ? null : i;
+  renderWeek();
+  const nb = document.querySelector(`#week .dbtn[data-i="${i}"]`);
+  if (nb) nb.focus();
+});
+document.querySelectorAll('.units button').forEach((b) => b.addEventListener('click', () => {
+  st.unit = b.dataset.u;
+  store.set('lc:unit', st.unit);
+  document.querySelectorAll('.units button').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.u === st.unit)));
+  renderAll();
+}));
+$('#home').addEventListener('click', (e) => {
+  e.preventDefault();
+  runId++;
+  st.model = null;
+  autoZip = null;
+  try { history.replaceState(null, '', location.pathname + location.search); } catch (er) {}
+  body.className = 'idle';
+  $('#out').hidden = true;
+  $('#log').innerHTML = '';
+  zipEl.value = '';
+  setStatus('type a zip code', '');
+  zipEl.focus();
+  moveCur();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === '/' && document.activeElement !== zipEl) { e.preventDefault(); zipEl.focus(); zipEl.select(); }
+});
+let rt;
+window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if (st.model) renderChart(); }, 120); });
+
+document.querySelectorAll('.units button').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.u === st.unit)));
+const fromHash = (location.hash || '').replace(/\D/g, '').slice(0, 5);
+const first = /^\d{5}$/.test(fromHash) ? fromHash : store.get('lc:last');
+if (first && /^\d{5}$/.test(first)) run(first);
+else zipEl.focus();
+})();
+</script>
+</body>
+</html>

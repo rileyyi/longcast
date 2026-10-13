@@ -291,6 +291,8 @@ footer p{margin:0 0 4px}
 /* calendar: today in inverse like cal(1), selected day fully inverse */
 .cell[aria-pressed="true"]{background:var(--ink);color:var(--paper);box-shadow:none}
 .cell[aria-pressed="true"] .d,.cell[aria-pressed="true"] .lo,.cell[aria-pressed="true"] .rn{color:var(--paper)}
+.cell[aria-pressed="true"] .hi{color:var(--paper)}
+.cell::before{display:none !important}
 .cell.today[aria-pressed="true"] .d{background:var(--paper);color:var(--ink)}
 .cell:hover:not(.blank):not([aria-pressed="true"]){background:#f2f2f2}
 
@@ -404,12 +406,43 @@ footer{border-top:1px dashed #bdbdbd}
 @media (prefers-reduced-motion:reduce){
   *{transition:none !important;animation:none !important}
 }
+
+/* command-center modules: compact grid, expandable panels, restrained motion */
+.ask #horizon{font:inherit;font-size:var(--s);border:0;border-bottom:1px dashed var(--ink);border-radius:0;background:transparent;padding:2px 18px 2px 4px;color:var(--ink);align-self:baseline;cursor:pointer}
+.horizon-label{font-size:var(--s);color:var(--ink-2);margin-left:4px}
+.out{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(14px,1.5vw,26px);align-items:start}
+.out[hidden]{display:none}
+.out>.hero{grid-column:1/-1;min-width:0}
+.out>.month{grid-column:span 2;min-width:0}
+.out>.cols{display:contents}
+.out>.cols>.module{min-width:0;margin:0}
+.out>.trend{grid-column:span 2;min-width:0;margin:0}
+.out>.srcs{grid-column:span 1;min-width:0;margin:0;align-self:start}
+.module{margin:0;min-width:0}
+.module-title{position:relative;display:flex;align-items:baseline;gap:1ch;cursor:pointer;list-style:none;font-size:var(--m);font-weight:600;line-height:1.4;padding:0 0 10px;border-bottom:1px dashed #bdbdbd}
+.module-title::-webkit-details-marker{display:none}
+.module-title::before{content:"[-]";font-weight:400}
+.module:not([open])>.module-title::before{content:"[+]"}
+.module-title small{font-size:var(--s);font-weight:400;color:var(--ink-2);margin-left:auto}
+.module[open]>.module-title{animation:module-in .24s ease-out}
+.module .cal,.module .dow,.module .dhead,.module .whead{margin-top:10px}
+.module .note{margin-top:14px}
+@keyframes module-in{from{opacity:.65;transform:translateY(2px)}to{opacity:1;transform:translateY(0)}}
+.top::after{content:"";height:1px;position:absolute;left:0;right:0;bottom:-1px;background:repeating-linear-gradient(90deg,transparent 0 22px,var(--ink) 22px 24px,transparent 24px 40px);opacity:.22;animation:scanline 12s linear infinite}
+.top{position:relative}
+@keyframes scanline{from{background-position:0 0}to{background-position:160px 0}}
+.status .mode{animation:status-pulse 3.6s steps(1,end) infinite}
+@keyframes status-pulse{50%{opacity:.72}}
+@media(max-width:1100px){.out{grid-template-columns:repeat(2,minmax(0,1fr))}.out>.month,.out>.trend{grid-column:1/-1}.out>.srcs{grid-column:1/-1}}
+@media(max-width:680px){.out{grid-template-columns:minmax(0,1fr);gap:24px}.out>.month,.out>.trend,.out>.srcs{grid-column:1}.out>.cols{display:contents}.ask{gap:10px}.ask #horizon{max-width:6ch}.out>.hero{grid-column:1}.module.panel{padding:18px 8px 8px}.module-title{padding-bottom:8px}}
+@media(prefers-reduced-motion:reduce){.top::after,.status .mode{animation:none}}
+
 </style>
 </head>
 <body class="idle">
 <main>
   <header class="top" id="top">
-    <a class="mark" href="#" id="home">longcast</a><span class="tag">35-day outlook</span>
+    <a class="mark" href="#" id="home">longcast</a><span class="tag" id="tag">35-day outlook</span>
     <div class="units" role="group" aria-label="Temperature unit">
       <button type="button" data-u="f" aria-pressed="true">°F</button>
       <button type="button" data-u="c" aria-pressed="false">°C</button>
@@ -417,12 +450,12 @@ footer{border-top:1px dashed #bdbdbd}
   </header>
 
   <section class="ask" id="askwrap">
-    <form id="ask" autocomplete="off" novalidate aria-label="Find a 35-day outlook">
+    <form id="ask" autocomplete="off" novalidate aria-label="Find a weather outlook">
       <label for="zip" class="gt" aria-hidden="true">&gt;</label>
       <span class="zipwrap"><input id="zip" name="zip" inputmode="numeric" maxlength="5" pattern="[0-9]{5}" autocomplete="postal-code" placeholder="zip code" aria-label="US ZIP code, five digits" aria-describedby="ziphelp" spellcheck="false" title="Press / to jump here"><span class="cur" aria-hidden="true"></span></span>
-      <button type="submit" class="go" aria-label="Get outlook">enter</button>
+      <label class="horizon-label" for="horizon">days</label><select id="horizon" aria-label="Outlook length"><option value="14">14</option><option value="21">21</option><option value="35" selected>35</option></select><button type="submit" class="go" aria-label="Get outlook">enter</button>
     </form>
-    <p class="intro" id="ziphelp">A 35-day outlook for any US ZIP code. It pools nine open forecast sources, including the National Weather Service, and sets them against 30 years of local climate.</p>
+    <p class="intro" id="ziphelp">Choose 14, 21, or 35 days. Long-range daily forecast data beyond 35 days is not consistently available from these sources. Results compare available forecasts with 30 years of local climate.</p>
     <noscript><p class="intro" style="color:#000">This page needs JavaScript and network access. Download the file and open it in a web browser.</p></noscript>
     <div class="log" id="log" aria-live="polite"></div>
   </section>
@@ -434,36 +467,35 @@ footer{border-top:1px dashed #bdbdbd}
       <p class="facts" id="facts"></p>
     </div>
 
-    <section class="month panel">
-      <h2>next 35 days</h2>
+    <details class="module panel month" open><summary class="module-title" id="cal-title">calendar <small>next 35 days</small></summary>
       <div class="dow" aria-hidden="true"><span>mo</span><span>tu</span><span>we</span><span>th</span><span>fr</span><span>sa</span><span>su</span></div>
       <div class="cal" id="cal"></div>
       <div class="cdet" id="cdet" aria-live="polite"></div>
-    </section>
+    </details>
 
     <div class="cols">
-      <section class="panel">
-        <h2>this week</h2>
+      <details class="module panel" open>
+        <summary class="module-title">this week</summary>
         <div class="dhead" aria-hidden="true"><span></span><span></span><span class="r">low</span><span></span><span class="r">high</span><span class="r">rain</span></div>
         <ul class="list" id="week"></ul>
         <p class="note"><i class="sw sw-fc"></i>forecast low to high <i class="sw sw-nm"></i>average range for that date. Tap a day to compare sources.</p>
-      </section>
-      <section class="panel">
-        <h2>weeks ahead</h2>
+      </details>
+      <details class="module panel" open>
+        <summary class="module-title">weeks ahead</summary>
         <div class="whead" aria-hidden="true"><span>week of</span><span class="r vs">vs average</span><span class="scale"><span>cooler</span><span>warmer</span></span><span class="r whl">high/low</span><span>rain</span><span class="r">confidence</span></div>
         <ul class="list" id="weeks"></ul>
         <p class="note" id="wnote"></p>
-      </section>
+      </details>
     </div>
 
-    <section class="trend panel">
-      <h2>temperature trend</h2>
+    <details class="module panel trend" open>
+      <summary class="module-title">temperature trend</summary>
       <p class="readout" id="readout2"></p>
       <div class="chart" id="chart"></div>
       <p class="legend"><span><i class="l-fc"></i>forecast high and low</span><span><i class="l-band"></i>likely range of the high</span><span><i class="l-norm"></i>30-year average</span><span><i class="l-rain"></i>chance of rain</span></p>
-    </section>
+    </details>
 
-    <details class="srcs" id="srcs">
+    <details class="srcs" id="srcs" open>
       <summary>sources <small id="srcsum"></small></summary>
       <div class="log" id="srclog"></div>
       <p class="cross" id="cross"></p>
@@ -481,7 +513,7 @@ footer{border-top:1px dashed #bdbdbd}
 (() => {
 'use strict';
 
-const DAYS = 35;
+let DAYS = 35;
 const WET = 0.04;            // inches, about 1 mm: a "wet day"
 const API = {
   fc:  'https://api.open-meteo.com/v1/forecast',
@@ -836,10 +868,12 @@ function renderHero() {
   const { rows, loc } = st.model;
   const valid = rows.map(anomOf).filter(isNum);
   const avg = valid.length >= 7 ? mean(valid) : null;
-  $('#head').textContent = avg == null ? 'The next 35 days'
+  $('#head').textContent = avg == null ? `The next ${DAYS} days`
     : Math.round(avg) >= 2 ? 'Warmer than average' : Math.round(avg) <= -2 ? 'Cooler than average' : 'Close to average';
-  $('#where').innerHTML = [`${loc.name}, ${loc.region}`, 'next 35 days'].map((t) => `<span>${esc(t)}</span>`).join('');
+  $('#where').innerHTML = [`${loc.name}, ${loc.region}`, `next ${DAYS} days`].map((t) => `<span>${esc(t)}</span>`).join('');
 
+  $('#tag').textContent = `${DAYS}-day outlook`;
+  $('#cal-title small').textContent = `next ${DAYS} days`;
   const f = [];
   if (avg != null) {
     const r = Math.round(st.unit === 'c' ? avg * 5 / 9 : avg);
@@ -1271,7 +1305,7 @@ form.addEventListener('submit', (e) => {
   e.preventDefault();
   const v = zipEl.value.replace(/\D/g, '');
   if (/^\d{5}$/.test(v)) {
-    if (v !== autoZip || !st.model || st.model.loc.zip !== v) run(v);
+    if (v !== autoZip || !st.model || st.model.loc.zip !== v || st.model.rows.length !== DAYS) run(v);
   } else {
     const L = makeLog($('#log'));
     L.clear();

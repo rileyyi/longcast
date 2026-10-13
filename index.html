@@ -39,6 +39,9 @@ body{
 a{color:var(--ink);text-underline-offset:3px;text-decoration-thickness:1px}
 button{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+#zip[aria-invalid="true"]{box-shadow:inset 0 -2px 0 var(--ink)}
+.chart svg:focus-visible{outline-offset:4px}
+.status{padding-bottom:max(3px, env(safe-area-inset-bottom,0px))}
 main{max-width:1040px;margin:0 auto;padding:20px 32px 72px}
 
 /* header: mark, prompt (once loaded), units */
@@ -75,6 +78,8 @@ body:not(.idle) .intro{display:none}
 .log .wait::after{content:"";display:inline-block;width:.62em;height:1.05em;background:var(--ink);vertical-align:-3px;animation:blink 1s steps(1) infinite}
 @keyframes blink{50%{opacity:0}}
 body.ready #log{display:none}
+body.loading .out:not([hidden]){opacity:.78}
+body.loading .status .mode::after{content:' /';}
 
 /* output */
 .out[hidden]{display:none}
@@ -250,10 +255,13 @@ footer p{margin:0 0 4px}
 /* prompt with a terminal block cursor */
 .zipwrap{position:relative;display:inline-block}
 #zip,#zip:focus{box-shadow:none;caret-color:transparent}
-.cur{position:absolute;top:50%;left:calc(var(--n,0) * 1ch);width:1ch;height:1em;transform:translateY(-50%);
-  font-family:var(--mono);background:var(--ink);pointer-events:none;visibility:hidden}
+.cur{position:absolute;top:calc(50% + .42em);left:calc(var(--n,0) * 1ch);width:.62ch;height:2px;
+  background:var(--ink);transform:translateY(-50%);pointer-events:none;visibility:hidden;
+  animation:cursor-blink 1s steps(1,end) infinite}
 .ask .cur{font-size:var(--xxl)}
 .zipwrap:focus-within .cur{visibility:visible}
+@keyframes cursor-blink{50%{opacity:0}}
+@media(prefers-reduced-motion:reduce){.cur{animation:none}}
 .go{background:none;color:var(--ink);padding:0;font-size:var(--m)}
 .go::before{content:"[ "} .go::after{content:" ]"}
 .go:hover{background:var(--ink);color:var(--paper)}
@@ -369,6 +377,30 @@ footer{border-top:1px dashed #bdbdbd}
   .srcs{padding:10px 8px}
   .tag{display:none}
 }
+/* responsive command-center layout: spacious at desktop, compact on phones */
+@media (min-width:1200px){
+  :root{--s:clamp(12px,.72vw,15px);--m:clamp(14px,.88vw,18px);--l:clamp(20px,1.35vw,28px);--xl:clamp(38px,2.7vw,56px);--xxl:clamp(52px,4.3vw,88px)}
+  main{max-width:none;width:100%;min-height:100vh;padding:clamp(24px,3vw,56px) clamp(28px,4.2vw,88px) 90px}
+  .top{min-height:54px;padding-bottom:14px}
+  .ask{padding:clamp(100px,14vh,220px) 0 24px}
+  body:not(.idle) .ask{padding:32px 0 0}
+  .intro{max-width:64ch;margin-top:36px}
+  .hero{margin-top:24px}
+  .head{margin-top:34px}
+  .facts{gap:4px 3vw;margin-top:16px}
+  .month{margin-top:clamp(44px,5vh,72px)}
+  .cols{grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:clamp(28px,3vw,64px);margin-top:48px}
+  .trend,.srcs{margin-top:clamp(44px,5vh,72px)}
+  .panel{padding:28px 22px 18px}
+  .status{margin-left:calc(-1 * clamp(28px,4.2vw,88px));margin-right:calc(-1 * clamp(28px,4.2vw,88px));margin-bottom:-90px;padding:6px clamp(28px,4.2vw,88px) calc(6px + env(safe-area-inset-bottom,0px))}
+}
+@media (min-width:1800px){
+  .cols{grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr)}
+  .panel{padding:32px 28px 22px}
+}
+@media (max-width:1199px){
+  main{width:100%}
+}
 @media (prefers-reduced-motion:reduce){
   *{transition:none !important;animation:none !important}
 }
@@ -385,12 +417,12 @@ footer{border-top:1px dashed #bdbdbd}
   </header>
 
   <section class="ask" id="askwrap">
-    <form id="ask" autocomplete="off" novalidate>
+    <form id="ask" autocomplete="off" novalidate aria-label="Find a 35-day outlook">
       <label for="zip" class="gt" aria-hidden="true">&gt;</label>
-      <span class="zipwrap"><input id="zip" name="zip" inputmode="numeric" maxlength="5" placeholder="zip code" aria-label="US zip code" spellcheck="false" title="Press / to jump here"><span class="cur" aria-hidden="true"></span></span>
+      <span class="zipwrap"><input id="zip" name="zip" inputmode="numeric" maxlength="5" pattern="[0-9]{5}" autocomplete="postal-code" placeholder="zip code" aria-label="US ZIP code, five digits" aria-describedby="ziphelp" spellcheck="false" title="Press / to jump here"><span class="cur" aria-hidden="true"></span></span>
       <button type="submit" class="go" aria-label="Get outlook">enter</button>
     </form>
-    <p class="intro">A 35-day outlook for any US zip code. It pools nine open forecast sources, including the National Weather Service, and sets them against 30 years of local climate.</p>
+    <p class="intro" id="ziphelp">A 35-day outlook for any US ZIP code. It pools nine open forecast sources, including the National Weather Service, and sets them against 30 years of local climate.</p>
     <noscript><p class="intro" style="color:#000">This page needs JavaScript and network access. Download the file and open it in a web browser.</p></noscript>
     <div class="log" id="log" aria-live="polite"></div>
   </section>
@@ -442,7 +474,7 @@ footer{border-top:1px dashed #bdbdbd}
     <p>Forecast data from <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> (CC BY 4.0) and the <a href="https://www.weather.gov/" target="_blank" rel="noopener">National Weather Service</a>. Averages from ERA5 reanalysis via Open-Meteo.</p>
     <p>Long-range forecasts show tendencies, not promises. Not for safety-critical decisions.</p>
   </footer>
-  <div class="status" id="status" aria-hidden="true"><span class="mode">longcast</span><span id="st-mid">type a zip code</span><span class="r" id="st-r"></span></div>
+  <div class="status" id="status" role="status" aria-live="polite" aria-atomic="true"><span class="mode">longcast</span><span id="st-mid">type a zip code</span><span class="r" id="st-r"></span></div>
 </main>
 
 <script>
@@ -897,7 +929,7 @@ function renderWeeks() {
   }
   $('#weeks').innerHTML = out.join('');
   const fade = all.find((r) => r.d >= 3 && r.conf < 0.3);
-  $('#wnote').textContent = 'Each week is compared with the 30-year average for the same dates. Confidence depends on how closely the forecasts agree.'
+  $('#wnote').textContent = 'Compared with the 30-year average for the same dates. Confidence is a rough signal from model spread and forecast lead time, not a probability.'
     + (fade ? ` After ${label(addDays(fade.date, -1))}, read these as tendencies, not exact numbers.` : '');
 }
 
@@ -1010,7 +1042,7 @@ function renderChart() {
     if (cur.length) out.push(cur);
     return out;
   };
-  let s = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="img" aria-label="Forecast high and low temperatures for the next ${n} days, with the likely range and the 30-year average">`
+  let s = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="group" tabindex="0" aria-label="Temperature trend for the next ${n} days. Use left and right arrow keys to inspect dates; Home and End jump to the first and last date.">`
     + '<defs><pattern id="dotband" width="3" height="3" patternUnits="userSpaceOnUse"><circle cx="1.5" cy="1.5" r="0.75" fill="#000"/></pattern></defs>';
   for (let v = lo; v <= hi; v += step) {
     s += `<line class="g" x1="${m.l}" x2="${W - m.r}" y1="${f1(yv(v))}" y2="${f1(yv(v))}"/><text x="${m.l - 6}" y="${f1(yv(v) + 4)}" text-anchor="end">${v}</text>`;
@@ -1058,6 +1090,14 @@ function renderChart() {
   svg.addEventListener('pointermove', (ev) => { if (ev.pointerType === 'mouse') { const i = pick(ev); renderTrendReadout(i); setLine(i); } });
   svg.addEventListener('pointerleave', () => { renderTrendReadout(); setLine(st.sel); });
   svg.addEventListener('click', (ev) => { const i = pick(ev); if (i !== st.sel) select(i); });
+  svg.addEventListener('keydown', (ev) => {
+    if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(ev.key)) return;
+    ev.preventDefault();
+    const current = st.sel == null ? 0 : st.sel;
+    const next = ev.key === 'Home' ? 0 : ev.key === 'End' ? n - 1
+      : clamp(current + (ev.key === 'ArrowRight' ? 1 : -1), 0, n - 1);
+    if (next !== st.sel) select(next);
+  });
   st.chartX = x;
 }
 
@@ -1119,7 +1159,7 @@ async function run(zip) {
   moveCur();
   body.classList.remove('idle', 'ready');
   body.classList.add('loading');
-  $('#out').hidden = true;
+  // Keep the last successful forecast visible during refreshes and failed lookups.
   const L = makeLog($('#log'));
   L.clear();
   L.add('loc', 'locating');
@@ -1131,11 +1171,13 @@ async function run(zip) {
     if (my !== runId) return;
     L.set('loc', 'fail', e.network ? 'blocked or offline' : '');
     L.msg(e.network ? BLOCKED : `No place found for ${zip}. Check the 5-digit zip and try again.`);
-    setStatus(`${zip}  ${e.network ? 'offline' : 'no match'}`, '');
+    setStatus(`${zip}  ${e.network ? 'offline' : 'no match'}`, e.network ? 'check connection / retry' : 'check ZIP / retry');
     body.classList.remove('loading');
+    if (st.model) body.classList.add('ready');
     return;
   }
   if (my !== runId) return;
+  loc.zip = zip;
   L.set('loc', 'ok', `${loc.name}, ${loc.region}`.toLowerCase());
 
   const base = { latitude: loc.lat.toFixed(4), longitude: loc.lon.toFixed(4), timezone: 'auto', temperature_unit: 'fahrenheit', precipitation_unit: 'inch' };
@@ -1184,7 +1226,9 @@ async function run(zip) {
   const timed = srcs.filter((s) => s.time && s.time.length);
   if (!timed.length) {
     L.msg(BLOCKED);
+    setStatus(`${zip}  unavailable`, 'retry or check connection');
     body.classList.remove('loading');
+    if (st.model) body.classList.add('ready');
     return;
   }
   const firsts = {};
@@ -1218,17 +1262,23 @@ function moveCur() {
 zipEl.addEventListener('input', () => {
   const v = zipEl.value.replace(/\D/g, '').slice(0, 5);
   if (v !== zipEl.value) zipEl.value = v;
+  // A ZIP is queried only on explicit submit, matching the terminal-style [ enter ] control.
   if (v.length < 5) autoZip = null;
-  else if (v !== autoZip) run(v);
+  zipEl.removeAttribute('aria-invalid');
+  moveCur();
 });
 form.addEventListener('submit', (e) => {
   e.preventDefault();
   const v = zipEl.value.replace(/\D/g, '');
-  if (/^\d{5}$/.test(v)) run(v);
-  else {
+  if (/^\d{5}$/.test(v)) {
+    if (v !== autoZip || !st.model || st.model.loc.zip !== v) run(v);
+  } else {
     const L = makeLog($('#log'));
     L.clear();
-    L.msg('Enter a 5-digit US zip code.');
+    L.msg('Enter a 5-digit US ZIP code.');
+    zipEl.setAttribute('aria-invalid', 'true');
+    zipEl.focus();
+    setStatus('invalid input', 'enter 5 digits');
   }
 });
 $('#cal').addEventListener('click', (e) => {

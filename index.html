@@ -248,7 +248,7 @@ ul.list{list-style:none;margin:0;padding:0}
 .cdet-temp .r.wet{font-weight:600}
 .cdet-text p{margin:0 0 3px;font-size:var(--m)}
 .cdet-text p.sub{color:var(--ink-2)}
-.cdet .src{display:block;width:100%;box-sizing:border-box;grid-column:1/-1;margin-top:12px;padding-top:12px;border-top:1px dashed var(--rule);font-size:var(--s);white-space:pre-wrap;overflow-wrap:anywhere;word-break:normal;max-width:100%;overflow-x:auto;line-height:1.65;color:var(--ink-2)}
+.cdet .src{display:block;width:100%;box-sizing:border-box;grid-column:1/-1;margin-top:12px;padding-top:12px;border-top:1px dashed var(--rule);font-size:var(--s);white-space:normal;overflow-wrap:anywhere;word-break:normal;max-width:100%;min-width:0;overflow-x:hidden;line-height:1.65;color:var(--ink-2);container-type:inline-size}
 .cdet .src b{font-weight:400;color:var(--ink)}
 .cdet .src .hd{color:var(--ink-3)}
 .cdet .src-row{display:grid;grid-template-columns:minmax(0,1fr) 12ch 6ch 24ch;align-items:baseline;gap:10px;width:100%;min-width:0;padding:3px 0;box-sizing:border-box}
@@ -261,11 +261,29 @@ ul.list{list-style:none;margin:0;padding:0}
 .cdet .src-row.src-head{padding-bottom:5px;margin-bottom:3px;border-bottom:1px solid var(--rule)}
 .cdet .src-row.src-head>span{color:var(--ink-3);font-weight:400;text-align:right}.cdet .src-row.src-head>span:first-child{text-align:left}.cdet .src-row.src-head>span:last-child::before{content:"runs"}
 @media(max-width:760px){
-  .cdet .src-row{grid-template-columns:minmax(0,1fr) 9ch 4ch;gap:6px;font-size:12px}
+  .cdet .src-row{grid-template-columns:minmax(0,1fr) minmax(6.5ch,auto) minmax(3.5ch,auto);gap:6px;font-size:12px}
   .cdet .src-row .src-name{overflow:visible;white-space:normal;overflow-wrap:anywhere;line-height:1.4}
-  .cdet .src-row .src-extra{grid-column:1/-1;justify-content:flex-end;text-align:right;padding-left:0;white-space:normal;line-height:1.45}
-  .cdet .src-row .src-name::after,.cdet .src-row .src-temp::before,.cdet .src-row .src-rain::before,.cdet .src-row .src-extra::before{min-width:4px}
+  .cdet .src-row .src-extra{grid-column:1/-1;justify-content:flex-start;text-align:left;padding:2px 0 3px 0;white-space:normal;overflow-wrap:anywhere;line-height:1.45}
+  .cdet .src-row .src-name::after,.cdet .src-row .src-temp::before,.cdet .src-row .src-rain::before,.cdet .src-row .src-extra::before{min-width:0}
   .cdet .src-row.src-head>span:last-child{display:none}
+}
+/* Adapt to the source panel's actual width, not just the device viewport. */
+@container (max-width:560px){
+  .cdet .src-runs,.cdet .src-range,.cdet .src-row .src-extra{display:none}
+  .cdet .src-row{grid-template-columns:minmax(0,1fr) auto auto;gap:clamp(4px,1.5cqi,8px)}
+  .cdet .src-row .src-name::after,.cdet .src-row .src-temp::before,.cdet .src-row .src-rain::before,.cdet .src-row .src-extra::before{display:none}
+  .cdet .src-row .src-name{white-space:normal;overflow:visible;overflow-wrap:anywhere;min-width:0}
+  .cdet .src-row .src-temp,.cdet .src-row .src-rain{white-space:nowrap;gap:3px}
+  .cdet .src-row .src-extra{grid-column:1/-1;white-space:normal;overflow-wrap:anywhere;justify-content:flex-start;text-align:left;line-height:1.4;padding:2px 0 4px}
+  .cdet .src-row.src-head{font-size:11px}
+}
+@container (max-width:360px){
+  .cdet .src-row{grid-template-columns:minmax(0,1fr) auto;gap:5px}
+  .cdet .src-row .src-rain{grid-column:2;grid-row:2}
+  .cdet .src-row .src-temp{grid-column:2;grid-row:1}
+  .cdet .src-row .src-name{grid-column:1;grid-row:1}
+  .cdet .src-row .src-extra{grid-column:1/-1}
+  .cdet .src-row.src-head>span:nth-child(3){display:none}
 }
 .ascii-wrap{margin-top:12px;padding-top:9px;border-top:1px dashed var(--rule);font-size:var(--s);color:var(--ink-2)}
 .ascii-title{color:var(--ink);font-weight:600;margin-bottom:5px}
@@ -1235,7 +1253,7 @@ function renderCalDetail() {
   const rowsTxt = srcs.map((s2) => {
     const t = `${T(s2.hi) || '-'} / ${T(s2.lo) || '-'}`;
     const p = isNum(s2.pop) ? pct(s2.pop) : '—';
-    const extra = s2.n ? `${s2.n} runs, high ${T(s2.r10)} to ${T(s2.r90)}` : '';
+    const extra = s2.n ? `<span class="src-runs">${s2.n} runs, </span><span class="src-range">high ${T(s2.r10)} to ${T(s2.r90)}</span>` : '';
     return `<div class="src-row"><span class="src-name">${esc(s2.name)}</span><span class="src-temp">${t}</span><span class="src-rain">${p}</span><span class="src-extra">${extra}</span></div>`;
   });
   const head = `<div class="src-row src-head"><span>source</span><span>high / low</span><span>rain</span><span></span></div>`;

@@ -1636,4 +1636,580 @@ function renderCal() {
   for (let i = 0; i < lead; i++) h += '<div class="cell blank" aria-hidden="true"></div>';
   rows.forEach((r, i) => {
     const dn = parseD(r.date).getUTCDate();
-    const dl = i === 0 || dn === 1 ? `<span class="mo">${label(r.date).split(' ')[0]} 
+    const dl = i === 0 || dn === 1 ? `<span class="mo">${label(r.date).split(' ')[0]} </span>${dn}` : String(dn);
+    const p = isNum(r.pop) && r.pop >= 0.2 ? r.pop : 0;
+    const aria = `${dowOf(r.date)} ${label(r.date)}${i === 0 ? ', today' : ''}: high ${T(r.hi)}, low ${T(r.lo)}${p ? ', ' + pct(r.pop) + ' chance of ' + precipTypeLabel(r) : ''}`;
+    h += `<button type="button" class="cell${i === 0 ? ' today' : ''}" data-i="${i}" aria-pressed="${st.sel === i}" aria-label="${esc(aria)}" style="--o:${inkCal(r.conf)};--rp:${p.toFixed(2)}">`
+      + `<span class="dayhead"><span class="d">${dl}</span><span class="wxmini" aria-hidden="true">${tinyWx(r)}</span></span>`
+      + `<span class="hi v">${isNum(r.hi) ? T(r.hi) : '·'}</span>`
+      + `<span class="lo v">${T(r.lo)}</span>`
+      + `<span class="rn v${p >= 0.5 ? ' wet' : ''}">${p ? pct(p) : ''}</span>`
+      + '</button>';
+  });
+  const trail = (7 - ((lead + rows.length) % 7)) % 7;
+  for (let i = 0; i < trail; i++) h += '<div class="cell blank" aria-hidden="true"></div>';
+  $('#cal').innerHTML = h;
+}
+
+function readoutHTML(r) {
+  const name = r.d === 0 ? 'today' : `${dowOf(r.date)} ${label(r.date)}`;
+  const bits = [`<i>high</i>${T(r.hi)}°`, `<i>low</i>${T(r.lo)}°`];
+  if (isNum(r.pop)) bits.push(`<i>precip</i>${pct(r.pop)}`);
+  if (r.n) bits.push(`<i>average</i>${T(r.n.hi)}° / ${T(r.n.lo)}°`);
+  return `<b>${name}</b>` + bits.map((b) => `<span>${b}</span>`).join('');
+}
+
+function renderTrendReadout(hover) {
+  const k = hover != null ? hover : st.sel;
+  $('#readout2').innerHTML = k == null
+    ? '<span class="hint">Tap or hover the chart to read a date.</span>'
+    : readoutHTML(st.model.rows[k]);
+}
+
+function renderCalDetail() {
+  const el = $('#cdet');
+  const r = st.model.rows[st.sel];
+  el.className = 'cdet open';
+  const name = `${dowOf(r.date)} ${label(r.date)}`;
+  const when = r.d === 0 ? 'today' : r.d === 1 ? 'tomorrow' : `in ${r.d} days`;
+  const rainTxt = isNum(r.pop) ? `precip ${pct(r.pop)}` : '';
+
+  const kv = [];
+  if (r.n && isNum(r.hi)) {
+    const a = Math.round(cv(r.hi) - cv(r.n.hi));
+    kv.push(['vs average', a === 0 ? `right at the average high of ${T(r.n.hi)}°` : `${Math.abs(a)}° ${a > 0 ? 'warmer' : 'cooler'} than the average high of ${T(r.n.hi)}°`]);
+    kv.push(['average', `${T(r.n.hi)}° / ${T(r.n.lo)}°`]);
+  }
+  if (isNum(r.p10) && isNum(r.p90)) kv.push(['likely high', `${T(r.p10)}° to ${T(r.p90)}°`]);
+  if (isNum(r.l10) && isNum(r.l90)) kv.push(['likely low', `${T(r.l10)}° to ${T(r.l90)}°`]);
+  if (isNum(r.pop) && r.pop >= 0.2 && isNum(r.rainIf)) kv.push(['precip', `${pct(r.pop)} chance, ${r.rainIf < 0.05 && st.unit !== 'c' ? 'light if it does' : 'about ' + P(r.rainIf) + ' if it does'}`]);
+  else if (isNum(r.pop)) kv.push(['precip', `${pct(r.pop)} chance, probably dry`]);
+  const cw = confWord(r.conf);
+  kv.push(['confidence', `${cw}, ${cw === 'high' ? 'the forecasts agree closely' : cw === 'medium' ? 'the forecasts roughly agree' : 'the forecasts disagree, treat it as a tendency'}`]);
+  const srcs = st.model.perSource(r.date);
+  const longOnly = srcs.length && srcs.every((s2) => s2.n);
+  kv.push(['sources', `${r.reach} of ${st.model.srcCount} reach this date${longOnly ? ', all long-range ensembles' : ''}`]);
+
+  const rowsTxt = srcs.map((s2) => {
+    const t = `${T(s2.hi) || '-'} / ${T(s2.lo) || '-'}`;
+    const p = isNum(s2.pop) ? pct(s2.pop) : '-';
+    const extra = s2.n ? `<span class="src-runs">${s2.n} runs,</span><span class="src-range">high ${T(s2.r10)} to ${T(s2.r90)}${isNum(s2.q10) ? ',' : ''}</span>${isNum(s2.q10) ? `<span class="src-range">low ${T(s2.q10)} to ${T(s2.q90)}</span>` : ''}` : '';
+    return `<div class="src-row"><span class="src-name">${esc(s2.name)}</span><span class="src-temp">${t}</span><span class="src-rain">${p}</span><span class="src-extra">${extra}</span></div>`;
+  });
+  const head = `<div class="src-row src-head"><span>source</span><span>high / low</span><span>precip</span><span></span></div>`;
+
+  el.innerHTML = `<div class="cdet-top"><b>${name}</b><span class="ago">${when}</span></div>`
+    + `<div class="cdet-body">`
+    + `<div class="cdet-main"><div class="cdet-temp"><span class="h">${T(r.hi)}°</span><span class="l">${T(r.lo)}°</span>${rainTxt ? `<span class="r${r.pop >= 0.5 ? ' wet' : ''}">${rainTxt}</span>` : ''}</div><div class="cdet-text" style="margin-top:16px"><p class="selected-desc">${esc(dayDescription(r))}</p><p><span class="hint">day range</span> &nbsp; ${Math.abs(cv(r.hi)-cv(r.lo)).toFixed(0)}° between high and low</p><p class="sub">${isNum(r.pop) ? `${pct(r.pop)} precipitation probability` : 'Precipitation probability unavailable'}</p><p class="sub">${r.reach} of ${st.model.srcCount} forecast sources contribute to this date</p></div></div>`
+    + `<aside class="cdet-side"><dl class="kv">${kv.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl></aside>`
+    + `</div>`
+    + `${rowsTxt.length ? `<div class="src">${head}\n${rowsTxt.join('\n')}</div>` : ''}`;
+}
+
+function setLine(i) {
+  const line = document.getElementById('selLine');
+  if (!line || !st.chartX) return;
+  if (i == null) { line.style.visibility = 'hidden'; return; }
+  const sx = st.chartX(i).toFixed(1);
+  line.setAttribute('x1', sx); line.setAttribute('x2', sx);
+  line.style.visibility = 'visible';
+}
+
+function renderChart() {
+  const rows = st.model.rows, el = $('#chart');
+  const W = Math.max(300, Math.round(el.clientWidth || 1000));
+  const H = W < 560 ? 200 : 240;
+  const m = { l: 50, r: 6, t: 8, b: 50 };   // left margin leaves room for the "precip" label
+  const pw = W - m.l - m.r, ph = H - m.t - m.b, n = rows.length;
+  const vals = [];
+  rows.forEach((r) => [r.hi, r.lo, r.p10, r.p90, r.n && r.n.hi, r.n && r.n.lo].forEach((v) => { if (isNum(v)) vals.push(cv(v)); }));
+  if (!vals.length) { el.innerHTML = ''; return; }
+  const step = st.unit === 'c' ? 5 : 10;
+  const lo = Math.floor((Math.min(...vals) - 1) / step) * step;
+  let hi = Math.ceil((Math.max(...vals) + 1) / step) * step;
+  if (hi - lo < step * 2) hi = lo + step * 2;
+  const x = (i) => m.l + (n > 1 ? i * pw / (n - 1) : pw / 2);
+  const yv = (v) => m.t + ph - (v - lo) / (hi - lo) * ph;
+  const y = (f) => yv(cv(f));
+  const f1 = (v) => v.toFixed(1);
+  const runs = (fn) => {
+    const out = []; let cur = [];
+    rows.forEach((r, i) => { if (fn(r)) cur.push(i); else if (cur.length) { out.push(cur); cur = []; } });
+    if (cur.length) out.push(cur);
+    return out;
+  };
+  let s = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="group" tabindex="0" aria-label="Temperature trend for the next ${n} days. Use left and right arrow keys to inspect dates; Home and End jump to the first and last date.">`
+    + '<defs><pattern id="dotband" width="3" height="3" patternUnits="userSpaceOnUse"><circle cx="1.5" cy="1.5" r="0.85" fill="var(--ink)"/></pattern></defs>';
+  for (let v = lo; v <= hi; v += step) {
+    s += `<line class="g" x1="${m.l}" x2="${W - m.r}" y1="${f1(yv(v))}" y2="${f1(yv(v))}"/><text x="${m.l - 6}" y="${f1(yv(v) + 4)}" text-anchor="end">${v}</text>`;
+  }
+  const ry = m.t + ph + 10, rh = 14;
+  rows.forEach((r, i) => {
+    if (parseD(r.date).getUTCDay() !== 1) return;
+    s += `<line class="g" x1="${f1(x(i))}" x2="${f1(x(i))}" y1="${m.t}" y2="${ry + rh}"/><text x="${f1(x(i))}" y="${H - 6}" text-anchor="middle">${label(r.date)}</text>`;
+  });
+  runs((r) => isNum(r.p10) && isNum(r.p90)).forEach((run) => {
+    const top = run.map((i) => `${f1(x(i))},${f1(y(rows[i].p90))}`);
+    const bot = run.slice().reverse().map((i) => `${f1(x(i))},${f1(y(rows[i].p10))}`);
+    s += `<polygon class="band" points="${top.concat(bot).join(' ')}"/>`;
+  });
+
+  runs((r) => r.n).forEach((run) => {
+    s += `<polyline class="norm" points="${run.map((i) => `${f1(x(i))},${f1(y(rows[i].n.hi))}`).join(' ')}"/>`;
+    s += `<polyline class="norm" points="${run.map((i) => `${f1(x(i))},${f1(y(rows[i].n.lo))}`).join(' ')}"/>`;
+  });
+  for (let i = 1; i < n; i++) {
+    const a = rows[i - 1], b = rows[i];
+    const op = (0.22 + 0.78 * (a.conf + b.conf) / 2).toFixed(2);
+    if (isNum(a.hi) && isNum(b.hi)) s += `<line class="hi" x1="${f1(x(i - 1))}" y1="${f1(y(a.hi))}" x2="${f1(x(i))}" y2="${f1(y(b.hi))}" stroke-opacity="${op}"/>`;
+    if (isNum(a.lo) && isNum(b.lo)) s += `<line class="lo" x1="${f1(x(i - 1))}" y1="${f1(y(a.lo))}" x2="${f1(x(i))}" y2="${f1(y(b.lo))}" stroke-opacity="${op}"/>`;
+  }
+  const bw = Math.max(2, Math.min(8, pw / n * 0.42));
+  rows.forEach((r, i) => {
+    if (!isNum(r.pop) || r.pop < 0.05) return;
+    const h = Math.max(1, r.pop * rh);
+    s += `<rect class="rain" x="${f1(x(i) - bw / 2)}" y="${f1(ry + rh - h)}" width="${f1(bw)}" height="${f1(h)}" fill-opacity="${(0.25 + 0.75 * r.conf).toFixed(2)}"/>`;
+  });
+  s += `<line class="base" x1="${m.l}" x2="${W - m.r}" y1="${ry + rh}" y2="${ry + rh}"/>`;
+  s += `<text x="${m.l - 6}" y="${ry + rh}" text-anchor="end">precip</text>`;
+  s += `<text x="${m.l + 4}" y="${m.t + 10}">°${st.unit.toUpperCase()}</text>`;
+  const sx = f1(x(st.sel == null ? 0 : st.sel));
+  s += `<line class="sel" id="selLine" x1="${sx}" x2="${sx}" y1="${m.t}" y2="${ry + rh}" style="visibility:${st.sel == null ? 'hidden' : 'visible'}"/>`;
+  s += `<rect class="hit" x="${m.l - 4}" y="0" width="${pw + 8}" height="${ry + rh}"/>`;
+  el.innerHTML = s + '</svg>';
+
+  const svg = el.querySelector('svg');
+  const pick = (ev) => {
+    const rect = svg.getBoundingClientRect();
+    const px = (ev.clientX - rect.left) * (W / rect.width);
+    return clamp(Math.round((px - m.l) / (pw / Math.max(1, n - 1))), 0, n - 1);
+  };
+  svg.addEventListener('pointermove', (ev) => { if (ev.pointerType === 'mouse') { const i = pick(ev); renderTrendReadout(i); setLine(i); } });
+  svg.addEventListener('pointerleave', () => { renderTrendReadout(); setLine(st.sel); });
+  svg.addEventListener('click', (ev) => { const i = pick(ev); if (i !== st.sel) select(i); });
+  svg.addEventListener('keydown', (ev) => {
+    if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(ev.key)) return;
+    ev.preventDefault();
+    const current = st.sel == null ? 0 : st.sel;
+    const next = ev.key === 'Home' ? 0 : ev.key === 'End' ? n - 1
+      : clamp(current + (ev.key === 'ArrowRight' ? 1 : -1), 0, n - 1);
+    if (next !== st.sel) select(next);
+  });
+  st.chartX = x;
+}
+
+function renderSources() {
+  const pad = (name) => name + ' ' + '.'.repeat(Math.max(2, 16 - name.length)) + ' ';
+  const status = st.model.status;
+  $('#srclog').innerHTML = status.map((s) => {
+    let detail = s.detail || '';
+    if (s.ok && s.off && (TD(s.off.hi) !== '0' || TD(s.off.lo) !== '0')) detail += `  adjusted ${TD(s.off.hi)}° / ${TD(s.off.lo)}°`;
+    return `  ${esc(pad(s.name))}<b>${s.ok ? 'ok  ' : 'fail'}</b>${detail ? '  ' + esc(detail) : ''}`;
+  }).join('\n');
+  const okN = status.filter((s) => s.ok).length;
+  $('#srcsum').textContent = `${okN} of ${status.length} responded, updated ${st.model.updated}`;
+  const la = st.model.loc.lat.toFixed(4), lo = st.model.loc.lon.toFixed(4);
+  $('#cross').innerHTML = `Ensembles are shifted so their first week lines up with the higher-resolution models. Compare with the <a href="https://forecast.weather.gov/MapClick.php?lat=${la}&lon=${lo}" target="_blank" rel="noopener">NWS point forecast</a>, the <a href="https://www.cpc.ncep.noaa.gov/products/predictions/814day/" target="_blank" rel="noopener">CPC 8 to 14 day outlook</a>, or the <a href="https://www.cpc.ncep.noaa.gov/products/predictions/WK34/" target="_blank" rel="noopener">CPC week 3 to 4 outlook</a>.`;
+}
+
+function setStatus(mid, right) {
+  const m = document.getElementById('st-mid'), r = document.getElementById('st-r');
+  if (m) m.textContent = mid;
+  if (r) r.textContent = right || '';
+}
+
+function renderAll() {
+  if (!st.model) return;
+  const okN = st.model.status.filter((x) => x.ok).length;
+  const placeTxt = st.model.loc.via === 'coordinates' ? '' : [st.model.loc.name, st.model.loc.region].filter(Boolean).join(', ').toLowerCase();
+  setStatus(`${zipEl.value}${placeTxt ? '  ' + placeTxt : ''}`, `${okN}/${st.model.status.length} ok  ${st.model.updated}`);
+  renderHero();
+  renderWeek();
+  renderSignals();
+  renderWeeks();
+  renderCal();
+  renderCalDetail();
+  renderTrendReadout();
+  renderChart();
+  renderSources();
+}
+
+document.addEventListener('click', (e) => {
+  const b = e.target.closest && e.target.closest('#signals .signal-row[data-i]');
+  if (!b || !st.model) return;
+  const i = +b.dataset.i;
+  select(i);
+  const cell = document.querySelector(`#cal .cell[data-i="${i}"]`);
+  if (cell) cell.scrollIntoView({ block: 'nearest', behavior: window.matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth' });
+});
+
+function select(i) {
+  if (!st.model || i == null || i === st.sel) return;
+  st.sel = i;
+  document.querySelectorAll('#cal .cell[data-i]').forEach((c) => c.setAttribute('aria-pressed', String(+c.dataset.i === st.sel)));
+  renderCalDetail();
+  renderHeroDay();
+  renderTrendReadout();
+  setLine(st.sel);
+}
+
+/* ---------- prompt placement ---------- */
+const form = $('#ask');
+
+/* ---------- run ---------- */
+let runId = 0;
+
+async function run(query) {
+  const my = ++runId;
+  query = String(query || '').trim().replace(/\s+/g, ' ');
+  autoZip = query;
+  store.set('lc:last', query);
+  try { const th=(location.hash||'').match(/~[0-9a-f]{6}-[0-9a-f]{6}-\d{3}$/i); history.replaceState(null, '', '#' + encodeURIComponent(query) + (th ? th[0] : '')); } catch (e) {}
+  zipEl.value = query;
+  moveCur();
+  body.classList.remove('idle', 'ready');
+  body.classList.add('loading');
+  // Keep the last successful forecast visible during refreshes and failed lookups.
+  const L = makeLog($('#log'));
+  L.clear();
+  L.add('loc', 'locating');
+  setStatus(`${query}  locating`, '');
+
+  let loc;
+  try { loc = await locate(query); }
+  catch (e) {
+    if (my !== runId) return;
+    L.set('loc', 'fail', e.network ? 'blocked or offline' : '');
+    L.msg(e.network ? BLOCKED : `No place found for “${query}”. Try a more specific place, include the country, or enter latitude, longitude.`);
+    setStatus(`${query}  ${e.network ? 'offline' : 'no match'}`, e.network ? 'check connection / retry' : 'refine location / retry');
+    body.classList.remove('loading');
+    if (st.model) body.classList.add('ready');
+    return;
+  }
+  if (my !== runId) return;
+  loc.query = query;
+  L.set('loc', 'ok', `${loc.name}, ${loc.region}`.toLowerCase());
+  { const full = [loc.name, loc.region].filter(Boolean).join(', ');
+    $('#where').innerHTML = `<span title="${esc(full)}">${esc(full)}</span>`; }
+  drawMap(loc);
+
+  const base = { latitude: loc.lat.toFixed(4), longitude: loc.lon.toFixed(4), timezone: 'auto', temperature_unit: 'fahrenheit', precipitation_unit: 'inch' };
+  const tasks = [];
+  let done = 0;
+  const tick = () => { done++; setStatus(`${query}  loading`, `${done}/${tasks.length} sources`); };
+  const add = (key, name, fn, describe) => {
+    L.add(key, name);
+    tasks.push(fn().then(
+      (v) => { if (my === runId) { L.set(key, 'ok', describe(v)); tick(); } return { key, name, ok: true, v, detail: describe(v) }; },
+      (e) => { if (my === runId) { L.set(key, 'fail', e.message || 'error'); tick(); } return { key, name, ok: false, detail: e.message || 'error' }; }
+    ));
+  };
+
+  add('nws', 'nws', () => fetchNWS(loc.lat, loc.lon), (v) => `${v.span} days  office ${v.office.toLowerCase()}`);
+  add('yday', 'yesterday', () => getJSON(qs(API.fc, { ...base, daily: 'temperature_2m_max,temperature_2m_min,precipitation_sum,weather_code', past_days: 1, forecast_days: 1 }))
+    .then((j) => {
+      const d = j && j.daily;
+      if (!d || !d.time || !isNum(d.temperature_2m_max[0])) throw new Error('no data');
+      return { date: d.time[0], hi: d.temperature_2m_max[0], lo: d.temperature_2m_min[0], rain: d.precipitation_sum[0], pop: null, wx: isNum(d.weather_code[0]) ? wxWord([d.weather_code[0]]) : null };
+    }), () => 'for comparison with today');
+  DET.forEach((mdl) => add(mdl.key, mdl.name,
+    () => getJSON(qs(API.fc, { ...base, daily: 'temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,weather_code', forecast_days: 16, models: mdl.id }))
+      .then((j) => fromDaily(j, 'det', mdl)),
+    (v) => `${v.span} days`));
+  ENS.forEach((mdl) => add(mdl.key, mdl.name,
+    () => getJSON(qs(API.ens, { ...base, daily: 'temperature_2m_max,temperature_2m_min,precipitation_sum', forecast_days: mdl.days, models: mdl.id }))
+      .then((j) => fromDaily(j, 'ens', mdl)),
+    (v) => `${v.span} days  ${v.members} members`));
+  add('ec46', 'ecmwf ec46',
+    () => getJSON(qs(API.sea, { ...base, daily: 'temperature_2m_max,temperature_2m_min,precipitation_sum', forecast_days: DAYS + 1 }))
+      .then((j) => fromDaily(j, 'ens', { key: 'ec46', name: 'ecmwf ec46' })),
+    (v) => `${v.span} days  ${v.members} members`);
+
+  /* 30-year averages. The old version asked the archive for 30 full years in one request,
+     which Open-Meteo counts as roughly 780 calls and quickly hits the daily limit. This asks
+     only for the weeks the outlook covers, one small request per year (about 105 calls total),
+     keeps whatever it learns in a per-location cache, and falls back to NASA POWER if
+     Open-Meteo refuses. */
+  const nk = 'lc:norm:v2:' + loc.lat.toFixed(2) + ',' + loc.lon.toFixed(2);
+  const endY = new Date().getFullYear() - 1, startY = endY - 29;
+  const anchor = localToday();
+  const winFirst = addDays(anchor, -8), winLast = addDays(anchor, DAYS + 8);
+  const needDoys = Array.from({ length: DAYS + 2 }, (_, i) => doyOf(addDays(anchor, i - 1)));
+  add('norm', 'climate average', async () => {
+    const c = store.get(nk);
+    const cachedN = c && Array.isArray(c.n) && c.n.length === 365 ? c.n : null;
+    if (cachedN && needDoys.every((k) => cachedN[k])) return { n: cachedN, cached: true, years: c.years, via: c.via };
+
+    const shift = (iso, k) => `${+iso.slice(0, 4) - k}${iso.slice(4)}`.replace(/-02-29$/, '-02-28');
+    const acc = { time: [], temperature_2m_max: [], temperature_2m_min: [], precipitation_sum: [] };
+    const push = (t, h, l, r) => { acc.time.push(t); acc.temperature_2m_max.push(h); acc.temperature_2m_min.push(l); acc.precipitation_sum.push(r); };
+    let years = 0, limited = false, via = 'open-meteo';
+    const oneYear = async (k) => {
+      if (limited) return;
+      try {
+        const j = await getJSON(qs(API.arc, { ...base, start_date: shift(winFirst, k), end_date: shift(winLast, k), daily: 'temperature_2m_max,temperature_2m_min,precipitation_sum' }), 15000);
+        const d = j && j.daily;
+        if (!d || !Array.isArray(d.time)) return;
+        d.time.forEach((t, i) => push(t, d.temperature_2m_max[i], d.temperature_2m_min[i], d.precipitation_sum[i]));
+        years++;
+      } catch (e) { if (/429|limit/i.test(e.message || '')) limited = true; }
+    };
+    const ks = Array.from({ length: 30 }, (_, i) => i + 1);
+    for (let i = 0; i < ks.length && !limited; i += 6) await Promise.all(ks.slice(i, i + 6).map(oneYear));
+
+    if (years < 10) {
+      // Fallback: NASA POWER daily point data (MERRA-2), separate quota from Open-Meteo.
+      acc.time.length = acc.temperature_2m_max.length = acc.temperature_2m_min.length = acc.precipitation_sum.length = 0;
+      const url = `https://power.larc.nasa.gov/api/temporal/daily/point?parameters=T2M_MAX,T2M_MIN,PRECTOTCORR&community=AG`
+        + `&longitude=${loc.lon.toFixed(3)}&latitude=${loc.lat.toFixed(3)}&start=${startY}0101&end=${endY}1231&format=JSON`;
+      const pw = await getJSON(url, 30000);
+      const P0 = pw && pw.properties && pw.properties.parameter;
+      if (!P0 || !P0.T2M_MAX) throw new Error(limited ? 'open-meteo daily limit, nasa power empty' : 'no history returned');
+      const ok = (v) => isNum(v) && v > -900;
+      Object.keys(P0.T2M_MAX).forEach((k) => {
+        const h = P0.T2M_MAX[k], l = P0.T2M_MIN && P0.T2M_MIN[k], r = P0.PRECTOTCORR && P0.PRECTOTCORR[k];
+        push(`${k.slice(0, 4)}-${k.slice(4, 6)}-${k.slice(6, 8)}`, ok(h) ? h * 9 / 5 + 32 : null, ok(l) ? l * 9 / 5 + 32 : null, ok(r) ? r / 25.4 : null);
+      });
+      years = endY - startY + 1;
+      via = 'nasa power';
+    }
+    const fresh = normalsFrom({ daily: acc });
+    const need = new Set(needDoys);
+    const n = cachedN ? cachedN.map((x, k) => (need.has(k) ? fresh[k] || x : x || fresh[k])) : fresh;
+    store.set(nk, { n, years, via });
+    return { n, cached: false, years, via };
+  }, (v) => `${v.years || 30} years  ${v.via || 'open-meteo'}${v.cached ? '  cached' : ''}`);
+
+  const results = await Promise.all(tasks);
+  if (my !== runId) return;
+
+  const srcs = results.filter((r) => r.ok && r.key !== 'norm' && r.key !== 'yday').map((r) => r.v);
+  const normR = results.find((r) => r.key === 'norm');
+  const norms = normR && normR.ok ? normR.v.n : null;
+  const timed = srcs.filter((s) => s.time && s.time.length);
+  if (!timed.length) {
+    const limited = results.some((r) => !r.ok && /429|limit/i.test(r.detail || ''));
+    L.msg(limited ? 'Open-Meteo\'s free daily request limit is used up for this connection, so forecasts can\'t load right now. It resets every day; try again later.' : BLOCKED);
+    setStatus(`${query}  unavailable`, 'retry or check connection');
+    body.classList.remove('loading');
+    if (st.model) body.classList.add('ready');
+    return;
+  }
+  const firsts = {};
+  timed.forEach((s) => { firsts[s.time[0]] = (firsts[s.time[0]] || 0) + 1; });
+  const start = Object.keys(firsts).sort((a, b) => firsts[b] - firsts[a])[0] || localToday();
+  const dates = Array.from({ length: DAYS }, (_, i) => addDays(start, i));
+
+  const model = assemble(dates, srcs, norms);
+  model.loc = loc;
+  model.status = results.map((r) => ({ name: r.name, ok: r.ok, detail: r.detail, off: r.ok && r.v && r.v.off }));
+  const yd = results.find((r) => r.key === 'yday');
+  model.yday = yd && yd.ok && yd.v.date === addDays(dates[0], -1) ? yd.v : null;
+  model.updated = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).toLowerCase();
+  st.model = model;
+  st.sel = 0;
+  st.open = null;
+
+  body.classList.remove('loading');
+  body.classList.add('ready');
+  $('#out').hidden = false;
+  renderAll();
+}
+
+/* ---------- events ---------- */
+const zipEl = $('#zip');
+let fitZip = () => {};
+(() => {
+  // use the longest placeholder that fits the input at its current size
+  const options = [zipEl.getAttribute('placeholder') || 'city, postal code, or coordinates', 'city, zip, or lat, lon', 'city or zip', 'place'];
+  const ctx = document.createElement('canvas').getContext('2d');
+  const fit = () => {
+    const cs = getComputedStyle(zipEl);
+    ctx.font = `${cs.fontWeight} ${cs.fontSize} ${cs.fontFamily}`;
+    const room = zipEl.clientWidth - 4;
+    zipEl.setAttribute('placeholder', options.find((t) => ctx.measureText(t).width <= room) || options[options.length - 1]);
+  };
+  fitZip = fit;
+  fit();
+  let t;
+  window.addEventListener('resize', () => { clearTimeout(t); t = setTimeout(fit, 100); });
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+  if (window.ResizeObserver) new ResizeObserver(() => fit()).observe(zipEl);
+})();
+let autoZip = null;
+const curEl = document.querySelector('.cur');
+function moveCur() {
+  const n = typeof zipEl.selectionStart === 'number' && document.activeElement === zipEl ? zipEl.selectionStart : zipEl.value.length;
+  curEl.style.setProperty('--n', String(n));
+  curEl.style.setProperty('--sx', (zipEl.scrollLeft || 0) + 'px');   // follow the text when it scrolls
+}
+['input', 'keyup', 'click', 'focus', 'blur', 'select', 'scroll'].forEach((ev) => zipEl.addEventListener(ev, () => requestAnimationFrame(moveCur)));
+zipEl.addEventListener('input', () => {
+  const v = zipEl.value;
+  if (v.trim() !== autoZip) autoZip = null;
+  zipEl.removeAttribute('aria-invalid');
+  moveCur();
+});
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const v = zipEl.value.trim().replace(/\s+/g, ' ');
+  if (v) {
+    if (v !== autoZip || !st.model || st.model.loc.query !== v || st.model.rows.length !== DAYS) run(v);
+  } else {
+    const L = makeLog($('#log'));
+    L.clear();
+    L.msg('Enter a city, region, country, postal code, or latitude and longitude.');
+    zipEl.setAttribute('aria-invalid', 'true');
+    zipEl.focus();
+    setStatus('location needed', 'enter a place');
+  }
+});
+$('#cal').addEventListener('click', (e) => {
+  const c = e.target.closest('.cell[data-i]');
+  if (!c) return;
+  select(+c.dataset.i);
+});
+$('#week').addEventListener('click', (e) => {
+  const b = e.target.closest('.dbtn');
+  if (!b) return;
+  const i = +b.dataset.i;
+  st.open = st.open === i ? null : i;
+  renderWeek();
+  const nb = document.querySelector(`#week .dbtn[data-i="${i}"]`);
+  if (nb) nb.focus();
+});
+document.querySelectorAll('.units button[data-u]').forEach((b) => b.addEventListener('click', () => {
+  st.unit = b.dataset.u;
+  store.set('lc:unit', st.unit);
+  document.querySelectorAll('.units button[data-u]').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.u === st.unit)));
+  renderAll();
+}));
+$('#home').addEventListener('click', (e) => {
+  e.preventDefault();
+  runId++;
+  st.model = null;
+  autoZip = null;
+  try { history.replaceState(null, '', location.pathname + location.search); } catch (er) {}
+  body.className = 'idle';
+  $('#out').hidden = true;
+  $('#log').innerHTML = '';
+  $('#where').innerHTML = '';
+  drawMap(null);
+  zipEl.value = '';
+  setStatus('search any location', '');
+  zipEl.focus();
+  moveCur();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === '/' && document.activeElement !== zipEl) { e.preventDefault(); zipEl.focus(); zipEl.select(); }
+});
+let rt;
+window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if (st.model) renderChart(); }, 120); });
+
+// Theme controls: high-contrast derived text colors, in-page swatches, and shareable URL settings.
+const themeButton = document.getElementById('themeButton');
+const themePanel = document.getElementById('themePanel');
+const themeBg = document.getElementById('themeBg');
+const themeInk = document.getElementById('themeInk');
+const themeWeight = document.getElementById('themeWeight');
+const weightValue = document.getElementById('weightValue');
+const bgChip = document.getElementById('bgChip');
+const inkChip = document.getElementById('inkChip');
+const themes = {
+  mono: {bg:'#ffffff',ink:'#000000',weight:400},
+  dark: {bg:'#101419',ink:'#e7edf2',weight:400},
+  cream: {bg:'#f3ead7',ink:'#352c20',weight:400},
+  seafoam: {bg:'#d9eee5',ink:'#174d43',weight:400},
+  blueyellow: {bg:'#173b70',ink:'#ffe66d',weight:450},
+  plum: {bg:'#251d2d',ink:'#e6c9ff',weight:400}
+};
+const palette = ['#ffffff','#f3ead7','#d9eee5','#b9d5f0','#173b70','#101419','#251d2d','#000000','#352c20','#174d43','#ffe66d','#e6c9ff'];
+function currentLocationFromHash(){ const raw=(location.hash||'').slice(1).replace(/~[0-9a-f]{6}-[0-9a-f]{6}-\d{3}$/i,''); try{return decodeURIComponent(raw);}catch(e){return raw;} }
+function updateShareHash(bg, ink, weight){
+  const place=currentLocationFromHash();
+  const suffix=`~${bg.slice(1).toLowerCase()}-${ink.slice(1).toLowerCase()}-${weight}`;
+  try { history.replaceState(null,'',location.pathname+location.search+'#'+(place?encodeURIComponent(place):'')+suffix); } catch(e) {}
+}
+function validHex(v){ return /^#[0-9a-f]{6}$/i.test(v); }
+function rgb(hex){return [1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255).map(v=>v<=.04045?v/12.92:Math.pow((v+.055)/1.055,2.4));}
+function contrast(a,b){const l=c=>{const v=rgb(c);return .2126*v[0]+.7152*v[1]+.0722*v[2];};const x=l(a),y=l(b);return (Math.max(x,y)+.05)/(Math.min(x,y)+.05);}
+function accessibleInk(bg,ink){
+  if(contrast(bg,ink)>=4.5)return ink;
+  const black='#000000',white='#ffffff',target=contrast(bg,black)>=contrast(bg,white)?black:white;
+  let lo=0,hi=1,best=target;
+  for(let i=0;i<18;i++){const t=(lo+hi)/2;const c='#'+[1,3,5].map(k=>Math.round(parseInt(ink.slice(k,k+2),16)*(1-t)+parseInt(target.slice(k,k+2),16)*t).toString(16).padStart(2,'0')).join('');if(contrast(bg,c)>=4.5){best=c;hi=t;}else lo=t;}
+  return best;
+}
+function syncColorUI(bg,ink){
+  bgChip.style.background=bg; inkChip.style.background=ink;
+  document.querySelectorAll('#bgSwatches .color-swatch').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.color===bg.toLowerCase())));
+  document.querySelectorAll('#inkSwatches .color-swatch').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.color===ink.toLowerCase())));
+}
+function applyTheme(bg, ink, weight, name='custom', save=true, share=true) {
+  if(!validHex(bg)||!validHex(ink)) return;
+  bg=bg.toLowerCase(); ink=accessibleInk(bg,ink.toLowerCase()); weight=Math.max(200,Math.min(600,Number(weight)||400));
+  document.documentElement.style.setProperty('--paper', bg);
+  document.documentElement.style.setProperty('--ink', ink);
+  // Secondary text remains close to the chosen foreground, avoiding washed-out gray on saturated themes.
+  document.documentElement.style.setProperty('--ink-2','color-mix(in srgb,var(--ink) 88%,var(--paper))');
+  document.documentElement.style.setProperty('--ink-3','color-mix(in srgb,var(--ink) 72%,var(--paper))');
+  document.documentElement.style.setProperty('--base-weight', String(weight));
+  document.body.style.fontWeight=String(weight);
+  themeBg.value=bg; themeInk.value=ink; themeWeight.value=String(weight); weightValue.value=String(weight);
+  document.querySelectorAll('.theme-preset').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.theme===name)));
+  syncColorUI(bg,ink);
+  if(save){try{localStorage.setItem('lc:appearance',JSON.stringify({bg,ink,weight,name}));}catch(e){}}
+  if(share) updateShareHash(bg,ink,weight);
+}
+function makeSwatches(id, target){
+  const holder=document.getElementById(id);
+  palette.forEach(color=>{
+    const b=document.createElement('button'); b.type='button'; b.className='color-swatch'; b.style.setProperty('--swatch',color); b.dataset.color=color; b.setAttribute('aria-label',color); b.title=color;
+    b.addEventListener('click',()=>applyTheme(target==='bg'?color:themeBg.value,target==='ink'?color:themeInk.value,Number(themeWeight.value)));
+    holder.appendChild(b);
+  });
+}
+makeSwatches('bgSwatches','bg'); makeSwatches('inkSwatches','ink');
+function closeThemePanel(returnFocus=false){
+  if(themePanel.hidden)return;
+  themePanel.hidden=true;
+  themeButton.setAttribute('aria-expanded','false');
+  themeButton.textContent='theme +';
+  if(returnFocus)themeButton.focus();
+}
+function openThemePanel(){themePanel.hidden=false;themeButton.setAttribute('aria-expanded','true');themeButton.textContent='theme −';}
+themeButton.addEventListener('click',()=>{if(themePanel.hidden)openThemePanel();else closeThemePanel();});
+document.getElementById('closeTheme').addEventListener('click',()=>closeThemePanel(true));
+document.addEventListener('pointerdown',e=>{
+  if(!themePanel.hidden&&!themePanel.contains(e.target)&&!themeButton.contains(e.target))closeThemePanel();
+});
+document.querySelectorAll('.theme-preset').forEach(b=>b.addEventListener('click',()=>{const t=themes[b.dataset.theme];applyTheme(t.bg,t.ink,t.weight,b.dataset.theme);}));
+function editColor(which){const el=which==='bg'?themeBg:themeInk; if(validHex(el.value)) applyTheme(which==='bg'?el.value:themeBg.value,which==='ink'?el.value:themeInk.value,Number(themeWeight.value)); else el.setAttribute('aria-invalid','true');}
+[themeBg,themeInk].forEach((el,i)=>{el.addEventListener('change',()=>{editColor(i===0?'bg':'ink');el.removeAttribute('aria-invalid');});el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();editColor(i===0?'bg':'ink');}});});
+themeWeight.addEventListener('input',()=>applyTheme(themeBg.value,themeInk.value,Number(themeWeight.value)));
+document.getElementById('copyThemeUrl').addEventListener('click',async()=>{
+  const url=location.href;
+  try{await navigator.clipboard.writeText(url);document.getElementById('copyThemeUrl').textContent='copied';}
+  catch(e){const temp=document.createElement('textarea');temp.value=url;temp.style.position='fixed';temp.style.opacity='0';document.body.appendChild(temp);temp.select();try{document.execCommand('copy');document.getElementById('copyThemeUrl').textContent='copied';}catch(er){document.getElementById('copyThemeUrl').textContent='select URL';}temp.remove();}
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!themePanel.hidden)closeThemePanel(true);});
+// Restore explicit theme settings from the URL first, then local preference if no URL theme exists.
+const hashTheme=(location.hash||'').match(/~([0-9a-f]{6})-([0-9a-f]{6})-(\d{3})$/i);
+if(hashTheme){applyTheme('#'+hashTheme[1],'#'+hashTheme[2],Number(hashTheme[3]),'custom',false,false);}
+else {try{const saved=JSON.parse(localStorage.getItem('lc:appearance')||'null');if(saved&&validHex(saved.bg)&&validHex(saved.ink))applyTheme(saved.bg,saved.ink,Math.max(200,Math.min(600,Number(saved.weight)||400)),saved.name||'custom',false,true);}catch(e){}}
+document.querySelectorAll('.units button[data-u]').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.u === st.unit)));
+drawMap(null);
+(() => {
+  const main = document.querySelector('.askmain'), map = document.getElementById('locmap');
+  if (!main || !map) return;
+  const size = () => { map.style.setProperty('--mh', main.getBoundingClientRect().height + 'px'); requestAnimationFrame(() => { drawMap(); fitZip(); }); };
+  size();
+  if (window.ResizeObserver) new ResizeObserver(size).observe(main); else window.addEventListener('resize', size);
+})();
+const fromHash = currentLocationFromHash();
+const first = fromHash || store.get('lc:last');
+if (first && String(first).trim()) run(first);
+else zipEl.focus();
+})();
+</script>
+</body></html>

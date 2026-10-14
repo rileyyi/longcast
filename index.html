@@ -35,3 +35,1609 @@ body{
   background:var(--paper);color:var(--ink);
   font:var(--base-weight,400) var(--m)/1.6 var(--mono);
   font-variant-numeric:tabular-nums;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+a{color:var(--ink);text-underline-offset:3px;text-decoration-thickness:1px}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+#zip[aria-invalid="true"]{box-shadow:inset 0 -2px 0 var(--ink)}
+.chart svg:focus-visible{outline-offset:4px}
+.status{padding-bottom:max(3px, env(safe-area-inset-bottom,0px))}
+main{max-width:1040px;margin:0 auto;padding:20px 32px 72px}
+
+/* header: mark, prompt (once loaded), units */
+.top{position:relative;display:flex;align-items:center;gap:24px;min-height:44px;padding-bottom:8px;border-bottom:1px solid var(--ink)}
+.mark{font-weight:600;text-decoration:none}
+.units{display:flex;margin-left:auto}
+.units button{background:none;border:1px solid var(--ink);padding:0 9px;line-height:22px;cursor:pointer;font-size:var(--s)}
+.units button + button{border-left:0}
+.units button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.theme-toggle{background:transparent;border:1px solid var(--rule);padding:2px 8px;font-size:var(--s);cursor:pointer}
+.theme-toggle:hover,.theme-toggle:focus-visible{background:var(--wash)}
+#themePanel{position:absolute;z-index:20;right:32px;top:54px;width:min(360px,calc(100vw - 24px));padding:14px;background:var(--paper);border:1px solid var(--ink);box-shadow:0 8px 28px color-mix(in srgb,var(--ink) 12%,transparent)}
+.theme-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px}.theme-close{border:1px solid var(--rule-fixed);background:transparent;color:var(--ink);font:inherit;font-size:var(--s);padding:2px 7px;cursor:pointer}.theme-close:hover{background:var(--ink);color:var(--paper)}
+#themePanel[hidden]{display:none}
+.theme-presets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:10px 0 14px}
+.theme-preset{display:flex;align-items:center;gap:8px;text-align:left;border:1px solid var(--rule);background:var(--paper);color:var(--ink);padding:7px;cursor:pointer;font-size:var(--s)}
+.theme-preset[aria-pressed="true"]{border-color:var(--ink);outline:1px solid var(--ink);outline-offset:-3px}
+.swatch{width:20px;height:20px;display:inline-block;border:1px solid color-mix(in srgb,var(--ink) 25%,transparent);flex:none}
+.theme-controls{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.theme-control{display:flex;flex-direction:column;gap:4px;font-size:var(--s);color:var(--ink-2)}
+.theme-control{min-width:0;color:var(--ink)}
+.hex-entry{display:flex;align-items:center;gap:6px;border:1px solid var(--rule-fixed);padding:4px 6px;min-width:0}
+.color-chip{width:18px;height:18px;border:1px solid var(--rule-fixed);background:#fff;flex:none}
+.hex-entry input{width:100%;min-width:0;border:0;outline:none;background:transparent;color:var(--ink);font:inherit;font-size:var(--s);text-transform:uppercase}
+.color-swatches{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px;margin-top:7px}
+.color-swatch{height:19px;min-width:0;border:1px solid var(--rule-fixed);padding:0;cursor:pointer;background:var(--swatch)}
+.color-swatch[aria-pressed="true"]{outline:2px solid var(--ink);outline-offset:1px}
+.theme-share{display:flex;justify-content:space-between;align-items:center;gap:8px;border-top:1px solid var(--rule);padding-top:9px;margin-top:12px;font-size:var(--s);color:var(--ink-2)}
+.theme-share button{border:1px solid var(--rule-fixed);background:transparent;color:var(--ink);font:inherit;font-size:var(--s);padding:3px 7px;cursor:pointer}
+.theme-share button:hover{background:var(--ink);color:var(--paper)}
+.theme-weight{margin-top:12px;font-size:var(--s);color:var(--ink-2)}
+.theme-weight input{width:100%;accent-color:var(--ink)}
+@media(max-width:680px){#themePanel{position:fixed;top:58px;right:12px;max-height:calc(100dvh - 72px);overflow:auto}.theme-controls{grid-template-columns:1fr 1fr}}
+
+/* prompt */
+#ask{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin:0}
+.gt{font-weight:200;line-height:1.1}
+#zip{
+  font-family:var(--mono);font-weight:200;line-height:1.1;
+  padding:2px 0;border:0;border-radius:0;background:none;color:var(--ink);
+  box-shadow:inset 0 -1px 0 var(--ink);caret-color:var(--ink);
+}
+#zip::placeholder{color:var(--ink-3)}
+#zip:focus{outline:none;box-shadow:inset 0 -2px 0 var(--ink)}
+.go{background:var(--ink);color:var(--paper);border:0;padding:3px 10px;font-size:var(--s);cursor:pointer}
+.ask .gt,.ask #zip{font-size:var(--xxl)}
+.ask #zip{width:min(32ch,calc(100vw - 110px));max-width:100%;min-width:14ch}
+
+.ask{padding:120px 0 16px;transition:padding .3s ease}
+body:not(.idle) .ask{padding:28px 0 0}
+.intro{max-width:54ch;color:var(--ink-2);margin:28px 0 0}
+body:not(.idle) .intro{display:none}
+
+.log{margin:24px 0 0;font-size:var(--s);line-height:1.8;white-space:pre;overflow-x:auto;color:var(--ink-2)}
+.log:empty{display:none}
+.log b{font-weight:400;color:var(--ink)}
+.log .err{display:inline-block;white-space:normal;max-width:60ch;margin-top:6px;vertical-align:top;color:var(--ink)}
+.log .wait::after{content:"";display:inline-block;width:.62em;height:1.05em;background:var(--ink);vertical-align:-3px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+body.ready #log{display:none}
+body.loading .out:not([hidden]){opacity:.78}
+body.loading .status .mode::after{content:' /';}
+
+/* output */
+.out[hidden]{display:none}
+.hero{margin-top:8px}
+.where{margin:0;font-size:var(--m);color:var(--ink-2)}
+.where span{margin-right:3ch;white-space:nowrap}
+.head{margin:14px 0 0;font-size:var(--xl);font-weight:300;line-height:1.2;letter-spacing:-.01em}
+
+.facts{display:flex;flex-wrap:wrap;gap:2px 28px;margin:10px 0 0;font-size:var(--m);color:var(--ink-2)}
+.facts span{white-space:nowrap}
+.facts .hero-day{display:block;white-space:normal;flex-basis:100%;color:var(--ink);line-height:1.55;margin-bottom:8px}
+.facts .hero-day strong{font-weight:600}
+.facts .trend-label{display:block;flex-basis:100%;font-size:var(--s);text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);margin-top:2px}
+.facts b{font-weight:600;color:var(--ink)}
+
+.cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:56px;margin-top:44px}
+h2{margin:0;padding-top:8px;border-top:1px solid var(--ink);font-size:var(--m);font-weight:600;display:flex;justify-content:space-between;align-items:baseline}
+h2 small{font-size:var(--s);font-weight:400;color:var(--ink-2)}
+ul.list{list-style:none;margin:0;padding:0}
+
+/* this week */
+.drow{border-bottom:1px solid var(--rule)}
+.dbtn{
+  display:grid;grid-template-columns:var(--dcols);
+  align-items:center;column-gap:12px;width:100%;
+  padding:9px 0;border:0;background:none;text-align:left;cursor:pointer;
+}
+.dbtn > *{opacity:var(--o,1);line-height:20px}
+.dbtn:hover{background:linear-gradient(var(--wash),var(--wash)) no-repeat center/calc(100% + 16px) 100%}
+.drow.open .dbtn{background:linear-gradient(var(--wash),var(--wash)) no-repeat center/calc(100% + 16px) 100%}
+.dn{font-size:var(--m);white-space:nowrap}
+.drow:first-child .dn{font-weight:600}
+.dbtn .wx{font-size:var(--s);color:var(--ink-2);white-space:nowrap}
+.dbtn .lo{font-size:var(--m);color:var(--ink-2);text-align:right}
+.dbtn .hi{font-size:var(--m);font-weight:500;text-align:right}
+.dbtn .rain{font-size:var(--m);text-align:right;color:var(--ink-2)}
+.dbtn .rain.wet{color:var(--ink);font-weight:600}
+.rng{position:relative;height:12px}
+.rng::before{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:var(--rule)}
+.rng .nm{position:absolute;top:0;bottom:0;background:var(--norm)}
+.rng .fc{position:absolute;top:4px;bottom:4px;background:var(--ink);min-width:2px}
+.ddet{padding:2px 0 16px;font-size:var(--s);color:var(--ink-2)}
+.ddet p{margin:0}
+.ddet .src{margin-top:10px;white-space:pre;overflow-x:auto;line-height:1.8}
+.ddet .src b{font-weight:400;color:var(--ink)}
+
+/* weeks ahead */
+.wrow{
+  display:grid;grid-template-columns:var(--wcols);
+  align-items:center;column-gap:10px;padding:10px 0;border-bottom:1px solid var(--rule);
+}
+.wc{font-size:var(--m);text-align:right}
+.wc.low{color:var(--ink-2)}
+.wrow > *{opacity:var(--o,1)}
+.wd{font-size:var(--m);white-space:nowrap}
+.wa{font-size:var(--m);font-weight:500;text-align:right}
+.whl{font-size:var(--m);color:var(--ink-2);text-align:right;white-space:nowrap}
+.wr{font-size:var(--m);color:var(--ink-2)}
+.wr.wetter{color:var(--ink);font-weight:600}
+.dv{position:relative;height:8px}
+.dv::before{content:"";position:absolute;left:50%;top:-4px;bottom:-4px;width:1px;background:var(--ink-2);z-index:2}
+.dv::after{content:"";position:absolute;left:0;right:0;top:3px;height:1px;background:var(--rule)}
+.dv i{position:absolute;top:0;bottom:0;z-index:1}
+.dv .warm{background:var(--ink)}
+.dv .cool{border:1px solid var(--ink);background:var(--paper)}
+.conf{display:inline-flex;gap:3px;justify-content:flex-end}
+.conf i{width:6px;height:6px;border:1px solid var(--ink)}
+.conf i.on{background:var(--ink)}
+.note{margin:10px 0 0;font-size:var(--s);color:var(--ink-2);line-height:1.7}
+.sw{display:inline-block;width:16px;vertical-align:middle;margin-right:6px}
+.sw + .sw,.note .sw:not(:first-child){margin-left:14px}
+.sw-fc{height:4px;background:var(--ink)}
+.sw-nm{height:12px;background:var(--norm)}
+
+/* column labels */
+.dhead,.whead{display:grid;align-items:end;column-gap:10px;padding:8px 0 5px;font-size:var(--m);color:var(--ink-2);border-bottom:1px solid var(--rule)}
+.dhead > span,.whead > span{font-size:var(--s);line-height:1.3;white-space:nowrap}
+.dhead{grid-template-columns:var(--dcols)}
+.whead{grid-template-columns:var(--wcols)}
+.dhead .r,.whead .r{text-align:right}
+.whead .scale{display:flex;justify-content:space-between;gap:8px}
+.whead .vs{white-space:normal}
+
+/* month calendar */
+.dow,.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
+.month{margin-top:36px}
+.dow{margin-top:10px;font-size:var(--s);color:var(--ink-2);padding-bottom:5px;border-bottom:1px solid var(--ink)}
+.dow span{padding:0 8px}
+.cell{
+  position:relative;display:flex;flex-direction:column;align-items:flex-start;
+  min-height:80px;padding:6px 8px 7px;
+  border:0;border-bottom:1px solid #d6d6d6;background:none;text-align:left;cursor:pointer;
+}
+.cell.blank{cursor:default}
+.cell::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:radial-gradient(circle,var(--ink) .9px,transparent 1.3px);background-size:4px 4px;opacity:calc(var(--rp,0) * .42)}
+.cell > *{position:relative}
+.cell[aria-pressed="true"]::before{opacity:0}
+.cell:hover:not(.blank){background:#f8f8f8}
+.cell[aria-pressed="true"]{background:var(--wash);box-shadow:inset 0 0 0 1px var(--ink)}
+.cell:focus-visible{outline-offset:-2px}
+.cell .dayhead{display:flex;align-items:center;justify-content:space-between;gap:3px;width:100%;min-width:0;line-height:24px}
+.cell .d{font-size:var(--s);color:var(--ink-2);padding:0 4px;margin-left:-4px;white-space:nowrap}
+.cell .wxmini{display:block;width:24px;height:24px;min-width:24px;flex:0 0 24px;color:var(--ink-2);opacity:.95;overflow:visible}
+.cell .wxmini svg{display:block;width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.35;stroke-linecap:round;stroke-linejoin:round}
+.cell .wxmini .fill{fill:var(--paper);stroke:currentColor}
+.cell[aria-pressed="true"] .wxmini{color:var(--ink) !important}
+.cell.today .d{background:var(--ink);color:var(--paper)}
+.cell .v{opacity:var(--o,1)}
+.cell .hi{font-size:var(--l);font-weight:400;line-height:1.2;margin-top:4px}
+.cell .lo{font-size:var(--s);color:var(--ink-2);line-height:1.35}
+.cell .rn{margin-top:auto;padding-top:4px;font-size:var(--s);line-height:14px;color:var(--ink-2);white-space:nowrap}
+.cell .rn.wet{font-weight:600;color:var(--ink)}
+
+/* trend chart */
+.trend{margin-top:48px}
+.readout{margin:12px 0 6px;font-size:var(--m);min-height:1.6em;color:var(--ink-2)}
+.hint{color:var(--ink-3)}
+.cdet{margin-top:12px}
+.cdet > .hint{margin:0;font-size:var(--s)}
+.cdet.open{border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);padding:12px 0 14px}
+.cdet-top{display:flex;align-items:baseline;gap:14px}
+.cdet-top b{font-size:var(--m);font-weight:600}
+.cdet-top .ago{font-size:var(--s);color:var(--ink-2)}
+.cdet-top .x{margin-left:auto;background:none;border:1px solid var(--ink);font-size:var(--s);padding:0 9px;line-height:20px;cursor:pointer}
+.cdet-body{display:grid;grid-template-columns:minmax(0,.72fr) minmax(0,1.28fr);gap:16px 28px;margin-top:14px;align-items:start}
+/* Detail source comparison spans the full module width beneath both columns. */
+.cdet.open{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:28px}
+.cdet.open>.cdet-body{display:contents}
+.cdet.open>.cdet-top{grid-column:1/-1;grid-row:1;min-width:0}
+.cdet.open .cdet-main{grid-column:1;grid-row:2}
+.cdet.open .cdet-side{grid-column:2;grid-row:2}
+.cdet.open>.src{grid-column:1 / -1;grid-row:3;width:100%;min-width:0;box-sizing:border-box;justify-self:stretch;white-space:normal;overflow:visible;letter-spacing:0;line-height:1.65}
+@media(max-width:760px){
+  .cdet.open{display:block;}
+  .cdet.open>.cdet-body{display:grid;grid-template-columns:minmax(0,1fr);gap:16px;margin-top:14px}
+  .cdet.open .cdet-main,.cdet.open .cdet-side{grid-column:1;grid-row:auto}
+  .cdet.open>.src{display:block;width:100%;margin-top:16px;font-size:12px;line-height:1.75;white-space:normal;overflow:visible}
+  .cdet-text p{font-size:14px;line-height:1.5}
+.cdet-text .selected-desc{font-size:15px;line-height:1.55;color:var(--ink);margin:0 0 12px}
+  .cdet-side .kv{font-size:14px;grid-template-columns:minmax(0,.42fr) minmax(0,.58fr);gap:9px 12px}
+  .cdet-top b{font-size:15px}
+  .cdet-top .ago{font-size:12px}
+}
+.cdet-main{min-width:0;min-height:100%;padding-right:8px}.cdet-side{min-width:0;display:flex;flex-direction:column;gap:0}.cdet-side .kv{margin:0;text-align:left;grid-template-columns:minmax(8ch,.38fr) minmax(0,.62fr);gap:8px 14px;width:100%}.cdet-side .kv dt,.cdet-side .kv dd{text-align:left;min-width:0;overflow-wrap:anywhere;word-break:normal}.cdet .src{margin-top:18px;padding-top:12px;border-top:1px dashed var(--rule);font-size:var(--s);white-space:pre-wrap;overflow-wrap:anywhere;word-break:normal;max-width:100%;overflow-x:auto;line-height:1.7;color:var(--ink-2)}
+.cdet-temp{display:flex;align-items:baseline;gap:10px;white-space:nowrap}
+.cdet-temp .h{font-size:var(--xl);font-weight:200;line-height:1}
+.cdet-temp .l{font-size:var(--l);font-weight:300;color:var(--ink-2)}
+.cdet-temp .r{font-size:var(--m);margin-left:10px}
+.cdet-temp .r.wet{font-weight:600}
+.cdet-text p{margin:0 0 3px;font-size:var(--m)}
+.cdet-text p.sub{color:var(--ink-2)}
+.cdet .src{display:block;width:100%;box-sizing:border-box;grid-column:1/-1;margin-top:12px;padding-top:12px;border-top:1px dashed var(--rule);font-size:var(--s);white-space:normal;overflow-wrap:anywhere;word-break:normal;max-width:100%;min-width:0;overflow-x:hidden;line-height:1.65;color:var(--ink-2);container-type:inline-size}
+.cdet .src b{font-weight:400;color:var(--ink)}
+
+.cdet .src-row{display:grid;grid-template-columns:minmax(0,1fr) 12ch 6ch 24ch;align-items:baseline;gap:10px;width:100%;min-width:0;padding:3px 0;box-sizing:border-box}
+.cdet .src-row>span{min-width:0}
+.cdet .src-row .src-name{display:flex;align-items:baseline;gap:7px;white-space:nowrap;min-width:0;width:100%;overflow:hidden}
+.cdet .src-row .src-name::after,.cdet .src-row .src-temp::before,.cdet .src-row .src-rain::before,.cdet .src-row .src-extra::before{content:"";flex:1;min-width:8px;border-bottom:1px dotted var(--ink-3);transform:translateY(-3px)}
+.cdet .src-row .src-temp{display:flex;align-items:baseline;justify-content:flex-end;gap:7px;font-weight:600;color:var(--ink);white-space:nowrap;text-align:right;width:100%}
+.cdet .src-row .src-rain{display:flex;align-items:baseline;justify-content:flex-end;gap:7px;white-space:nowrap;text-align:right;width:100%}
+.cdet .src-row .src-extra{display:flex;align-items:baseline;justify-content:flex-end;gap:7px;white-space:nowrap;text-align:right;width:100%}
+.cdet .src-row.src-head{padding-bottom:5px;margin-bottom:3px;border-bottom:1px solid var(--rule)}
+.cdet .src-row.src-head>span{color:var(--ink-3);font-weight:400;text-align:right}.cdet .src-row.src-head>span:first-child{text-align:left}.cdet .src-row.src-head>span:last-child::before{content:"runs"}
+@media(max-width:760px){
+  .cdet .src-row{grid-template-columns:minmax(0,1fr) minmax(6.5ch,auto) minmax(3.5ch,auto);gap:6px;font-size:12px}
+  .cdet .src-row .src-name{overflow:visible;white-space:normal;overflow-wrap:anywhere;line-height:1.4}
+  .cdet .src-row .src-extra{grid-column:1/-1;justify-content:flex-start;text-align:left;padding:2px 0 3px 0;white-space:normal;overflow-wrap:anywhere;line-height:1.45}
+  .cdet .src-row .src-name::after,.cdet .src-row .src-temp::before,.cdet .src-row .src-rain::before,.cdet .src-row .src-extra::before{min-width:0}
+  .cdet .src-row.src-head>span:last-child{display:none}
+}
+/* Adapt to the source panel's actual width, not just the device viewport. */
+@container (max-width:560px){
+  .cdet .src-runs,.cdet .src-range,.cdet .src-row .src-extra{display:none}
+  .cdet .src-row{grid-template-columns:minmax(0,1fr) auto auto;gap:clamp(4px,1.5cqi,8px)}
+  .cdet .src-row .src-name::after,.cdet .src-row .src-temp::before,.cdet .src-row .src-rain::before,.cdet .src-row .src-extra::before{display:none}
+  .cdet .src-row .src-name{white-space:normal;overflow:visible;overflow-wrap:anywhere;min-width:0}
+  .cdet .src-row .src-temp,.cdet .src-row .src-rain{white-space:nowrap;gap:3px}
+  .cdet .src-row .src-extra{grid-column:1/-1;white-space:normal;overflow-wrap:anywhere;justify-content:flex-start;text-align:left;line-height:1.4;padding:2px 0 4px}
+  .cdet .src-row.src-head{font-size:11px}
+}
+@container (max-width:360px){
+  .cdet .src-row{grid-template-columns:minmax(0,1fr) auto;gap:5px}
+  .cdet .src-row .src-rain{grid-column:2;grid-row:2}
+  .cdet .src-row .src-temp{grid-column:2;grid-row:1}
+  .cdet .src-row .src-name{grid-column:1;grid-row:1}
+  .cdet .src-row .src-extra{grid-column:1/-1}
+  .cdet .src-row.src-head>span:nth-child(3){display:none}
+}
+
+
+
+
+.source-guide{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px 18px;margin-top:12px;padding-top:10px;border-top:1px dashed var(--rule)}
+.source-guide article{min-width:0}
+.source-guide b{display:block;color:var(--ink);font-size:var(--s);font-weight:600;margin-bottom:3px}
+.source-guide p{font-size:var(--s);color:var(--ink-2);margin:0;line-height:1.5}
+@media(max-width:760px){.source-guide{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.readout b{font-weight:600;color:var(--ink);margin-right:2ch}
+.readout span{margin-right:2.4ch;white-space:nowrap;display:inline-block}
+.chart{width:100%}
+.chart svg{display:block;max-width:100%;touch-action:pan-y}
+.chart .g{stroke:var(--rule);stroke-width:1}
+.chart .band{fill:var(--wash)}
+.chart .norm{fill:none;stroke:var(--ink-3);stroke-width:1;stroke-dasharray:2 3}
+.chart .hi{stroke:var(--ink);stroke-width:1.75;stroke-linecap:round}
+.chart .lo{stroke:var(--ink);stroke-width:1;stroke-linecap:round}
+.chart .rain{fill:var(--ink)}
+.chart .base{stroke:var(--ink);stroke-width:1}
+.chart .sel{stroke:var(--ink);stroke-width:1;stroke-dasharray:1 2}
+.chart .hit{fill:transparent;cursor:crosshair}
+.chart text{font-family:var(--mono);font-size:var(--s);fill:var(--ink-2)}
+.legend{display:flex;flex-wrap:wrap;gap:4px 24px;margin:10px 0 0;font-size:var(--s);color:var(--ink-2)}
+.legend span{display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.legend i{display:inline-block;width:18px}
+.legend .l-fc{height:2px;background:var(--ink)}
+.legend .l-band{height:9px;background:var(--wash)}
+.legend .l-norm{height:0;border-top:1px dashed var(--ink-3)}
+.legend .l-rain{width:4px;height:9px;background:var(--ink)}
+
+/* sources */
+.srcs{margin-top:48px;border-top:1px solid var(--ink);padding-top:10px}
+.srcs summary{cursor:pointer;font-size:var(--m);font-weight:600;list-style:none;display:flex;align-items:baseline;gap:16px}
+.srcs summary::-webkit-details-marker{display:none}
+.srcs summary small{font-weight:400;font-size:var(--s);color:var(--ink-2);margin-left:auto}
+.srcs summary::after{content:"+";font-weight:400;margin-left:12px}
+.srcs[open] summary::after{content:"-"}
+.srcs .log{margin-top:14px}
+.cross{font-size:var(--s);color:var(--ink-2);margin:16px 0 0;max-width:72ch}
+
+footer{margin-top:40px;padding-top:12px;border-top:1px solid var(--rule);font-size:var(--s);color:var(--ink-2);max-width:72ch}
+footer p{margin:0 0 4px}
+
+
+/* ================= console layer ================= */
+.top{border-bottom:1px solid var(--ink)}
+.mark{background:var(--ink);color:var(--paper);padding:0 8px;font-weight:600}
+
+.units{gap:0;font-size:var(--s)}
+.units button{border:0;padding:0 7px}
+.units button::before{content:"["} .units button::after{content:"]"}
+.units button[aria-pressed="true"]::before,.units button[aria-pressed="true"]::after{content:" "}
+
+/* prompt with a terminal block cursor */
+.zipwrap{position:relative;display:inline-block}
+#zip,#zip:focus{box-shadow:none;caret-color:transparent}
+.cur{position:absolute;top:calc(50% + .42em);left:calc(var(--n,0) * 1ch);width:.62ch;height:2px;
+  background:var(--ink);transform:translateY(-50%);pointer-events:none;visibility:hidden;
+  animation:cursor-blink 1s steps(1,end) infinite}
+.ask .cur{font-size:var(--xxl)}
+.zipwrap:focus-within .cur{visibility:visible}
+@keyframes cursor-blink{50%{opacity:0}}
+@media(prefers-reduced-motion:reduce){.cur{animation:none}}
+.go{background:none;color:var(--ink);padding:0;font-size:var(--m)}
+.go::before{content:"[ "} .go::after{content:" ]"}
+.go:hover{background:var(--ink);color:var(--paper)}
+
+/* comments */
+.intro::before,.note::before,.cross::before,footer p::before{content:"# ";color:var(--ink-3)}
+
+/* hero */
+.head{text-transform:lowercase}
+.facts i{font-style:normal}
+.facts i::after{content:":";margin-right:1ch}
+
+/* framed panels with titles on the border */
+.panel{position:relative;border:1px solid var(--ink);padding:20px 14px 12px}
+.panel > h2{position:absolute;top:0;left:10px;transform:translateY(-55%);margin:0;padding:0 6px;border:0;
+  background:var(--paper);display:block;font-size:var(--m);font-weight:600;line-height:1.4}
+.panel > h2::before{content:"[ "} .panel > h2::after{content:" ]"}
+.month{margin-top:36px}
+.cols{margin-top:36px;gap:28px}
+.trend,.srcs{margin-top:36px}
+
+/* rules become dashed */
+.drow,.wrow,.dhead,.whead{border-bottom-style:dashed;border-bottom-color:var(--rule-fixed)}
+.dow{margin-top:0;border-bottom:1px dashed var(--ink)}
+.cell{border-bottom:1px dashed var(--rule-fixed)}
+
+/* calendar: today in inverse like cal(1), selected day fully inverse */
+.cell[aria-pressed="true"]{background:#000 !important;color:#fff !important;box-shadow:none !important}
+.cell[aria-pressed="true"] *,.cell[aria-pressed="true"] .d,.cell[aria-pressed="true"] .lo,.cell[aria-pressed="true"] .rn,.cell[aria-pressed="true"] .hi,.cell.today[aria-pressed="true"] .d{color:#fff !important;background-color:transparent !important}
+.cell[aria-pressed="true"] .v{opacity:1 !important}
+.cell::before{display:none !important}
+
+.cell:hover:not(.blank):not([aria-pressed="true"]){background:var(--hover)}
+
+/* block-character bars */
+.rng::before{background:none;border-top:1px dashed #c4c4c4;height:0}
+.rng .nm,.sw-nm{background-color:transparent;background-image:radial-gradient(circle,#6e6e6e .85px,transparent 1.25px);background-size:3px 3px;background-position:0 0}
+.rng .fc,.sw-fc{background:repeating-linear-gradient(90deg,var(--ink) 0 5px,transparent 5px 7px)}
+.rng .fc{top:4px;bottom:4px;background:repeating-linear-gradient(90deg,var(--ink) 0 5px,var(--paper) 5px 7px);box-shadow:0 0 0 1px var(--paper)}
+.sw-fc{height:4px}
+.dv::after{background:none;border-top:1px dashed #c4c4c4;height:0}
+.dv .warm{background:repeating-linear-gradient(90deg,var(--ink) 0 5px,transparent 5px 7px)}
+.dv .cool{background-color:var(--paper);background-image:radial-gradient(circle,var(--ink) .85px,transparent 1.25px);background-size:3px 3px;border:1px solid var(--ink)}
+.drow.open .dbtn,.dbtn:hover{background:linear-gradient(var(--hover),var(--hover)) no-repeat center/calc(100% + 16px) 100%}
+
+/* readouts and details as key: value */
+.readout i,.kv dt{font-style:normal;color:var(--ink-2)}
+.readout i::after{content:":";margin-right:.6ch}
+.cdet.open{border-top:1px dashed var(--ink);border-bottom:0;padding:12px 0 2px;margin-top:0}
+.kv{display:grid;grid-template-columns:minmax(0,12ch) minmax(0,1fr);gap:4px 1.5ch;margin:0;min-width:0}
+.kv dt::after{content:":"}
+.kv dd{margin:0}
+
+/* chart */
+.chart .g{stroke:var(--rule-fixed);stroke-dasharray:1 3}
+.chart .band{fill:url(#dotband);opacity:.48}
+/* Theme-aware forecast shading: use the current foreground color for dots so it stays visible on dark themes. */
+.chart .band{stroke:var(--ink);stroke-width:.5;stroke-opacity:.55}
+.legend .l-band{background:radial-gradient(circle,var(--ink) .95px,transparent 1.4px) 0 0/3px 3px;opacity:.8}
+.legend .l-band{background:radial-gradient(circle,#000 .85px,transparent 1.25px) 0 0/3px 3px;opacity:.6}
+
+/* sources */
+.srcs{border:1px solid var(--ink);padding:10px 14px}
+.srcs summary{font-weight:600}
+.srcs summary::after{content:none}
+.srcs summary::before{content:"[+]";font-weight:400;margin-right:1ch}
+.srcs[open] summary::before{content:"[-]"}
+
+/* status line */
+.status{position:sticky;bottom:0;z-index:5;margin:40px -32px -72px;padding:3px 32px calc(3px + env(safe-area-inset-bottom,0px));
+  background:var(--ink);color:var(--paper);font-size:var(--s);display:flex;gap:3ch;white-space:nowrap;overflow:hidden}
+.status span{overflow:hidden;text-overflow:ellipsis;min-width:0}
+.status .mode,.status .r{flex-shrink:0}
+.status .r{margin-left:auto}
+.status .mode{background:var(--paper);color:var(--ink);padding:0 6px;margin-left:-6px}
+footer{border-top:1px dashed var(--rule-fixed)}
+
+@media (max-width:860px){
+  .cols{grid-template-columns:minmax(0,1fr);gap:48px}
+}
+@media (max-width:560px){
+  :root{--s:11px;--m:13px;--l:17px;--xl:28px;--xxl:40px}
+  main{padding:16px 16px 72px}
+  .top{gap:14px}
+  .ask{padding:72px 0 12px}
+  body:not(.idle) .ask{padding:32px 0 0}
+  .ask .gt,.ask #zip{font-size:var(--xxl)}
+  .head{font-size:var(--xl);margin-top:20px}
+  .month{margin-top:28px}
+  .facts{gap:2px 20px;font-size:var(--m)}
+  .cols{margin-top:36px;gap:36px}
+  :root{--dcols:6ch 5.5ch 3.5ch minmax(36px,1fr) 3.5ch 5.5ch 4ch;--wcols:6.5ch 6ch minmax(44px,1fr) 7ch 8.5ch}
+  .dbtn,.dhead,.whead{column-gap:8px}
+  .dbtn .wx{font-size:var(--s)}
+  .wrow{column-gap:8px;font-size:var(--m)}
+  .whead{font-size:var(--m)}
+  .whead > span{font-size:var(--s)}
+  .wd{font-size:var(--m)}
+  .whl{display:none}
+  .trend,.srcs{margin-top:36px}
+  .dow span{padding:0 4px}
+  .cell{min-height:64px;padding:4px 4px 5px}
+  .cell .d{font-size:var(--s);margin-left:-2px;padding:0 2px}
+  .cell .hi{font-size:var(--l);margin-top:4px}
+  .cell .lo{font-size:var(--s)}
+  .cell .rn{font-size:var(--s)}
+  .cell .rl{display:none}
+  .cell.today .d{padding:0 1px;margin-left:-1px;letter-spacing:-.03em}
+  .cdet-body{grid-template-columns:minmax(0,1fr);gap:16px}
+  .cdet-main{padding-right:0;padding-bottom:12px;border-bottom:1px dashed var(--rule)}
+  .cdet-side .kv{grid-template-columns:minmax(8ch,.36fr) minmax(0,.64fr);gap:8px 10px}
+  .cdet .src{font-size:var(--s);white-space:pre-wrap;overflow-wrap:anywhere}
+    }
+@media (max-width:560px){
+  .panel{padding:18px 8px 8px}
+  .panel > h2{left:6px}
+  .cell{padding:4px 3px 5px}
+  .status{margin:32px -16px -72px;padding-left:16px;padding-right:16px;gap:2ch}
+  
+  .kv{grid-template-columns:minmax(0,12ch) minmax(0,1fr)}
+  .srcs{padding:10px 8px}
+  
+}
+/* responsive command-center layout: spacious at desktop, compact on phones */
+@media (min-width:1200px){
+  :root{--s:clamp(12px,.72vw,15px);--m:clamp(14px,.88vw,18px);--l:clamp(20px,1.35vw,28px);--xl:clamp(38px,2.7vw,56px);--xxl:clamp(52px,4.3vw,88px)}
+  main{max-width:none;width:100%;min-height:100vh;padding:clamp(24px,3vw,56px) clamp(28px,4.2vw,88px) 90px}
+  .top{min-height:54px;padding-bottom:14px}
+  .ask{padding:clamp(100px,14vh,220px) 0 24px}
+  body:not(.idle) .ask{padding:32px 0 0}
+  .intro{max-width:64ch;margin-top:36px}
+  .hero{margin-top:24px}
+  .head{margin-top:34px}
+  .facts{gap:4px 3vw;margin-top:16px}
+  .month{margin-top:clamp(44px,5vh,72px)}
+  .cols{grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:clamp(28px,3vw,64px);margin-top:48px}
+  .trend,.srcs{margin-top:clamp(44px,5vh,72px)}
+  .panel{padding:28px 22px 18px}
+  .status{margin-left:calc(-1 * clamp(28px,4.2vw,88px));margin-right:calc(-1 * clamp(28px,4.2vw,88px));margin-bottom:-90px;padding:6px clamp(28px,4.2vw,88px) calc(6px + env(safe-area-inset-bottom,0px))}
+}
+@media (min-width:1800px){
+  .cols{grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr)}
+  .panel{padding:32px 28px 22px}
+}
+@media (max-width:1199px){
+  main{width:100%}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none !important;animation:none !important}
+}
+
+/* command-center modules: compact grid, expandable panels, restrained motion */
+.out{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(14px,1.5vw,26px);align-items:start}
+.out[hidden]{display:none}
+.out>.hero{grid-column:1/-1;min-width:0}
+.out>.month{grid-column:span 2;min-width:0}
+.out>.cols{display:contents}
+.out>.cols>.module{min-width:0;margin:0}
+.out>.trend{grid-column:span 2;min-width:0;margin:0}
+.out>.srcs{grid-column:span 1;min-width:0;margin:0;align-self:start}
+.module{margin:0;min-width:0}
+.module-title{position:relative;display:flex;align-items:baseline;gap:1ch;cursor:pointer;list-style:none;font-size:var(--m);font-weight:600;line-height:1.4;padding:0 0 10px;border-bottom:1px dashed var(--rule-fixed)}
+.module-title::-webkit-details-marker{display:none}
+.module-title::before{content:"[-]";font-weight:400}
+.module:not([open])>.module-title::before{content:"[+]"}
+.module-title small{font-size:var(--s);font-weight:400;color:var(--ink-2);margin-left:auto}
+.module[open]>.module-title{animation:module-in .24s ease-out}
+.module .cal,.module .dow,.module .dhead,.module .whead{margin-top:10px}
+.module .note{margin-top:14px}
+@keyframes module-in{from{opacity:.65;transform:translateY(2px)}to{opacity:1;transform:translateY(0)}}
+.top::after{content:"";height:1px;position:absolute;left:0;right:0;bottom:-1px;background:repeating-linear-gradient(90deg,transparent 0 22px,var(--ink) 22px 24px,transparent 24px 40px);opacity:.22;animation:scanline 12s linear infinite}
+.top{position:relative}
+@keyframes scanline{from{background-position:0 0}to{background-position:160px 0}}
+.status .mode{animation:status-pulse 3.6s steps(1,end) infinite}
+@keyframes status-pulse{50%{opacity:.72}}
+@media(max-width:1100px){.out{grid-template-columns:repeat(2,minmax(0,1fr))}.out>.month,.out>.trend{grid-column:1/-1}.out>.srcs{grid-column:1/-1}}
+@media(max-width:680px){.out{grid-template-columns:minmax(0,1fr);gap:24px}.out>.month,.out>.trend,.out>.srcs{grid-column:1}.out>.cols{display:contents}.ask{gap:10px}.out>.hero{grid-column:1}.module.panel{padding:18px 8px 8px}.module-title{padding-bottom:8px}}
+@media(prefers-reduced-motion:reduce){.top::after,.status .mode{animation:none}}
+
+/* desktop content sweet spot: fluid below the cap, centered above it */
+@media (min-width:1200px){
+  main{width:100%;max-width:1440px;margin-inline:auto}
+}
+
+/* desktop dashboard: calendar left, compact module stack right, trend and sources full-width at the bottom */
+.out{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-auto-flow:row;gap:12px;align-content:start}
+.out[hidden]{display:none}
+.out>.hero{grid-column:1/-1;grid-row:1;min-width:0;margin:0}
+.out>.month{grid-column:1;grid-row:2 / span 3;align-self:start;min-width:0;margin:0}
+.out>.cols{display:contents}
+.out>.cols>.module{grid-column:2;min-width:0;margin:0;align-self:stretch;box-sizing:border-box}
+.out>.cols>.module:nth-child(1){grid-row:2}
+.out>.cols>.module:nth-child(3){grid-row:3}
+.out>.cols>.module.signal{grid-row:4;min-height:0}
+.out>.trend{grid-column:1/-1;grid-row:5;min-width:0;margin:0}
+.out>.srcs{grid-column:1/-1;grid-row:6;min-width:0;margin:0;align-self:start}
+.module{margin:0;min-width:0}
+.module-title{position:relative;display:flex;align-items:baseline;gap:1ch;cursor:pointer;list-style:none;font-size:var(--m);font-weight:600;line-height:1.3;padding:0 0 6px;border-bottom:1px dashed var(--rule-fixed)}
+.module-title::-webkit-details-marker{display:none}
+.module-title::before{content:"[-]";font-weight:400}
+.module:not([open])>.module-title::before{content:"[+]"}
+.module-title small{font-size:var(--s);font-weight:400;color:var(--ink-2);margin-left:auto}
+.module[open]>.module-title{animation:module-in .24s ease-out}
+.module .cal,.module .dow,.module .dhead,.module .whead{margin-top:6px}
+.module .note{margin-top:6px}
+.module.panel{padding:10px 12px 8px}
+.signal-row{padding:4px 0}
+.signals{display:grid;grid-template-columns:1fr;gap:0;align-content:space-between;flex:1}
+.signal-row{display:grid;grid-template-columns:8ch minmax(0,1fr);gap:8px;padding:4px 0;border-bottom:1px solid var(--rule);align-items:baseline}
+.out>.cols>.module.signal{display:flex;flex-direction:column}
+.out>.cols>.module.signal .note{margin-top:auto;padding-top:8px}
+.signal-row:last-child{border-bottom:0}
+.signal-key{color:var(--ink-2);font-size:var(--s);text-transform:lowercase}
+.signal-value{font-size:var(--m);font-weight:600;overflow-wrap:anywhere}
+.signal-sub{display:block;color:var(--ink-2);font-size:var(--s);font-weight:400;margin-top:2px}
+.srcs{border:1px solid var(--ink);padding:8px 10px}
+.srcs summary{cursor:pointer;font-size:var(--m);font-weight:600;list-style:none;display:flex;align-items:baseline;gap:16px}
+.srcs summary::-webkit-details-marker{display:none}
+.srcs summary small{font-weight:400;font-size:var(--s);color:var(--ink-2);margin-left:auto}
+.srcs summary::before{content:"[+]";font-weight:400;margin-right:1ch}
+.srcs[open] summary::before{content:"[-]"}
+.srcs .log{margin-top:10px}
+.trend .chart{margin-top:4px;min-width:0;max-width:100%;overflow:hidden}
+.trend .chart svg{display:block;width:100%;max-width:100%;height:auto}
+.trend .legend{margin-top:4px;gap:3px 14px}
+@media(min-width:1100px) and (min-height:800px){
+  main{width:100%;max-width:1600px;margin-inline:auto;padding:10px 24px 18px}
+  .top{min-height:34px;padding-bottom:5px}
+  body:not(.idle) .ask{padding:8px 0 0}
+  .hero{margin-top:4px}
+  .head{margin-top:6px;font-size:clamp(28px,2vw,36px);line-height:1.1}
+  .facts{gap:2px 16px;margin-top:4px}
+  .out{gap:12px}
+  .module.panel{padding:9px 10px 8px}
+  .module-title{padding-bottom:4px;line-height:1.2}
+  .module .cal,.module .dow,.module .dhead,.module .whead{margin-top:4px}
+  .module .note{margin-top:4px}
+  .signal-row{padding:3px 0}
+  .out>.trend{margin-top:0}
+  .status{position:static;margin:8px 0 0;padding:5px 0 0}
+}
+@media(min-width:1100px) and (min-height:800px) and (max-height:950px){
+  main{padding-top:6px;padding-bottom:10px}
+  .head{font-size:clamp(26px,1.8vw,32px)}
+  .module.panel{padding:7px 9px 6px}
+  .signal-row{padding:2px 0}
+}
+@media(max-width:900px){
+  .out{grid-template-columns:minmax(0,1fr);gap:12px}
+  .out>.hero,.out>.month,.out>.cols>.module,.out>.srcs,.out>.trend{grid-column:1;grid-row:auto}
+  .out>.month{grid-row:auto}
+  .out>.cols{display:contents}
+  .out>.cols>.module:nth-child(1),.out>.cols>.module:nth-child(3),.out>.cols>.module.signal{grid-column:1;grid-row:auto}
+  .out>.trend,.out>.srcs{grid-column:1;grid-row:auto}
+  .module.panel{padding:16px 10px 10px}
+}
+@media(prefers-reduced-motion:reduce){.top::after,.status .mode,.module[open]>.module-title{animation:none}}
+
+/* calendar day header: chip padding, gap and icon scale with the cell, and the icon
+   drops under the date instead of spilling into the next day when there is no room */
+.cal{container-type:inline-size;container-name:cal}
+.cal .cell{--cw:calc(100cqi / 7);
+  padding-left:clamp(3px, calc(var(--cw) * .07), 8px);
+  padding-right:clamp(4px, calc(var(--cw) * .1), 10px)}
+.cal .cell .dayhead{flex-wrap:wrap;align-items:center;row-gap:2px;
+  column-gap:clamp(2px, calc(var(--cw) * .05), 6px);line-height:normal;min-width:0}
+.cal .cell .d{--chip:clamp(1px, calc(var(--cw) * .035), 4px);
+  padding:0 var(--chip);margin-left:calc(var(--chip) * -1);letter-spacing:normal;
+  line-height:clamp(14px, calc(var(--cw) * .2), 18px)}
+.cal .cell .wxmini{width:clamp(14px, calc(var(--cw) * .24), 24px);height:clamp(14px, calc(var(--cw) * .24), 24px);
+  min-width:0;flex:0 0 auto;margin-left:auto}
+.cal .cell .wxmini svg{width:100%;height:100%}
+/* when cells get too narrow for "oct 12" plus an icon, keep just the day number */
+@container cal (max-width: 640px){ .cal .cell .mo{display:none} }
+
+/* forecast signals: two even columns, label over value */
+.signals{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:0;align-content:start;flex:0 0 auto}
+.signal-row{display:flex;flex-direction:column;align-items:flex-start;gap:1px;min-width:0;
+  padding:7px 12px 7px 0;margin:0;border:0;border-bottom:1px dashed var(--rule-fixed);
+  background:none;font:inherit;color:inherit;text-align:left}
+.signal-row:nth-child(even){padding-left:12px;padding-right:0;border-left:1px dashed var(--rule-fixed)}
+.signal-row:nth-child(odd):nth-last-child(-n+2),.signal-row:nth-child(odd):nth-last-child(-n+2) + .signal-row{border-bottom:0}
+button.signal-row{cursor:pointer}
+button.signal-row:hover{background:var(--hover)}
+button.signal-row:focus-visible{outline-offset:-2px}
+.signal-key{font-size:var(--s);color:var(--ink-2);line-height:1.35;text-transform:lowercase}
+.signal-value{display:flex;flex-wrap:wrap;align-items:baseline;column-gap:1ch;font-size:var(--m);font-weight:600;line-height:1.35;overflow-wrap:normal}
+.signal-sub{display:inline;margin:0;font-size:var(--s);font-weight:400;color:var(--ink-2)}
+@media(min-width:1100px) and (min-height:800px){.signal-row{padding-top:4px;padding-bottom:4px}}
+@media(max-width:560px){.signal-row{padding-right:8px}.signal-row:nth-child(even){padding-left:8px}}
+
+/* hero: location, bold "overall trend", then the selected day at body size */
+.out .hero .facts{margin-top:6px}
+.out .hero .facts .trend-label{display:block;flex-basis:100%;font-size:var(--m);font-weight:700;color:var(--ink);
+  text-transform:none;letter-spacing:0;margin:0}
+.out .hero .head{font-size:var(--m);font-weight:600;line-height:1.55;letter-spacing:0;margin:12px 0 0;text-transform:none}
+.out .hero .hero-day{margin:2px 0 0;font-size:var(--m);line-height:1.55;color:var(--ink-2);max-width:80ch}
+
+
+/* this week: the 30-year average as numbers, next to the forecast high */
+.dbtn .avg{font-size:var(--s);color:var(--ink-2);text-align:right;white-space:nowrap}
+
+</style>
+</head>
+<body class="idle">
+<main>
+  <header class="top" id="top">
+    <a class="mark" href="#" id="home">longcast</a>
+    <div class="units" role="group" aria-label="Temperature unit">
+      <button type="button" data-u="f" aria-pressed="true">°F</button>
+      <button type="button" data-u="c" aria-pressed="false">°C</button>
+      <button type="button" id="themeButton" class="theme-toggle" aria-expanded="false" aria-controls="themePanel">theme +</button>
+    </div>
+    <section id="themePanel" aria-label="Appearance settings" hidden="">
+      <div class="theme-head"><div class="module-title">appearance <small>color / type</small></div><button type="button" id="closeTheme" class="theme-close" aria-label="Collapse theme picker">close ×</button></div>
+      <div class="theme-presets" id="themePresets">
+        <button class="theme-preset" type="button" data-theme="mono" aria-pressed="true"><span class="swatch" style="background:#fff;border-color:#000"></span>paper / ink</button>
+        <button class="theme-preset" type="button" data-theme="dark" aria-pressed="false"><span class="swatch" style="background:#101419;border-color:#e7edf2"></span>night console</button>
+        <button class="theme-preset" type="button" data-theme="cream" aria-pressed="false"><span class="swatch" style="background:#f3ead7;border-color:#352c20"></span>warm cream</button>
+        <button class="theme-preset" type="button" data-theme="seafoam" aria-pressed="false"><span class="swatch" style="background:#d9eee5;border-color:#174d43"></span>seafoam</button>
+        <button class="theme-preset" type="button" data-theme="blueyellow" aria-pressed="false"><span class="swatch" style="background:#173b70;border-color:#ffe66d"></span>signal / yellow</button>
+        <button class="theme-preset" type="button" data-theme="plum" aria-pressed="false"><span class="swatch" style="background:#251d2d;border-color:#e6c9ff"></span>plum terminal</button>
+      </div>
+      <div class="theme-controls">
+        <div class="theme-control"><label for="themeBg">background</label><div class="hex-entry"><span class="color-chip" id="bgChip" aria-hidden="true" style="background: rgb(255, 255, 255);"></span><input id="themeBg" type="text" value="#ffffff" maxlength="7" spellcheck="false" aria-label="Background hex color"></div><div class="color-swatches" id="bgSwatches" aria-label="Background color choices"><button type="button" class="color-swatch" data-color="#ffffff" aria-label="#ffffff" title="#ffffff" style="--swatch: #ffffff;" aria-pressed="true"></button><button type="button" class="color-swatch" data-color="#f3ead7" aria-label="#f3ead7" title="#f3ead7" style="--swatch: #f3ead7;" aria-pressed="false"></button><button type="button" class="color-swatch" data-color="#d9eee5" aria-label="#d9eee5" title="#d9eee5" style="--swatch: #d9eee5;" aria-pressed="false"></button><button type="button" class="color-swatch" data-color="#b9d5f0" aria-label="#b9d5f0" title="#b9d5f0" style="--swatch: #b9d5f0;" aria-pressed="false"></button><button type="button" class="color-swatch" data-color="#173b70" aria-label="#173b70" title="#173b70" style="--swatch: #173b70;" aria-pressed="false"></button><button type="button" class="color-swatch" data-color="#101419" aria-label="#101419" title="#101419" style="--swatch: #101419;" aria-pressed="false"></button><button type="button" class="color-swatch" data-color="#251d2d" aria-label="#251d2d" title="#251d2d" style="--swatch: #251d2d;" aria-pressed="false"></button><button type="button" class="color-swatch" data-color="#000000" aria-label="#000000" title="#000000" style="--swatch: #000000;" aria-pressed="false"></button><button type="button" class="color-swatch" data-color="#352c20" aria-label="#352c20" title="#352c20" style="--swatch: #352c20;" aria-pressed="false"></button><button type="button" class="color-swatch" data-color="#174d43" aria-label="#174d43" title="#174d43" style="--swatch: #174d43;" aria-pressed="false"></button><button type="button" class="color-swatch" data-color="#ffe66d" aria-label="#ffe66d" title="#ffe66d" style="--swatch: #ffe66d;" aria-pressed="false"></button><button type="button" class="color-swatch" data-color="#e6c9ff" aria-label="#e6c9ff" title="#e6c9ff" style="--swatch: #e6c9ff;" aria-pressed="false"></button></div></div>
+        <div class="theme-control"><label for="themeInk">font color</label><div class="hex-entry"><span class="color-chip" id="inkChip" aria-hidden="true" style="background: rgb(0, 0, 0);"></span><input id="themeInk" type="text" value="#000000" maxlength="7" spellcheck="false" aria-label="Font hex color"></div><div class="color-swatches" id="inkSwatches" aria-label="Font color choices"><button type="button" class="color-swatch" data-color="#ffffff" aria-label="#ffffff" title="#ffffff" style="--swatch: #ffffff;" aria-pressed="false"></button><button type="button" class="color-swatch" data-color="#f3ead7" aria-label="#f3ead7" title="#f3ead7" style="--swatch: #f3ead7;" aria-pressed="false"></button><button type="button" class="color-swatch" data-color="#d9eee5" aria-label="#d9eee5" title="#d9eee5" style="--swatch: #d9eee5;" aria-pressed="false"></button><button type="button" class="color-swatch" data-color="#b9d5f0" aria-label="#b9d5f0" title="#b9d5f0" style="--swatch: #b9d5f0;" aria-pressed="false"></button><button type="button" class="color-swatch" data-color="#173b70" aria-label="#173b70" title="#173b70" style="--swatch: #173b70;" aria-pressed="false"></button><button type="button" class="color-swatch" data-color="#101419" aria-label="#101419" title="#101419" style="--swatch: #101419;" aria-pressed="false"></button><button type="button" class="color-swatch" data-color="#251d2d" aria-label="#251d2d" title="#251d2d" style="--swatch: #251d2d;" aria-pressed="false"></button><button type="button" class="color-swatch" data-color="#000000" aria-label="#000000" title="#000000" style="--swatch: #000000;" aria-pressed="true"></button><button type="button" class="color-swatch" data-color="#352c20" aria-label="#352c20" title="#352c20" style="--swatch: #352c20;" aria-pressed="false"></button><button type="button" class="color-swatch" data-color="#174d43" aria-label="#174d43" title="#174d43" style="--swatch: #174d43;" aria-pressed="false"></button><button type="button" class="color-swatch" data-color="#ffe66d" aria-label="#ffe66d" title="#ffe66d" style="--swatch: #ffe66d;" aria-pressed="false"></button><button type="button" class="color-swatch" data-color="#e6c9ff" aria-label="#e6c9ff" title="#e6c9ff" style="--swatch: #e6c9ff;" aria-pressed="false"></button></div></div>
+      </div>
+      <label class="theme-weight">font weight <output id="weightValue">400</output><input id="themeWeight" type="range" min="200" max="600" step="50" value="400"></label>
+      <div class="theme-share"><span>shareable appearance URL</span><button type="button" id="copyThemeUrl">copy URL</button></div>
+    </section>
+  </header>
+
+  <section class="ask" id="askwrap">
+    <form id="ask" autocomplete="off" novalidate="" aria-label="Find a weather outlook">
+      <label for="zip" class="gt" aria-hidden="true">&gt;</label>
+      <span class="zipwrap"><input id="zip" name="location" type="text" inputmode="search" maxlength="120" autocomplete="off" placeholder="city, postal code, or coordinates" aria-label="Search any location worldwide by place name, postal code, or latitude and longitude" aria-describedby="ziphelp" spellcheck="false" title="Press / to jump here"><span class="cur" aria-hidden="true" style="--n: 5;"></span></span>
+      <button type="submit" class="go" aria-label="Get 35-day outlook">search</button>
+    </form>
+    <p class="intro" id="ziphelp">Search worldwide by city, region, country, postal code, or coordinates (latitude, longitude). Local climate context included.</p>
+    <noscript><p class="intro" style="color:#000">longcast needs JavaScript turned on to load forecasts.</p></noscript>
+    <div class="log" id="log" aria-live="polite"></div>
+  </section>
+
+  <section class="out" id="out" hidden>
+    <div class="hero">
+      <p class="where" id="where"></p>
+      <p class="facts" id="facts"></p>
+      <h1 class="head" id="head"></h1>
+      <p class="hero-day" id="hero-day"></p>
+    </div>
+
+    <details class="module panel month" open=""><summary class="module-title" id="cal-title">calendar</summary>
+      <div class="dow" aria-hidden="true"><span>mo</span><span>tu</span><span>we</span><span>th</span><span>fr</span><span>sa</span><span>su</span></div>
+      <div class="cal" id="cal"></div>
+      <div class="cdet open" id="cdet" aria-live="polite"></div>
+    </details>
+
+    <div class="cols">
+      <details class="module panel" open="">
+        <summary class="module-title">this week</summary>
+        <div class="dhead" aria-hidden="true"><span></span><span></span><span class="r">low</span><span></span><span class="r">high</span><span class="r">avg</span><span class="r">precip</span></div>
+        <ul class="list" id="week"></ul>
+        <p class="note"><i class="sw sw-fc"></i>forecast low to high <i class="sw sw-nm"></i>30-year average range for that date (numbers in the avg column). Tap a day to compare sources.</p>
+      </details>
+      <details class="module panel signal" open="">
+        <summary class="module-title">forecast signals <small>35-day scan</small></summary>
+        <div id="signals" class="signals" aria-live="polite"></div>
+        <p class="note">Extremes are relative to this outlook, not historical records. Tap a signal with a date to jump to it.</p>
+      </details>
+      <details class="module panel" open="">
+        <summary class="module-title">weeks ahead</summary>
+        <div class="whead" aria-hidden="true"><span>week of</span><span class="r vs">vs average</span><span class="scale"><span>cooler</span><span>warmer</span></span><span class="r whl">high/low</span><span>precip</span><span class="r">confidence</span></div>
+        <ul class="list" id="weeks"></ul>
+        <p class="note" id="wnote">Compared with the 30-year average for the same dates. Confidence is a rough signal from model spread and forecast lead time, not a probability. After nov 5, read these as tendencies, not exact numbers.</p>
+      </details>
+    </div>
+
+    <details class="module panel trend" open="">
+      <summary class="module-title">temperature trend</summary>
+      <p class="readout" id="readout2"></p>
+      <div class="chart" id="chart"></div>
+      <p class="legend"><span><i class="l-fc"></i>forecast high and low</span><span><i class="l-band"></i>likely range of the high and low</span><span><i class="l-norm"></i>30-year average</span><span><i class="l-rain"></i>chance of precipitation</span></p>
+    </details>
+
+    <details class="srcs" id="srcs" open="">
+      <summary>sources <small id="srcsum"></small></summary>
+      <div class="log" id="srclog"></div>
+      <p class="cross" id="cross"></p>
+      <div class="source-guide" aria-label="About the forecast sources">
+        <article><b>gfs / NOAA</b><p>US global forecast model. The ensemble runs many versions to show a range of plausible outcomes.</p></article>
+        <article><b>ecmwf</b><p>European global model, often useful for medium-range patterns. Ensemble spread helps indicate uncertainty.</p></article>
+        <article><b>icon / DWD</b><p>German global model. An independent forecast signal to compare against the US and European systems.</p></article>
+        <article><b>gem / ECCC</b><p>Canadian global model. Adds another independent view of temperature and precipitation trends.</p></article>
+        <article><b>ensemble spread</b><p>Wider member-to-member spread usually means lower confidence. Agreement is a signal, not a guarantee.</p></article>
+        <article><b>climate baseline</b><p>30-year averages provide seasonal context; they are not a prediction for any one day.</p></article>
+        <article><b>lead time</b><p>Daily detail is most useful early in the outlook. Later weeks are better read as broad tendencies.</p></article>
+        <article><b>adjustments</b><p>Long-range ensembles are aligned to the higher-resolution first-week outlook to reduce early bias.</p></article>
+      </div>
+    </details>
+  </section>
+
+  <footer>
+    <p>Forecast data from <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> (CC BY 4.0) and the <a href="https://www.weather.gov/" target="_blank" rel="noopener">National Weather Service</a>. Averages from ERA5 reanalysis via Open-Meteo, or <a href="https://power.larc.nasa.gov/" target="_blank" rel="noopener">NASA POWER</a> when Open-Meteo is unavailable.</p>
+    <p>Long-range forecasts show tendencies, not promises. Not for safety-critical decisions.</p>
+  </footer>
+  <div class="status" id="status" role="status" aria-live="polite" aria-atomic="true"><span class="mode">longcast</span><span id="st-mid">search any location</span><span class="r" id="st-r"></span></div>
+</main>
+
+<script>
+(() => {
+'use strict';
+
+let DAYS = 35;
+const WET = 0.04;            // inches, about 1 mm: a "wet day"
+const API = {
+  fc:  'https://api.open-meteo.com/v1/forecast',
+  ens: 'https://ensemble-api.open-meteo.com/v1/ensemble',
+  sea: 'https://seasonal-api.open-meteo.com/v1/seasonal',
+  arc: 'https://archive-api.open-meteo.com/v1/archive',
+  geo: 'https://geocoding-api.open-meteo.com/v1/search',
+  zip: 'https://api.zippopotam.us/us/',
+  nws: 'https://api.weather.gov/points/'
+};
+const DET = [
+  { key: 'gfs',   name: 'gfs',       id: 'gfs_seamless',  org: 'NOAA' },
+  { key: 'ecmwf', name: 'ecmwf',     id: 'ecmwf_ifs025',  org: 'ECMWF' },
+  { key: 'icon',  name: 'icon',      id: 'icon_seamless', org: 'DWD' },
+  { key: 'gem',   name: 'gem',       id: 'gem_seamless',  org: 'ECCC' }
+];
+const ENS = [
+  { key: 'gfse',   name: 'gfs ens',   id: 'gfs05',        days: 35 },
+  { key: 'ecmwfe', name: 'ecmwf ens', id: 'ecmwf_ifs025', days: 15 },
+  { key: 'geme',   name: 'gem ens',   id: 'gem_global',   days: 35 }
+];
+
+const $ = (s) => document.querySelector(s);
+const body = document.body;
+const BLOCKED = 'The weather services could not be reached. Check your connection and try again in a minute. If you opened this inside another app, open it in your browser instead.';
+
+/* ---------- storage (per-browser conveniences only) ---------- */
+const store = {
+  get(k) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+};
+
+const st = { unit: store.get('lc:unit') === 'c' ? 'c' : 'f', model: null, sel: 0, open: null };
+
+/* ---------- small utils ---------- */
+const isNum = (x) => typeof x === 'number' && isFinite(x);
+const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+const mean = (a) => { const s = a.filter(isNum); return s.length ? s.reduce((x, y) => x + y, 0) / s.length : null; };
+const median = (a) => {
+  const s = a.filter(isNum).sort((x, y) => x - y);
+  if (!s.length) return null;
+  const m = s.length >> 1;
+  return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+};
+const quant = (sorted, p) => {
+  if (!sorted.length) return null;
+  const i = (sorted.length - 1) * p, lo = Math.floor(i), hi = Math.ceil(i);
+  return sorted[lo] + (sorted[hi] - sorted[lo]) * (i - lo);
+};
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+const MON = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+const DOW = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+const CUM = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+const parseD = (s) => { const [y, m, d] = s.split('-').map(Number); return new Date(Date.UTC(y, m - 1, d)); };
+const iso = (dt) => dt.toISOString().slice(0, 10);
+const addDays = (s, n) => { const d = parseD(s); d.setUTCDate(d.getUTCDate() + n); return iso(d); };
+const label = (s) => { const d = parseD(s); return MON[d.getUTCMonth()] + ' ' + d.getUTCDate(); };
+const dowOf = (s) => DOW[parseD(s).getUTCDay()];
+const doyOf = (s) => Math.min(364, CUM[+s.slice(5, 7) - 1] + (+s.slice(8, 10)) - 1);
+const rangeLabel = (a, b) => {
+  const A = parseD(a), B = parseD(b);
+  return A.getUTCMonth() === B.getUTCMonth() ? `${label(a)} to ${B.getUTCDate()}` : `${label(a)} to ${label(b)}`;
+};
+const localToday = () => { const d = new Date(); return iso(new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()))); };
+
+/* unit display. everything is stored in °F and inches */
+const cv = (f) => st.unit === 'c' ? (f - 32) * 5 / 9 : f;
+const T = (f) => isNum(f) ? String(Math.round(cv(f))) : '';
+const TD = (df) => { const r = Math.round(st.unit === 'c' ? df * 5 / 9 : df); return (r > 0 ? '+' : '') + r; };
+const TA = (df) => Math.round(Math.abs(st.unit === 'c' ? df * 5 / 9 : df));
+const P = (inch) => {
+  if (!isNum(inch)) return '';
+  if (st.unit === 'c') return Math.round(inch * 25.4) + ' mm';
+  if (inch > 0 && inch < 0.05) return '<0.1 in';
+  return inch.toFixed(1) + ' in';
+};
+const pct = (p) => isNum(p) ? Math.round(p * 10) * 10 + '%' : '';
+const confWord = (c) => c >= 0.6 ? 'high' : c >= 0.3 ? 'medium' : 'low';
+
+/* ---------- network ---------- */
+const qs = (base, p) => base + '?' + Object.entries(p)
+  .map(([k, v]) => k + '=' + encodeURIComponent(v).replace(/%2C/g, ','))
+  .join('&');
+
+async function getJSON(url, ms = 15000) {
+  const ctl = new AbortController();
+  const t = setTimeout(() => ctl.abort(), ms);
+  try {
+    const r = await fetch(url, { signal: ctl.signal });
+    if (!r.ok) {
+      let msg = 'http ' + r.status;
+      try { const j = await r.json(); if (j && j.reason) msg += ' ' + j.reason; } catch (e) {}
+      throw new Error(msg);
+    }
+    return await r.json();
+  } catch (e) {
+    if (e.name === 'AbortError') { const er = new Error('timed out'); er.network = true; throw er; }
+    if (e instanceof TypeError) { const er = new Error('blocked or offline'); er.network = true; throw er; }
+    throw e;
+  } finally { clearTimeout(t); }
+}
+
+async function locate(query) {
+  const q = String(query || '').trim().replace(/\s+/g, ' ');
+  if (!q) throw new Error('no match');
+  const ck = 'lc:place:' + q.toLowerCase();
+  const cached = store.get(ck);
+  if (cached) return cached;
+
+  // Coordinates are the most direct, unambiguous global location input.
+  const coord = q.match(/^\s*(-?\d{1,2}(?:\.\d+)?)\s*[,;\s]\s*(-?\d{1,3}(?:\.\d+)?)\s*$/);
+  if (coord) {
+    const lat = Number(coord[1]), lon = Number(coord[2]);
+    if (lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) {
+      const loc = { lat, lon, name: `${lat.toFixed(4)}, ${lon.toFixed(4)}`, region: 'coordinates', query: q, via: 'coordinates' };
+      store.set(ck, loc); return loc;
+    }
+    throw new Error('coordinates out of range');
+  }
+
+  let netFails = 0;
+  // Preserve the fast, reliable US ZIP lookup, but only for an exact ZIP input.
+  if (/^\d{5}$/.test(q)) {
+    try {
+      const j = await getJSON(API.zip + q, 8000);
+      const p = j && j.places && j.places[0];
+      if (p) {
+        const loc = { lat: +p.latitude, lon: +p.longitude, name: p['place name'], region: p['state abbreviation'] || p['state'] || 'United States', country: 'United States', query: q, via: 'zippopotam.us' };
+        store.set(ck, loc); return loc;
+      }
+    } catch (e) { if (e.network) netFails++; }
+  }
+
+  try {
+    const g = await getJSON(qs(API.geo, { name: q, count: 10, language: 'en', format: 'json' }), 10000);
+    const results = (g.results || []).filter(r => isNum(r.latitude) && isNum(r.longitude));
+    if (results.length) {
+      const norm = x => String(x || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+      const queryNorm = norm(q);
+      const postcodeQuery = /[0-9]/.test(q) && !/[a-z]{3,}/i.test(q);
+      results.sort((a, b) => {
+        const score = r => {
+          const name = norm(r.name), country = norm(r.country), admin = norm(r.admin1), postcodes = (r.postcodes || []).map(norm);
+          let n = 0;
+          if (name === queryNorm) n += 100;
+          if (postcodes.includes(queryNorm)) n += 120;
+          if (queryNorm.includes(',') && [country, admin, norm(r.admin2)].some(v => v && queryNorm.includes(v))) n += 30;
+          if (postcodeQuery && (r.feature_code || '').startsWith('PPL')) n -= 20;
+          if (r.population) n += Math.min(10, Math.log10(Math.max(1, r.population)));
+          return n;
+        };
+        return score(b) - score(a);
+      });
+      const hit = results[0];
+      const loc = { lat: hit.latitude, lon: hit.longitude, name: hit.name, region: [hit.admin1, hit.country].filter(Boolean).join(', '), country: hit.country || '', query: q, via: 'open-meteo geocoding' };
+      store.set(ck, loc); return loc;
+    }
+  } catch (e) { if (e.network) netFails++; else throw e; }
+  if (netFails > 0) { const er = new Error('network'); er.network = true; throw er; }
+  throw new Error('no match');
+}
+
+function fromDaily(j, kind, meta) {
+  const d = j && j.daily;
+  if (!d || !Array.isArray(d.time)) throw new Error('no daily data');
+  const pick = (base) => Object.keys(d).filter((k) => k === base || k.startsWith(base + '_')).map((k) => d[k]);
+  const src = { ...meta, kind, time: d.time, hi: pick('temperature_2m_max'), lo: pick('temperature_2m_min'), pr: pick('precipitation_sum') };
+  if (kind === 'det') {
+    src.pop = pick('precipitation_probability_max')[0] || null;
+    src.code = pick('weather_code')[0] || null;
+  }
+  let last = -1;
+  src.hi.forEach((arr) => arr.forEach((v, i) => { if (isNum(v) && i > last) last = i; }));
+  src.span = last + 1;
+  src.members = src.hi.filter((arr) => arr.some(isNum)).length;
+  if (!src.members) throw new Error('empty response');
+  return src;
+}
+
+async function fetchNWS(lat, lon) {
+  const p = await getJSON(API.nws + lat.toFixed(4) + ',' + lon.toFixed(4), 10000);
+  const url = p && p.properties && p.properties.forecast;
+  if (!url) throw new Error('outside nws coverage');
+  const f = await getJSON(url, 10000);
+  const periods = (f && f.properties && f.properties.periods) || [];
+  if (!periods.length) throw new Error('no periods');
+  const hi = {}, lo = {}, pop = {};
+  periods.forEach((per) => {
+    const date = String(per.startTime).slice(0, 10);
+    const t = per.temperatureUnit === 'C' ? per.temperature * 9 / 5 + 32 : per.temperature;
+    const pp = per.probabilityOfPrecipitation && per.probabilityOfPrecipitation.value;
+    if (isNum(pp)) pop[date] = Math.max(pop[date] || 0, pp);
+    if (!isNum(t)) return;
+    if (per.isDaytime) hi[date] = t;
+    else lo[addDays(date, 1)] = t;     // tonight's low lands on tomorrow morning
+  });
+  const days = new Set(Object.keys(hi).concat(Object.keys(lo))).size;
+  return { key: 'nws', name: 'nws', kind: 'nws', hi, lo, pop, office: p.properties.cwa || '', span: days };
+}
+
+function normalsFrom(arc) {
+  const d = arc && arc.daily;
+  if (!d || !d.time) throw new Error('no archive data');
+  const H = d.temperature_2m_max, L = d.temperature_2m_min, R = d.precipitation_sum;
+  const buckets = Array.from({ length: 365 }, () => []);
+  d.time.forEach((t, i) => { if (isNum(H[i]) && isNum(L[i])) buckets[doyOf(t)].push(i); });
+  const out = [];
+  for (let k = 0; k < 365; k++) {
+    const hs = [], ls = [], rs = [];
+    for (let w = -7; w <= 7; w++) {
+      buckets[(k + w + 365) % 365].forEach((i) => { hs.push(H[i]); ls.push(L[i]); if (isNum(R[i])) rs.push(R[i]); });
+    }
+    if (!hs.length) { out.push(null); continue; }
+    hs.sort((a, b) => a - b);
+    const r1 = (x) => Math.round(x * 10) / 10;
+    out.push({
+      hi: r1(mean(hs)), lo: r1(mean(ls)),
+      p10: r1(quant(hs, 0.1)), p90: r1(quant(hs, 0.9)),
+      pr: Math.round(mean(rs) * 1000) / 1000,
+      wet: Math.round(rs.filter((x) => x >= WET).length / Math.max(1, rs.length) * 100) / 100
+    });
+  }
+  return out;
+}
+
+/* ---------- console log ---------- */
+function makeLog(el) {
+  const lines = [];
+  const pad = (name) => name + ' ' + '.'.repeat(Math.max(2, 16 - name.length)) + ' ';
+  const draw = () => {
+    el.innerHTML = lines.map((l) => {
+      if (l.status === 'msg') return `  <span class="err">${esc(l.detail)}</span>`;
+      if (l.status === 'wait') return `  ${esc(pad(l.name))}<span class="wait" aria-label="loading"></span>`;
+      const s = l.status === 'ok' ? '<b>ok</b>  ' : '<b>fail</b>';
+      return `  ${esc(pad(l.name))}${s}${l.detail ? '  ' + esc(l.detail) : ''}`;
+    }).join('\n');
+  };
+  return {
+    add(id, name) { lines.push({ id, name, status: 'wait', detail: '' }); draw(); },
+    set(id, status, detail) { const l = lines.find((x) => x.id === id); if (l) { l.status = status; l.detail = detail || ''; draw(); } },
+    msg(text) { lines.push({ id: 'm' + lines.length, name: '', status: 'msg', detail: text }); draw(); },
+    clear() { lines.length = 0; el.innerHTML = ''; }
+  };
+}
+
+/* ---------- model ---------- */
+function assemble(dates, srcs, norms) {
+  const det = srcs.filter((s) => s.kind === 'det');
+  const ens = srcs.filter((s) => s.kind === 'ens');
+  const nws = srcs.find((s) => s.kind === 'nws');
+  srcs.forEach((s) => { if (s.time) s.idx = new Map(s.time.map((t, i) => [t, i])); });
+  const val = (s, key, m, date) => {
+    const i = s.idx.get(date);
+    if (i == null || !s[key][m]) return null;
+    const v = s[key][m][i];
+    return isNum(v) ? v : null;
+  };
+  const detVals = (key, date) => {
+    const v = det.map((s) => val(s, key, 0, date)).filter(isNum);
+    if (nws && key !== 'pr' && isNum(nws[key][date])) v.push(nws[key][date]);
+    return v;
+  };
+
+  /* Each ensemble gets a fixed offset so its median matches the higher-resolution
+     models over days 2 to 8. This removes sampling bias (3 or 6-hourly output
+     can miss the true afternoon peak) before the long-range days are pooled. */
+  ens.forEach((s) => {
+    s.off = { hi: 0, lo: 0 };
+    ['hi', 'lo'].forEach((key) => {
+      const diffs = [];
+      for (let k = 1; k <= 7 && k < dates.length; k++) {
+        const ref = median(detVals(key, dates[k]));
+        const med = median(s[key].map((_, m) => val(s, key, m, dates[k])));
+        if (isNum(ref) && isNum(med)) diffs.push(ref - med);
+      }
+      if (diffs.length >= 3) s.off[key] = clamp(mean(diffs), -8, 8);
+    });
+  });
+
+  const rows = dates.map((date, d) => {
+    const eh = [], el = [], ep = [];
+    ens.forEach((s) => {
+      for (let m = 0; m < s.hi.length; m++) {
+        const h = val(s, 'hi', m, date); if (h != null) eh.push(h + s.off.hi);
+        const l = val(s, 'lo', m, date); if (l != null) el.push(l + s.off.lo);
+        const p = val(s, 'pr', m, date); if (p != null) ep.push(p);
+      }
+    });
+    const dh = detVals('hi', date), dl = detVals('lo', date), dp = detVals('pr', date);
+    const blend = (dv, ev) => {
+      const a = median(dv), b = ev.length >= 5 ? median(ev) : null;
+      if (a == null) return b;
+      if (b == null) return a;
+      const w = dv.length >= 2 ? 0.5 : 0.3;
+      return w * a + (1 - w) * b;
+    };
+    const hi = blend(dh, eh), lo = blend(dl, el);
+    let p10 = null, p90 = null;
+    if (eh.length >= 8) { const s = eh.slice().sort((a, b) => a - b); p10 = quant(s, 0.1); p90 = quant(s, 0.9); }
+    else if (dh.length >= 2) { p10 = Math.min(...dh); p90 = Math.max(...dh); }
+    let l10 = null, l90 = null;
+    if (el.length >= 8) { const s = el.slice().sort((a, b) => a - b); l10 = quant(s, 0.1); l90 = quant(s, 0.9); }
+    else if (dl.length >= 2) { l10 = Math.min(...dl); l90 = Math.max(...dl); }
+
+    const parts = [];
+    if (ep.length >= 8) parts.push(ep.filter((x) => x >= WET).length / ep.length);
+    const dpop = det.map((s) => s.pop && s.idx.has(date) ? s.pop[s.idx.get(date)] : null).filter(isNum);
+    if (dpop.length) parts.push(mean(dpop) / 100);
+    if (nws && isNum(nws.pop[date])) parts.push(nws.pop[date] / 100);
+    if (!parts.length && dp.length) parts.push(dp.filter((x) => x >= WET).length / dp.length);
+    const pop = parts.length ? clamp(mean(parts), 0, 1) : null;
+    const rain = mean(ep.length >= 8 ? ep : dp);
+    const rainIf = mean((ep.length >= 8 ? ep : dp).filter((x) => x >= WET));
+
+    const codes = det.map((s) => s.code && s.idx.has(date) ? s.code[s.idx.get(date)] : null).filter(isNum);
+    const wx = codes.length >= 2 && d < 10 ? wxWord(codes) : null;
+
+    const n = norms ? norms[doyOf(date)] : null;
+    let conf;
+    if (n && isNum(p10) && isNum(p90) && n.p90 > n.p10) conf = clamp(1 - (p90 - p10) / (n.p90 - n.p10), 0, 1);
+    else conf = clamp(1 - d / 30, 0, 1);
+    if (d <= 2) conf = Math.max(conf, 0.85);
+
+    const reach = det.filter((s) => val(s, 'hi', 0, date) != null).length
+      + ens.filter((s) => s.hi.some((_, m) => val(s, 'hi', m, date) != null)).length
+      + (nws && (isNum(nws.hi[date]) || isNum(nws.lo[date])) ? 1 : 0);
+
+    return { date, d, hi, lo, p10, p90, l10, l90, pop, rain, rainIf, wx, n, conf, reach, members: eh.length };
+  });
+
+  // per-source readings, used by the day panel
+  const perSource = (date) => {
+    const out = [];
+    if (nws && (isNum(nws.hi[date]) || isNum(nws.lo[date]))) out.push({ name: 'nws', hi: nws.hi[date], lo: nws.lo[date], pop: isNum(nws.pop[date]) ? nws.pop[date] / 100 : null });
+    det.forEach((s) => {
+      const h = val(s, 'hi', 0, date), l = val(s, 'lo', 0, date);
+      if (h == null && l == null) return;
+      const pp = s.pop && s.idx.has(date) ? s.pop[s.idx.get(date)] : null;
+      out.push({ name: s.name, hi: h, lo: l, pop: isNum(pp) ? pp / 100 : null });
+    });
+    ens.forEach((s) => {
+      const hs = [], ls = [], ps = [];
+      for (let m = 0; m < s.hi.length; m++) {
+        const h = val(s, 'hi', m, date); if (h != null) hs.push(h + s.off.hi);
+        const l = val(s, 'lo', m, date); if (l != null) ls.push(l + s.off.lo);
+        const p = val(s, 'pr', m, date); if (p != null) ps.push(p);
+      }
+      if (!hs.length) return;
+      const sh = hs.slice().sort((a, b) => a - b);
+      const sl = ls.slice().sort((a, b) => a - b);
+      out.push({ name: s.name, hi: median(hs), lo: median(ls), pop: ps.length ? ps.filter((x) => x >= WET).length / ps.length : null, n: hs.length, r10: quant(sh, 0.1), r90: quant(sh, 0.9), q10: sl.length ? quant(sl, 0.1) : null, q90: sl.length ? quant(sl, 0.9) : null });
+    });
+    return out;
+  };
+
+  return { rows, perSource, srcCount: srcs.length };
+}
+
+function wxWord(codes) {
+  const cat = (c) => c === 96 || c === 99 ? 'hailstorm'
+    : c === 95 ? 'storm'
+    : c === 56 || c === 57 ? 'freezing drizzle'
+    : c === 66 || c === 67 ? 'freezing rain'
+    : (c >= 71 && c <= 77) || c === 85 || c === 86 ? 'snow'
+    : (c >= 61 && c <= 65) || (c >= 80 && c <= 82) ? 'rain'
+    : c >= 51 && c <= 55 ? 'drizzle'
+    : c === 45 || c === 48 ? 'fog'
+    : c === 3 ? 'cloudy' : c === 2 ? 'partly' : 'clear';
+  const rank = ['clear', 'partly', 'cloudy', 'fog', 'drizzle', 'freezing drizzle', 'rain', 'freezing rain', 'snow', 'storm', 'hailstorm'];
+  const count = {};
+  codes.forEach((c) => { const k = cat(c); count[k] = (count[k] || 0) + 1; });
+  return Object.keys(count).sort((a, b) => count[b] - count[a] || rank.indexOf(b) - rank.indexOf(a))[0];
+}
+
+
+/* ---------- render ---------- */
+const ink = (c) => (0.55 + 0.45 * c).toFixed(2);
+const inkCal = (c) => (0.66 + 0.34 * c).toFixed(2);
+const anomOf = (r) => r.n && isNum(r.hi) ? r.hi - r.n.hi : null;
+
+function stretch(rows) {
+  const an = rows.map(anomOf);
+  let best = { v: -Infinity, i: 0 }, worst = { v: Infinity, i: 0 };
+  for (let i = 0; i + 5 <= an.length; i++) {
+    const v = mean(an.slice(i, i + 5));
+    if (!isNum(v)) continue;
+    if (v > best.v) best = { v, i };
+    if (v < worst.v) worst = { v, i };
+  }
+  const warm = best.v >= 4, cool = worst.v <= -4;
+  if (!warm && !cool) return null;
+  const useWarm = warm && (!cool || best.v >= -worst.v);
+  const w = useWarm ? best : worst;
+  return { word: useWarm ? 'warmest' : 'coolest', range: rangeLabel(rows[w.i].date, rows[w.i + 4].date) };
+}
+
+function renderHero() {
+  const { rows, loc } = st.model;
+  $('#where').innerHTML = `<span>${esc([loc.name, loc.region].filter(Boolean).join(', '))}</span>`;
+  const has = (k) => rows.filter((r) => isNum(r[k]));
+  const maxBy = (arr, f) => arr.reduce((a, r) => (a == null || f(r) > f(a) ? r : a), null);
+  const minBy = (arr, f) => arr.reduce((a, r) => (a == null || f(r) < f(a) ? r : a), null);
+  const item = (k, v) => `<span><i>${k}</i><b>${v}</b></span>`;
+  const trend = [];
+
+  const hottest = maxBy(has('hi'), (r) => r.hi);
+  if (hottest) trend.push(item('warmest date', `${esc(label(hottest.date))} · ${T(hottest.hi)}°`));
+  const coldest = minBy(has('lo'), (r) => r.lo);
+  if (coldest) trend.push(item('coldest date', `${esc(label(coldest.date))} · ${T(coldest.lo)}°`));
+
+  const rainy = maxBy(has('pop'), (r) => r.pop + (isNum(r.rainIf) ? r.rainIf / 100 : 0));
+  if (rainy && rainy.pop >= 0.2) {
+    const kind = precipTypeLabel(rainy);
+    trend.push(item('rainiest date', `${esc(label(rainy.date))} · ${pct(rainy.pop)}${kind && kind !== 'precip' ? ' ' + esc(kind) : ''}`));
+  } else if (rainy) trend.push(item('rainiest date', 'none, mostly dry'));
+
+  const s2 = stretch(rows);
+  if (s2) trend.push(item(`${s2.word} stretch`, s2.range));
+
+  let dry = { len: 0, s: 0 }, run = 0, s0 = 0;
+  rows.forEach((r, i) => {
+    if (isNum(r.pop) && r.pop < 0.2) { if (run === 0) s0 = i; run++; if (run > dry.len) dry = { len: run, s: s0 }; }
+    else run = 0;
+  });
+  if (dry.len >= 3) trend.push(item('longest dry spell', rangeLabel(rows[dry.s].date, rows[dry.s + dry.len - 1].date)));
+
+  let swing = null;
+  for (let i = 1; i < rows.length; i++) {
+    const a = rows[i - 1].hi, b = rows[i].hi;
+    if (isNum(a) && isNum(b) && (!swing || Math.abs(b - a) > Math.abs(swing.d))) swing = { d: b - a, i };
+  }
+  if (swing && TA(swing.d) >= (st.unit === 'c' ? 3 : 5)) trend.push(item(swing.d < 0 ? 'biggest drop' : 'biggest jump', `${esc(label(rows[swing.i].date))} · ${TD(swing.d)}°`));
+
+  const freeze = rows.find((r) => isNum(r.lo) && r.lo <= 32);
+  const heat = rows.find((r) => isNum(r.hi) && r.hi >= 90);
+  if (freeze) trend.push(item('first freeze', `${esc(label(freeze.date))} · ${T(freeze.lo)}°`));
+  else if (heat) trend.push(item('first hot day', `${esc(label(heat.date))} · ${T(heat.hi)}°`));
+
+  $('#facts').innerHTML = `<span class="trend-label">overall trend</span>${trend.join('')}`;
+  renderHeroDay();
+}
+
+const FULLDOW = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+function compareToPrev(r, i) {
+  const rows = st.model.rows;
+  let prev = null, name = '';
+  if (i > 0) { prev = rows[i - 1]; name = i === 1 ? 'today' : FULLDOW[parseD(prev.date).getUTCDay()]; }
+  else if (st.model.yday) { prev = st.model.yday; name = 'yesterday'; }
+  if (!prev || !isNum(r.hi) || !isNum(prev.hi)) return null;
+  const dHi = Math.round(cv(r.hi) - cv(prev.hi));
+  const dLo = isNum(r.lo) && isNum(prev.lo) ? Math.round(cv(r.lo) - cv(prev.lo)) : 0;
+  const same = st.unit === 'c' ? 1 : 2, night = st.unit === 'c' ? 2 : 4;
+  let t;
+  if (Math.abs(dHi) < same) {
+    t = Math.abs(dLo) >= night ? `similar high to ${name}, ${Math.abs(dLo)}° ${dLo > 0 ? 'milder' : 'colder'} overnight` : `about the same as ${name}`;
+  } else t = `${Math.abs(dHi)}° ${dHi > 0 ? 'warmer' : 'colder'} than ${name}`;
+  const wetOf = (x) => (isNum(x.pop) ? (x.pop >= 0.5 ? 1 : x.pop < 0.2 ? -1 : 0) : isNum(x.rain) ? (x.rain >= WET ? 1 : -1) : 0);
+  const now = wetOf(r), before = wetOf(prev);
+  if (now === 1 && before === -1) t += ', and wetter';
+  else if (now === -1 && before === 1) t += ', and drier';
+  return t;
+}
+
+function dayDescription(r) {
+  const labels = { clear: 'Clear', partly: 'Partly cloudy', cloudy: 'Cloudy', fog: 'Foggy', drizzle: 'Drizzle', 'freezing drizzle': 'Freezing drizzle', rain: 'Rain', 'freezing rain': 'Freezing rain', snow: 'Snow', storm: 'Thunderstorms', hailstorm: 'Thunderstorms with possible hail' };
+  const wx = labels[r.wx];
+  const high = isNum(r.hi) ? `high near ${T(r.hi)}°` : 'high unavailable';
+  const low = isNum(r.lo) ? `low near ${T(r.lo)}°` : 'low unavailable';
+  const type = ['drizzle', 'freezing drizzle', 'rain', 'freezing rain', 'snow', 'storm', 'hailstorm'].includes(r.wx) ? r.wx : 'precip';
+  const precip = isNum(r.pop) ? `${pct(r.pop)} chance of ${type}` : '';
+  const weather = wx ? `${wx} conditions. ` : '';
+  return `${weather}With a ${high} and ${low}.${precip ? ` ${precip}.` : ''}`;
+}
+
+function renderHeroDay() {
+  const el = $('#hero-day');
+  if (!el || !st.model) return;
+  const r = st.model.rows[st.sel == null ? 0 : st.sel];
+  if (!r) return;
+  const i = st.sel == null ? 0 : st.sel;
+  const name = r.d === 0 ? 'today' : `${dowOf(r.date)} ${label(r.date)}`;
+  const cmp = compareToPrev(r, i);
+  $('#head').textContent = cmp ? `${name}: ${cmp}` : `${name}: high ${T(r.hi)}°, low ${T(r.lo)}°`;
+  el.textContent = dayDescription(r);
+}
+
+function renderWeek() {
+  const rows = st.model.rows.slice(0, 7);
+  const vals = [];
+  rows.forEach((r) => [r.hi, r.lo, r.n && r.n.hi, r.n && r.n.lo].forEach((v) => { if (isNum(v)) vals.push(v); }));
+  if (!vals.length) { $('#week').innerHTML = '<li class="note">Temperature data unavailable.</li>'; return; }
+  const mn = Math.min(...vals), mx = Math.max(...vals), span = Math.max(1, mx - mn);
+  const pos = (v) => ((v - mn) / span * 100).toFixed(1);
+  const wid = (a, b) => ((b - a) / span * 100).toFixed(1);
+  $('#week').innerHTML = rows.map((r, i) => {
+    const open = st.open === i;
+    const name = i === 0 ? 'today' : `${dowOf(r.date)} ${parseD(r.date).getUTCDate()}`;
+    const nm = r.n ? `<i class="nm" style="left:${pos(r.n.lo)}%;width:${wid(r.n.lo, r.n.hi)}%"></i>` : '';
+    const fc = isNum(r.hi) && isNum(r.lo) ? `<i class="fc" style="left:${pos(r.lo)}%;width:${wid(r.lo, r.hi)}%"></i>` : '';
+    const rain = isNum(r.pop) && r.pop >= 0.2 ? pct(r.pop) : '';
+    const aria = `${i === 0 ? 'today' : dowOf(r.date) + ' ' + label(r.date)}: high ${T(r.hi)}, low ${T(r.lo)}${rain ? ', ' + rain + ' chance of precipitation' : ''}`;
+    return `<li class="drow${open ? ' open' : ''}">`
+      + `<button type="button" class="dbtn" data-i="${i}" aria-expanded="${open}" aria-label="${esc(aria)}" style="--o:${ink(r.conf)}">`
+      + `<span class="dn">${name}</span><span class="wx">${r.wx || ''}</span>`
+      + `<span class="lo">${T(r.lo)}°</span><span class="rng">${nm}${fc}</span><span class="hi">${T(r.hi)}°</span>`
+      + `<span class="avg" title="30-year average low / high">${r.n ? `${T(r.n.lo)}/${T(r.n.hi)}` : '--'}</span>`
+      + `<span class="rain${isNum(r.pop) && r.pop >= 0.5 ? ' wet' : ''}">${rain}</span></button>`
+      + (open ? dayDetail(r) : '') + '</li>';
+  }).join('');
+}
+
+function dayDetail(r) {
+  const parts = [];
+  if (r.n) parts.push(`Average ${T(r.n.hi)}° / ${T(r.n.lo)}°.`);
+  if (isNum(r.p10) && isNum(r.p90)) parts.push(`Likely high ${T(r.p10)}° to ${T(r.p90)}°.`);
+  if (isNum(r.l10) && isNum(r.l90)) parts.push(`Likely low ${T(r.l10)}° to ${T(r.l90)}°.`);
+  parts.push(`${r.reach} of ${st.model.srcCount} sources.`);
+  const pad = (name) => name + ' ' + '.'.repeat(Math.max(2, 13 - name.length)) + ' ';
+  const lines = st.model.perSource(r.date).map((s) => {
+    const t = `${(T(s.hi) || '-').padStart(3)} / ${(T(s.lo) || '-').padEnd(3)}`;
+    const p = isNum(s.pop) ? pct(s.pop).padStart(5) : '     ';
+    const extra = s.n ? `   ${s.n} runs` : '';
+    return `${esc(pad(s.name))}<b>${t}</b>${p}${extra}`;
+  });
+  return `<div class="ddet"><p>${parts.join(' ')}</p>${lines.length ? `<div class="src">${lines.join('\n')}</div>` : ''}</div>`;
+}
+
+function renderSignals() {
+  const rows = st.model.rows;
+  const has = (k) => rows.filter((r) => isNum(r[k]));
+  const maxBy = (arr, f) => arr.reduce((a, r) => (a == null || f(r) > f(a) ? r : a), null);
+  const minBy = (arr, f) => arr.reduce((a, r) => (a == null || f(r) < f(a) ? r : a), null);
+  const items = [];
+  const add = (key, value, sub, r) => items.push({ key, value, sub: sub || '', i: r ? rows.indexOf(r) : -1 });
+
+  const hot = maxBy(has('hi'), (r) => r.hi);
+  if (hot) add('peak high', `${T(hot.hi)}°`, label(hot.date), hot);
+  const cold = minBy(has('lo'), (r) => r.lo);
+  if (cold) add('coldest low', `${T(cold.lo)}°`, label(cold.date), cold);
+
+  const an = rows.filter((r) => isNum(anomOf(r)));
+  if (an.length) {
+    const w = maxBy(an, anomOf), c = minBy(an, anomOf);
+    add('warmest vs avg', `${TD(anomOf(w))}°`, label(w.date), w);
+    add('coolest vs avg', `${TD(anomOf(c))}°`, label(c.date), c);
+  }
+
+  const wet = maxBy(has('pop'), (r) => r.pop);
+  if (wet) {
+    const kind = precipTypeLabel(wet);
+    if (wet.pop >= 0.1) add('top precip chance', pct(wet.pop), kind && kind !== 'precip' ? `${label(wet.date)}, ${kind}` : label(wet.date), wet);
+    else add('top precip chance', 'under 10%', 'no wet day stands out');
+  }
+  const wetDays = rows.reduce((a, r) => a + (isNum(r.pop) ? r.pop : 0), 0);
+  const nWet = rows.every((r) => r.n && isNum(r.n.wet)) ? rows.reduce((a, r) => a + r.n.wet, 0) : null;
+  add('wet days', String(Math.round(wetDays)), nWet != null ? `average ${Math.round(nWet)}` : 'expected in 35 days');
+  const total = rows.reduce((a, r) => a + (isNum(r.rain) ? r.rain : 0), 0);
+  const nTotal = rows.every((r) => r.n && isNum(r.n.pr)) ? rows.reduce((a, r) => a + r.n.pr, 0) : null;
+  add('total precip', P(total), nTotal != null ? `average ${P(nTotal)}` : 'expected in 35 days');
+
+  let dry = { len: 0, s: 0 }, run = 0, s0 = 0;
+  rows.forEach((r, i) => {
+    if (isNum(r.pop) && r.pop < 0.2) { if (run === 0) s0 = i; run++; if (run > dry.len) dry = { len: run, s: s0 }; }
+    else run = 0;
+  });
+  if (dry.len >= 2) add('longest dry spell', `${dry.len} days`, rangeLabel(rows[dry.s].date, rows[dry.s + dry.len - 1].date), rows[dry.s]);
+  else add('longest dry spell', 'none', 'precip chances most days');
+
+  let swing = null;
+  for (let i = 1; i < rows.length; i++) {
+    const a = rows[i - 1].hi, b = rows[i].hi;
+    if (isNum(a) && isNum(b) && (!swing || Math.abs(b - a) > Math.abs(swing.d))) swing = { d: b - a, i };
+  }
+  if (swing) add('biggest swing', `${TD(swing.d)}°`, `highs, ${rangeLabel(rows[swing.i - 1].date, rows[swing.i].date)}`, rows[swing.i]);
+
+  const w1 = mean(rows.slice(0, 7).map((r) => r.hi)), w5 = mean(rows.slice(-7).map((r) => r.hi));
+  if (isNum(w1) && isNum(w5)) {
+    const d = w5 - w1;
+    add('35-day trend', TA(d) < 2 ? 'steady' : `${d < 0 ? 'cooling' : 'warming'} ${TA(d)}°`, 'week 1 vs week 5 highs');
+  }
+
+  const fzLabel = st.unit === 'c' ? '0°C' : '32°F', hotLabel = st.unit === 'c' ? '32°C' : '90°F';
+  const freeze = rows.find((r) => isNum(r.lo) && r.lo <= 32);
+  const heat = rows.find((r) => isNum(r.hi) && r.hi >= 90);
+  if (freeze) add('first freeze', `${T(freeze.lo)}°`, label(freeze.date), freeze);
+  else if (heat) add('first hot day', `${T(heat.hi)}°`, label(heat.date), heat);
+  else add('freeze or heat', 'none expected', `no lows under ${fzLabel}, no highs over ${hotLabel}`);
+
+  const fade = rows.find((r) => r.d >= 3 && r.conf < 0.3);
+  if (fade) add('reliable through', label(addDays(fade.date, -1)), 'then read as tendencies', rows[fade.d - 1]);
+  else add('reliable through', 'all 35 days', 'the forecasts agree well');
+
+  $('#signals').innerHTML = items.map((x) => {
+    const inner = `<span class="signal-key">${esc(x.key)}</span><span class="signal-value">${esc(x.value)}${x.sub ? `<span class="signal-sub">${esc(x.sub)}</span>` : ''}</span>`;
+    return x.i >= 0
+      ? `<button type="button" class="signal-row" data-i="${x.i}" aria-label="${esc(`${x.key}: ${x.value}, ${x.sub}. Show this date`)}">${inner}</button>`
+      : `<div class="signal-row">${inner}</div>`;
+  }).join('');
+}
+
+function renderWeeks() {
+  const all = st.model.rows;
+  const out = [];
+  for (let w = 1; w < 5; w++) {
+    const rs = all.slice(w * 7, w * 7 + 7).filter((r) => isNum(r.hi));
+    if (!rs.length) continue;
+    const hi = mean(rs.map((r) => r.hi)), lo = mean(rs.map((r) => r.lo));
+    const nh = rs.every((r) => r.n) ? mean(rs.map((r) => r.n.hi)) : null;
+    const wet = rs.reduce((a, r) => a + (r.pop || 0), 0);
+    const nwet = rs.every((r) => r.n) ? rs.reduce((a, r) => a + r.n.wet, 0) : null;
+    const c = mean(rs.map((r) => r.conf));
+    let rain = `${Math.round(wet)} wet`;
+    let rcls = '';
+    if (isNum(nwet)) {
+      if (wet >= nwet + 1 && wet >= nwet * 1.25) { rain = 'wetter'; rcls = 'wetter'; }
+      else if (wet <= nwet - 1 && wet <= nwet * 0.75) rain = 'drier';
+      else rain = 'typical';
+    }
+    const a = isNum(nh) ? hi - nh : null;
+    let bar = '';
+    if (isNum(a)) {
+      const w2 = Math.max(1.5, Math.min(50, Math.abs(a) / 6 * 50)).toFixed(1);
+      bar = a >= 0 ? `<i class="warm" style="left:50%;width:${w2}%"></i>` : `<i class="cool" style="right:50%;width:${w2}%"></i>`;
+    }
+    const range = rangeLabel(rs[0].date, rs[rs.length - 1].date);
+    const cw = confWord(c);
+    const aria = `${range}: highs ${isNum(a) ? TD(a) + ' degrees vs average' : T(hi)}, precipitation ${rain}, ${cw} confidence`;
+    out.push(`<li class="wrow" style="--o:${ink(c)}" aria-label="${esc(aria)}" title="${esc(range)}">`
+      + `<span class="wd">${label(rs[0].date)}</span>`
+      + `<span class="wa">${isNum(a) ? TD(a) + '°' : ''}</span>`
+      + `<span class="dv" aria-hidden="true">${bar}</span>`
+      + `<span class="whl">${T(hi)} / ${T(lo)}°</span>`
+      + `<span class="wr ${rcls}">${rain}</span>`
+      + `<span class="wc ${cw === 'low' ? 'low' : ''}">${cw}</span>`
+      + '</li>');
+  }
+  $('#weeks').innerHTML = out.join('');
+  const fade = all.find((r) => r.d >= 3 && r.conf < 0.3);
+  $('#wnote').textContent = 'Compared with the 30-year average for the same dates. Confidence is a rough signal from model spread and forecast lead time, not a probability.'
+    + (fade ? ` After ${label(addDays(fade.date, -1))}, read these as tendencies, not exact numbers.` : '');
+}
+
+function tinyWx(r) {
+  // Minimal, near-square weather line art. If model codes are missing or mixed,
+  // Without a weather code, avoid guessing rain or snow from precipitation totals alone.
+  let wx = r.wx;
+  if (!wx || wx === 'variable' || wx === 'unknown' || wx === 'mixed') {
+    const p = isNum(r.pop) ? r.pop : 0;
+    const amount = isNum(r.rainIf) ? r.rainIf : 0;
+    if (p >= 0.35) wx = 'partly';
+    else if (p >= 0.18) wx = 'partly';
+    else wx = 'clear';
+  }
+  if (wx === 'freezing drizzle') wx = 'drizzle';
+  if (wx === 'freezing rain') wx = 'rain';
+  if (wx === 'hailstorm') wx = 'storm';
+  const icons = {
+    clear: `<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/>`,
+    partly: `<circle cx="8" cy="8" r="3.1"/><path d="M8 2.1v1.5M8 12.4v1.5M2.1 8h1.5M12.4 8h1.5M3.8 3.8l1.1 1.1M11.1 11.1l1.1 1.1"/><path d="M7 18.5h11.1a3.1 3.1 0 0 0 .2-6.2 5.2 5.2 0 0 0-9.8-1.1A3.7 3.7 0 0 0 7 18.5Z"/>`,
+    cloudy: `<path d="M6.5 18.2h11a3.4 3.4 0 0 0 .1-6.8 5.3 5.3 0 0 0-10-1.1 3.9 3.9 0 0 0-1.1 7.9Z"/>`,
+    fog: `<path d="M5 8.5h13M3 12h18M5 15.5h13M7 19h10"/>`,
+    drizzle: `<path d="M6.5 14.5h11a3.2 3.2 0 0 0 .1-6.4 5.1 5.1 0 0 0-9.7-1 3.7 3.7 0 0 0-1.4 7.4Z"/><path d="M8 17.2l-.7 1.5M13 17.2l-.7 1.5M18 17.2l-.7 1.5"/>`,
+    rain: `<path d="M6.5 13.5h11a3.2 3.2 0 0 0 .1-6.4 5.1 5.1 0 0 0-9.7-1 3.7 3.7 0 0 0-1.4 7.4Z"/><path d="m8 16-1 2.5M13 16l-1 2.5M18 16l-1 2.5"/>`,
+    snow: `<path d="M6.5 12.5h11a3.2 3.2 0 0 0 .1-6.4 5.1 5.1 0 0 0-9.7-1 3.7 3.7 0 0 0-1.4 7.4Z"/><path d="M8 16v4M6.3 17l3.4 2M9.7 17l-3.4 2M16 16v4M14.3 17l3.4 2M17.7 17l-3.4 2"/>`,
+    storm: `<path d="M6.5 13.5h11a3.2 3.2 0 0 0 .1-6.4 5.1 5.1 0 0 0-9.7-1 3.7 3.7 0 0 0-1.4 7.4Z"/><path d="m13 14-3 4h2l-1 3 4-5h-2l1-2"/>`
+  };
+  return `<svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><g>${icons[wx] || icons.clear}</g></svg>`;
+}
+function precipTypeLabel(r) {
+  const labels = { rain: 'rain', drizzle: 'drizzle', 'freezing rain': 'freezing rain', 'freezing drizzle': 'freezing drizzle', snow: 'snow', storm: 'thunderstorms', hailstorm: 'hail' };
+  return labels[r.wx] || 'precip';
+}
+
+function renderCal() {
+  const rows = st.model.rows;
+  const lead = (parseD(rows[0].date).getUTCDay() + 6) % 7;
+  let h = '';
+  for (let i = 0; i < lead; i++) h += '<div class="cell blank" aria-hidden="true"></div>';
+  rows.forEach((r, i) => {
+    const dn = parseD(r.date).getUTCDate();
+    const dl = i === 0 || dn === 1 ? `<span class="mo">${label(r.date).split(' ')[0]} </span>${dn}` : String(dn);
+    const p = isNum(r.pop) && r.pop >= 0.2 ? r.pop : 0;
+    const aria = `${dowOf(r.date)} ${label(r.date)}${i === 0 ? ', today' : ''}: high ${T(r.hi)}, low ${T(r.lo)}${p ? ', ' + pct(r.pop) + ' chance of ' + precipTypeLabel(r) : ''}`;
+    h += `<button type="button" class="cell${i === 0 ? ' today' : ''}" data-i="${i}" aria-pressed="${st.sel === i}" aria-label="${esc(aria)}" style="--o:${inkCal(r.conf)};--rp:${p.toFixed(2)}">`
+      + `<span class="dayhead"><span class="d">${dl}</span><span class="wxmini" aria-hidden="true">${tinyWx(r)}</span></span>`
+      + `<span class="hi v">${isNum(r.hi) ? T(r.hi) : '·'}</span>`
+      + `<span class="lo v">${T(r.lo)}</span>`
+      + `<span class="rn v${p >= 0.5 ? ' wet' : ''}">${p ? `<span class="rl">${esc(precipTypeLabel(r))} </span>${pct(p)}` : ''}</span>`
+      + '</button>';
+  });
+  const trail = (7 - ((lead + rows.length) % 7)) % 7;
+  for (let i = 0; i < trail; i++) h += '<div class="cell blank" aria-hidden="true"></div>';
+  $('#cal').innerHTML = h;
+}
+
+function readoutHTML(r) {
+  const name = r.d === 0 ? 'today' : `${dowOf(r.date)} ${label(r.date)}`;
+  const bits = [`<i>high</i>${T(r.hi)}°`, `<i>low</i>${T(r.lo)}°`];
+  if (isNum(r.pop)) bits.push(`<i>precip</i>${pct(r.pop)}`);
+  if (r.n) bits.push(`<i>average</i>${T(r.n.hi)}° / ${T(r.n.lo)}°`);
+  return `<b>${name}</b>` + bits.map((b) => `<span>${b}</span>`).join('');
+}
+
+function renderTrendReadout(hover) {
+  const k = hover != null ? hover : st.sel;
+  $('#readout2').innerHTML = k == null
+    ? '<span class="hint">Tap or hover the chart to read a date.</span>'
+    : readoutHTML(st.model.rows[k]);
+}
+
+function renderCalDetail() {
+  const el = $('#cdet');
+  const r = st.model.rows[st.sel];
+  el.className = 'cdet open';
+  const name = `${dowOf(r.date)} ${label(r.date)}`;
+  const when = r.d === 0 ? 'today' : r.d === 1 ? 'tomorrow' : `in ${r.d} days`;
+  const rainTxt = isNum(r.pop) ? `precip ${pct(r.pop)}` : '';
+
+  const kv = [];
+  if (r.n && isNum(r.hi)) {
+    const a = Math.round(cv(r.hi) - cv(r.n.hi));
+    kv.push(['vs average', a === 0 ? `right at the average high of ${T(r.n.hi)}°` : `${Math.abs(a)}° ${a > 0 ? 'warmer' : 'cooler'} than the average high of ${T(r.n.hi)}°`]);
+    kv.push(['average', `${T(r.n.hi)}° / ${T(r.n.lo)}°`]);
+  }
+  if (isNum(r.p10) && isNum(r.p90)) kv.push(['likely high', `${T(r.p10)}° to ${T(r.p90)}°`]);
+  if (isNum(r.l10) && isNum(r.l90)) kv.push(['likely low', `${T(r.l10)}° to ${T(r.l90)}°`]);
+  if (isNum(r.pop) && r.pop >= 0.2 && isNum(r.rainIf)) kv.push(['precip', `${pct(r.pop)} chance, ${r.rainIf < 0.05 && st.unit !== 'c' ? 'light if it does' : 'about ' + P(r.rainIf) + ' if it does'}`]);
+  else if (isNum(r.pop)) kv.push(['precip', `${pct(r.pop)} chance, probably dry`]);
+  const cw = confWord(r.conf);
+  kv.push(['confidence', `${cw}, ${cw === 'high' ? 'the forecasts agree closely' : cw === 'medium' ? 'the forecasts roughly agree' : 'the forecasts disagree, treat it as a tendency'}`]);
+  const srcs = st.model.perSource(r.date);
+  const longOnly = srcs.length && srcs.every((s2) => s2.n);
+  kv.push(['sources', `${r.reach} of ${st.model.srcCount} reach this date${longOnly ? ', all long-range ensembles' : ''}`]);
+
+  const rowsTxt = srcs.map((s2) => {
+    const t = `${T(s2.hi) || '-'} / ${T(s2.lo) || '-'}`;
+    const p = isNum(s2.pop) ? pct(s2.pop) : '-';
+    const extra = s2.n ? `<span class="src-runs">${s2.n} runs, </span><span class="src-range">high ${T(s2.r10)} to ${T(s2.r90)}${isNum(s2.q10) ? `, low ${T(s2.q10)} to ${T(s2.q90)}` : ''}</span>` : '';
+    return `<div class="src-row"><span class="src-name">${esc(s2.name)}</span><span class="src-temp">${t}</span><span class="src-rain">${p}</span><span class="src-extra">${extra}</span></div>`;
+  });
+  const head = `<div class="src-row src-head"><span>source</span><span>high / low</span><span>precip</span><span></span></div>`;
+  // Clean outline-style ASCII weather icons inspired by classic weather pictograms.
+  const wet = isNum(r.pop) && r.pop >= 0.35;
+  const showery = isNum(r.pop) && r.pop >= 0.12;
+  const weatherArt = wet ? `       .-~~~~~~~~-.
+    .-'            '-.
+   /                  \\
+  |                    |
+   \\                  /
+    '-.____________.-'
+        /   /   /   /
+       /   /   /   /` : showery ? `       \\    |    /
+        \\   |   /
+      .-  \\ | /  -.
+    .'     .---.    '.
+   /      /     \\     \\
+  |      |       |     |
+   \\      \\_____/     /
+    '.___         __.'
+        /   /   /` : `           \\   |   /
+            \\  |  /
+         ----\\ | /----
+              .-.
+       -------(   )-------
+              '-'
+         ----/ | \\----
+            /  |  \\
+           /   |   \\`;
+  const weatherLabel = wet ? 'rainy' : showery ? 'partly cloudy' : 'sunny';
+
+  el.innerHTML = `<div class="cdet-top"><b>${name}</b><span class="ago">${when}</span></div>`
+    + `<div class="cdet-body">`
+    + `<div class="cdet-main"><div class="cdet-temp"><span class="h">${T(r.hi)}°</span><span class="l">${T(r.lo)}°</span>${rainTxt ? `<span class="r${r.pop >= 0.5 ? ' wet' : ''}">${rainTxt}</span>` : ''}</div><div class="cdet-text" style="margin-top:16px"><p class="selected-desc">${esc(dayDescription(r))}</p><p><span class="hint">day range</span> &nbsp; ${Math.abs(cv(r.hi)-cv(r.lo)).toFixed(0)}° between high and low</p><p class="sub">${isNum(r.pop) ? `${pct(r.pop)} precipitation probability` : 'Precipitation probability unavailable'}</p><p class="sub">${r.reach} of ${st.model.srcCount} forecast sources contribute to this date</p></div></div>`
+    + `<aside class="cdet-side"><dl class="kv">${kv.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl></aside>`
+    + `</div>`
+    + `${rowsTxt.length ? `<div class="src">${head}\n${rowsTxt.join('\n')}</div>` : ''}`;
+}
+
+function setLine(i) {
+  const line = document.getElementById('selLine');
+  if (!line || !st.chartX) return;
+  if (i == null) { line.style.visibility = 'hidden'; return; }
+  const sx = st.chartX(i).toFixed(1);
+  line.setAttribute('x1', sx); line.setAttribute('x2', sx);
+  line.style.visibility = 'visible';
+}
+
+function renderChart() {
+  const rows = st.model.rows, el = $('#chart');
+  const W = Math.max(300, Math.round(el.clientWidth || 1000));
+  const H = W < 560 ? 200 : 240;
+  const m = { l: 34, r: 6, t: 8, b: 50 };
+  const pw = W - m.l - m.r, ph = H - m.t - m.b, n = rows.length;
+  const vals = [];
+  rows.forEach((r) => [r.hi, r.lo, r.p10, r.p90, r.l10, r.l90, r.n && r.n.hi, r.n && r.n.lo].forEach((v) => { if (isNum(v)) vals.push(cv(v)); }));
+  if (!vals.length) { el.innerHTML = ''; return; }
+  const step = st.unit === 'c' ? 5 : 10;
+  const lo = Math.floor((Math.min(...vals) - 1) / step) * step;
+  let hi = Math.ceil((Math.max(...vals) + 1) / step) * step;
+  if (hi - lo < step * 2) hi = lo + step * 2;
+  const x = (i) => m.l + (n > 1 ? i * pw / (n - 1) : pw / 2);
+  const yv = (v) => m.t + ph - (v - lo) / (hi - lo) * ph;
+  const y = (f) => yv(cv(f));
+  const f1 = (v) => v.toFixed(1);
+  const runs = (fn) => {
+    const out = []; let cur = [];
+    rows.forEach((r, i) => { if (fn(r)) cur.push(i); else if (cur.length) { out.push(cur); cur = []; } });
+    if (cur.length) out.push(cur);
+    return out;
+  };
+  let s = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="group" tabindex="0" aria-label="Temperature trend for the next ${n} days. Use left and right arrow keys to inspect dates; Home and End jump to the first and last date.">`
+    + '<defs><pattern id="dotband" width="3" height="3" patternUnits="userSpaceOnUse"><circle cx="1.5" cy="1.5" r="0.85" fill="var(--ink)"/></pattern></defs>';
+  for (let v = lo; v <= hi; v += step) {
+    s += `<line class="g" x1="${m.l}" x2="${W - m.r}" y1="${f1(yv(v))}" y2="${f1(yv(v))}"/><text x="${m.l - 6}" y="${f1(yv(v) + 4)}" text-anchor="end">${v}</text>`;
+  }
+  const ry = m.t + ph + 10, rh = 14;
+  rows.forEach((r, i) => {
+    if (parseD(r.date).getUTCDay() !== 1) return;
+    s += `<line class="g" x1="${f1(x(i))}" x2="${f1(x(i))}" y1="${m.t}" y2="${ry + rh}"/><text x="${f1(x(i))}" y="${H - 6}" text-anchor="middle">${label(r.date)}</text>`;
+  });
+  runs((r) => isNum(r.p10) && isNum(r.p90)).forEach((run) => {
+    const top = run.map((i) => `${f1(x(i))},${f1(y(rows[i].p90))}`);
+    const bot = run.slice().reverse().map((i) => `${f1(x(i))},${f1(y(rows[i].p10))}`);
+    s += `<polygon class="band" points="${top.concat(bot).join(' ')}"/>`;
+  });
+  runs((r) => isNum(r.l10) && isNum(r.l90)).forEach((run) => {
+    const top = run.map((i) => `${f1(x(i))},${f1(y(rows[i].l90))}`);
+    const bot = run.slice().reverse().map((i) => `${f1(x(i))},${f1(y(rows[i].l10))}`);
+    s += `<polygon class="band band-lo" points="${top.concat(bot).join(' ')}"/>`;
+  });
+  runs((r) => r.n).forEach((run) => {
+    s += `<polyline class="norm" points="${run.map((i) => `${f1(x(i))},${f1(y(rows[i].n.hi))}`).join(' ')}"/>`;
+    s += `<polyline class="norm" points="${run.map((i) => `${f1(x(i))},${f1(y(rows[i].n.lo))}`).join(' ')}"/>`;
+  });
+  for (let i = 1; i < n; i++) {
+    const a = rows[i - 1], b = rows[i];
+    const op = (0.22 + 0.78 * (a.conf + b.conf) / 2).toFixed(2);
+    if (isNum(a.hi) && isNum(b.hi)) s += `<line class="hi" x1="${f1(x(i - 1))}" y1="${f1(y(a.hi))}" x2="${f1(x(i))}" y2="${f1(y(b.hi))}" stroke-opacity="${op}"/>`;
+    if (isNum(a.lo) && isNum(b.lo)) s += `<line class="lo" x1="${f1(x(i - 1))}" y1="${f1(y(a.lo))}" x2="${f1(x(i))}" y2="${f1(y(b.lo))}" stroke-opacity="${op}"/>`;
+  }
+  const bw = Math.max(2, Math.min(8, pw / n * 0.42));
+  rows.forEach((r, i) => {
+    if (!isNum(r.pop) || r.pop < 0.05) return;
+    const h = Math.max(1, r.pop * rh);
+    s += `<rect class="rain" x="${f1(x(i) - bw / 2)}" y="${f1(ry + rh - h)}" width="${f1(bw)}" height="${f1(h)}" fill-opacity="${(0.25 + 0.75 * r.conf).toFixed(2)}"/>`;
+  });
+  s += `<line class="base" x1="${m.l}" x2="${W - m.r}" y1="${ry + rh}" y2="${ry + rh}"/>`;
+  s += `<text x="${m.l - 6}" y="${ry + rh}" text-anchor="end">precip</text>`;
+  s += `<text x="${m.l + 4}" y="${m.t + 10}">°${st.unit.toUpperCase()}</text>`;
+  const sx = f1(x(st.sel == null ? 0 : st.sel));
+  s += `<line class="sel" id="selLine" x1="${sx}" x2="${sx}" y1="${m.t}" y2="${ry + rh}" style="visibility:${st.sel == null ? 'hidden' : 'visible'}"/>`;
+  s += `<rect class="hit" x="${m.l - 4}" y="0" width="${pw + 8}" height="${ry + rh}"/>`;
+  el.innerHTML = s + '</svg>';
+
+  const svg = el.querySelector('svg');
+  const pick = (ev) => {
+    const rect = svg.getBoundingClientRect();
+    const px = (ev.clientX - rect.left) * (W / rect.width);
+    return clamp(Math.round((px - m.l) / (pw / Math.max(1, n - 1))), 0, n - 1);
+  };
+  svg.addEventListener('pointermove', (ev) => { if (ev.pointerType === 'mouse') { const i = pick(ev); renderTrendReadout(i); setLine(i); } });
+  svg.addEventListener('pointerleave', () => { renderTrendReadout(); setLine(st.sel); });
+  svg.addEventListener('click', (ev) => { const i = pick(ev); if (i !== st.sel) select(i); });
+  svg.addEventListener('keydown', (ev) => {
+    if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(ev.key)) return;
+    ev.preventDefault();
+    const current = st.sel == null ? 0 : st.sel;
+    const next = ev.key === 'Home' ? 0 : e

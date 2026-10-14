@@ -733,6 +733,24 @@ footer{max-width:none;width:100%}
 .ask #zip{padding-right:1ch}
 .ask .zipwrap{overflow:hidden}
 
+/* compact details panel: single-line rows, tighter spacing */
+.cdet-side .kv{gap:3px 14px}
+.cdet .src{margin-top:8px;padding-top:8px}
+.cdet .src-row{padding:1px 0;line-height:1.45}
+.cdet .src-head span{white-space:nowrap;overflow-wrap:normal;word-break:keep-all}
+.cdet .src-row .src-extra{flex-wrap:nowrap}
+
+/* tighter rows in the right column so both columns end at the same height */
+.dbtn{padding-top:6px;padding-bottom:6px}
+.wrow{padding-top:7px;padding-bottom:7px}
+.signal-row{padding-top:5px;padding-bottom:5px}
+@media (min-width:901px){
+  .out>.month{align-self:stretch}
+}
+
+.cdet-side .kv{grid-template-columns:minmax(12ch,auto) minmax(0,1fr)}
+.cdet-side .kv dt{white-space:nowrap}
+
 </style>
 </head>
 <body class="idle">
@@ -798,12 +816,12 @@ footer{max-width:none;width:100%}
         <summary class="module-title">this week</summary>
         <div class="dhead" aria-hidden="true"><span></span><span></span><span class="r">low</span><span></span><span class="r">high</span><span class="r">avg</span><span class="r">precip</span></div>
         <ul class="list" id="week"></ul>
-        <p class="note"><i class="sw sw-fc"></i>forecast low to high <i class="sw sw-nm"></i>30-year average range for that date (numbers in the avg column). Tap a day to compare sources.</p>
+        <p class="note"><i class="sw sw-fc"></i>forecast <i class="sw sw-nm"></i>30-year average. Tap a day for sources.</p>
       </details>
       <details class="module panel signal" open="">
         <summary class="module-title">forecast signals <small>35-day scan</small></summary>
         <div id="signals" class="signals" aria-live="polite"></div>
-        <p class="note">Extremes are relative to this outlook, not historical records. Tap a signal with a date to jump to it.</p>
+        <p class="note">Tap a signal with a date to jump to it.</p>
       </details>
       <details class="module panel" open="">
         <summary class="module-title">weeks ahead</summary>
@@ -1598,8 +1616,8 @@ function renderWeeks() {
   }
   $('#weeks').innerHTML = out.join('');
   const fade = all.find((r) => r.d >= 3 && r.conf < 0.3);
-  $('#wnote').textContent = 'Compared with the 30-year average for the same dates. Confidence is a rough signal from model spread and forecast lead time, not a probability.'
-    + (fade ? ` After ${label(addDays(fade.date, -1))}, read these as tendencies, not exact numbers.` : '');
+  $('#wnote').textContent = 'Compared with the 30-year average.'
+    + (fade ? ` Tendencies after ${label(addDays(fade.date, -1))}.` : '');
 }
 
 function tinyWx(r) {
@@ -1677,30 +1695,30 @@ function renderCalDetail() {
   const kv = [];
   if (r.n && isNum(r.hi)) {
     const a = Math.round(cv(r.hi) - cv(r.n.hi));
-    kv.push(['vs average', a === 0 ? `right at the average high of ${T(r.n.hi)}°` : `${Math.abs(a)}° ${a > 0 ? 'warmer' : 'cooler'} than the average high of ${T(r.n.hi)}°`]);
+    kv.push(['vs average', a === 0 ? 'right at average' : `${Math.abs(a)}° ${a > 0 ? 'warmer' : 'cooler'}`]);
     kv.push(['average', `${T(r.n.hi)}° / ${T(r.n.lo)}°`]);
   }
   if (isNum(r.p10) && isNum(r.p90)) kv.push(['likely high', `${T(r.p10)}° to ${T(r.p90)}°`]);
   if (isNum(r.l10) && isNum(r.l90)) kv.push(['likely low', `${T(r.l10)}° to ${T(r.l90)}°`]);
-  if (isNum(r.pop) && r.pop >= 0.2 && isNum(r.rainIf)) kv.push(['precip', `${pct(r.pop)} chance, ${r.rainIf < 0.05 && st.unit !== 'c' ? 'light if it does' : 'about ' + P(r.rainIf) + ' if it does'}`]);
-  else if (isNum(r.pop)) kv.push(['precip', `${pct(r.pop)} chance, probably dry`]);
+  if (isNum(r.pop) && r.pop >= 0.2 && isNum(r.rainIf)) kv.push(['precip', `${pct(r.pop)}, ${r.rainIf < 0.05 && st.unit !== 'c' ? 'light' : 'about ' + P(r.rainIf)}`]);
+  else if (isNum(r.pop)) kv.push(['precip', `${pct(r.pop)}, probably dry`]);
   const cw = confWord(r.conf);
-  kv.push(['confidence', `${cw}, ${cw === 'high' ? 'the forecasts agree closely' : cw === 'medium' ? 'the forecasts roughly agree' : 'the forecasts disagree, treat it as a tendency'}`]);
+  kv.push(['confidence', `${cw}, ${cw === 'high' ? 'models agree' : cw === 'medium' ? 'models roughly agree' : 'a tendency only'}`]);
   const srcs = st.model.perSource(r.date);
   const longOnly = srcs.length && srcs.every((s2) => s2.n);
-  kv.push(['sources', `${r.reach} of ${st.model.srcCount} reach this date${longOnly ? ', all long-range ensembles' : ''}`]);
+  kv.push(['sources', `${r.reach} of ${st.model.srcCount}${longOnly ? ', long-range only' : ''}`]);
 
   const rowsTxt = srcs.map((s2) => {
     const t = `${T(s2.hi) || '-'} / ${T(s2.lo) || '-'}`;
     const p = isNum(s2.pop) ? pct(s2.pop) : '-';
-    const extra = s2.n ? `<span class="src-runs">${s2.n} runs,</span><span class="src-range">high ${T(s2.r10)} to ${T(s2.r90)}${isNum(s2.q10) ? ',' : ''}</span>${isNum(s2.q10) ? `<span class="src-range">low ${T(s2.q10)} to ${T(s2.q90)}</span>` : ''}` : '';
+    const extra = s2.n ? `<span class="src-runs">${s2.n} runs,</span><span class="src-range">${T(s2.r10)} to ${T(s2.r90)}${isNum(s2.q10) ? ` / ${T(s2.q10)} to ${T(s2.q90)}` : ''}</span>` : '';
     return `<div class="src-row"><span class="src-name">${esc(s2.name)}</span><span class="src-temp">${t}</span><span class="src-rain">${p}</span><span class="src-extra">${extra}</span></div>`;
   });
-  const head = `<div class="src-row src-head"><span>source</span><span>high / low</span><span>precip</span><span></span></div>`;
+  const head = `<div class="src-row src-head"><span>source</span><span>high / low</span><span>precip</span><span>, likely high / low</span></div>`;
 
   el.innerHTML = `<div class="cdet-top"><b>${name}</b><span class="ago">${when}</span></div>`
     + `<div class="cdet-body">`
-    + `<div class="cdet-main"><div class="cdet-temp"><span class="h">${T(r.hi)}°</span><span class="l">${T(r.lo)}°</span>${rainTxt ? `<span class="r${r.pop >= 0.5 ? ' wet' : ''}">${rainTxt}</span>` : ''}</div><div class="cdet-text" style="margin-top:16px"><p class="selected-desc">${esc(dayDescription(r))}</p><p><span class="hint">day range</span> &nbsp; ${Math.abs(cv(r.hi)-cv(r.lo)).toFixed(0)}° between high and low</p><p class="sub">${isNum(r.pop) ? `${pct(r.pop)} precipitation probability` : 'Precipitation probability unavailable'}</p><p class="sub">${r.reach} of ${st.model.srcCount} forecast sources contribute to this date</p></div></div>`
+    + `<div class="cdet-main"><div class="cdet-temp"><span class="h">${T(r.hi)}°</span><span class="l">${T(r.lo)}°</span>${rainTxt ? `<span class="r${r.pop >= 0.5 ? ' wet' : ''}">${rainTxt}</span>` : ''}</div><div class="cdet-text" style="margin-top:10px"><p class="selected-desc">${esc(dayDescription(r))}</p><p><span class="hint">day range</span> &nbsp; ${Math.abs(cv(r.hi)-cv(r.lo)).toFixed(0)}° between high and low</p></div></div>`
     + `<aside class="cdet-side"><dl class="kv">${kv.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl></aside>`
     + `</div>`
     + `${rowsTxt.length ? `<div class="src">${head}\n${rowsTxt.join('\n')}</div>` : ''}`;

@@ -1,141 +1,1680 @@
-<!DOCTYPE html>
-<html lang="en" style="--paper: #d9eee5; --ink: #174d43; --ink-2: color-mix(in srgb,var(--ink) 88%,var(--paper)); --ink-3: color-mix(in srgb,var(--ink) 72%,var(--paper)); --base-weight: 400;"><head>
+<!doctype html>
+<html lang="en">
+<head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>longcast</title>
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Crect x='3' y='3' width='10' height='10' fill='black'/%3E%3C/svg%3E">
-<link rel="preconnect" href="https://fonts.googleapis.com/">
-<link rel="preconnect" href="https://fonts.gstatic.com/" crossorigin="">
-<link href="longcast_files/css2_YKG9.css" rel="stylesheet">
-<style>@keyframes blink{50%{opacity:0}}@keyframes cursor-blink{50%{opacity:0}}@keyframes module-in{0%{opacity:.65;transform:translateY(2px)}to{opacity:1;transform:translateY(0)}}@keyframes scanline{0%{background-position:0 0}to{background-position:160px 0}}@keyframes status-pulse{50%{opacity:.72}}:root{--s:12px;--m:14px;--l:20px;--xl:36px;--xxl:48px;--dcols:6.5ch 6ch 3.5ch minmax(48px,1fr) 3.5ch 4ch;--wcols:6ch 6ch minmax(96px,1fr) 8ch 7ch 9ch;--paper:#ffffff;--ink:#000000;--ink-2:color-mix(in srgb,var(--ink) 88%,var(--paper));--ink-3:color-mix(in srgb,var(--ink) 72%,var(--paper));--rule:color-mix(in srgb,var(--ink) 14%,var(--paper));--track:color-mix(in srgb,var(--ink) 8%,var(--paper));--norm:color-mix(in srgb,var(--ink) 22%,var(--paper));--wash:color-mix(in srgb,var(--ink) 4%,var(--paper));--rule-fixed:color-mix(in srgb,var(--ink) 24%,var(--paper));--hover:color-mix(in srgb,var(--ink) 7%,var(--paper));--mono:"M PLUS 1 Code", ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;box-sizing:border-box;padding-top:env(safe-area-inset-top,0);padding-bottom:env(safe-area-inset-bottom,0)}*,::after,::before{box-sizing:inherit}html{height:100%;scroll-padding-top:env(safe-area-inset-top,0)}a,body{color:var(--ink)}body{margin:0;min-height:100%;background:var(--paper);font:var(--base-weight,400) var(--m)/1.6 var(--mono);font-variant-numeric:tabular-nums;-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}a{text-underline-offset:3px;text-decoration-thickness:1px}button{font:inherit;color:inherit}:focus-visible{outline:2px solid var(--ink);outline-offset:2px}#zip[aria-invalid=true]{box-shadow:inset 0-2px 0 var(--ink)}.chart svg:focus-visible{outline-offset:4px}.status{padding-bottom:max(3px,env(safe-area-inset-bottom,0))}main{max-width:1040px;margin:0 auto;padding:20px 32px 72px}.top{display:flex;align-items:center;gap:24px;min-height:44px;padding-bottom:8px}.mark{text-decoration:none}.units{display:flex;margin-left:auto}.theme-toggle,.units button{background:0 0;font-size:var(--s);cursor:pointer}.units button{border:1px solid var(--ink);line-height:22px}.units button+button{border-left:0}.theme-share button:hover,.units button[aria-pressed=true]{background:var(--ink);color:var(--paper)}.theme-toggle{border:1px solid var(--rule);padding:2px 8px}.theme-toggle:focus-visible,.theme-toggle:hover{background:var(--wash)}#themePanel{position:absolute;z-index:20;right:32px;top:54px;width:min(360px,calc(100vw - 24px));padding:14px;background:var(--paper);border:1px solid var(--ink);box-shadow:0 8px 28px color-mix(in srgb,var(--ink) 12%,transparent)}#themePanel[hidden],body.ready #log{display:none}.theme-presets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:10px 0 14px}.theme-preset{display:flex;align-items:center;gap:8px;text-align:left;border:1px solid var(--rule);background:var(--paper);color:var(--ink);padding:7px;cursor:pointer;font-size:var(--s)}.theme-preset[aria-pressed=true]{border-color:var(--ink);outline:1px solid var(--ink);outline-offset:-3px}.swatch{width:20px;height:20px;display:inline-block;border:1px solid color-mix(in srgb,var(--ink) 25%,transparent);flex:none}.theme-controls{display:grid;grid-template-columns:1fr 1fr;gap:10px}.hex-entry input,.theme-control{min-width:0;color:var(--ink);font-size:var(--s)}.theme-control{display:flex;flex-direction:column;gap:4px}.color-chip,.hex-entry{border:1px solid var(--rule-fixed)}.hex-entry{display:flex;align-items:center;gap:6px;padding:4px 6px;min-width:0}.color-chip{width:18px;height:18px;background:#fff;flex:none}.hex-entry input{width:100%;border:0;outline:0;background:0 0;font:inherit;text-transform:uppercase}.color-swatches{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px;margin-top:7px}.color-swatch,.theme-share button{border:1px solid var(--rule-fixed);cursor:pointer}.color-swatch{height:19px;min-width:0;padding:0;background:var(--swatch)}.color-swatch[aria-pressed=true]{outline:2px solid var(--ink);outline-offset:1px}.theme-share{display:flex;justify-content:space-between;align-items:center;gap:8px;border-top:1px solid var(--rule);padding-top:9px}.theme-share button{background:0 0;color:var(--ink);font:inherit;font-size:var(--s);padding:3px 7px}.theme-share,.theme-weight{margin-top:12px;font-size:var(--s);color:var(--ink-2)}.theme-weight input{width:100%;accent-color:var(--ink)}@media (max-width:680px){#themePanel{position:fixed;top:58px;right:12px;max-height:calc(100dvh - 72px);overflow:auto}.theme-controls{grid-template-columns:1fr 1fr}}#ask{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin:0}#zip,.gt{font-weight:200;line-height:1.1}#zip{font-family:var(--mono);padding:2px 0;border:0;border-radius:0;background:0 0;color:var(--ink);box-shadow:inset 0-1px 0 var(--ink);caret-color:var(--ink)}#zip::placeholder{color:var(--ink-3)}#zip:focus{outline:0;box-shadow:inset 0-2px 0 var(--ink)}.ask #zip,.ask .gt{font-size:var(--xxl)}.ask #zip{width:8.4ch}.ask{padding:120px 0 16px;transition:padding .3s ease}body:not(.idle) .ask{padding:28px 0 0}.intro{max-width:54ch;color:var(--ink-2);margin:28px 0 0}body:not(.idle) .intro{display:none}.log{margin:24px 0 0;font-size:var(--s);line-height:1.8;white-space:pre;overflow-x:auto;color:var(--ink-2)}.log:empty{display:none}.cdet .src b,.ddet .src b,.log b{font-weight:400;color:var(--ink)}.log .err{display:inline-block;white-space:normal;max-width:60ch;margin-top:6px;vertical-align:top;color:var(--ink)}.log .wait::after{content:"";display:inline-block;width:.62em;height:1.05em;background:var(--ink);vertical-align:-3px;animation:blink 1s steps(1) infinite}body.loading .out:not([hidden]){opacity:.78}body.loading .status .mode::after{content:" /"}.hero{margin-top:8px}.where{margin:0;font-size:var(--m);color:var(--ink-2)}.where span{margin-right:3ch}.head{margin:26px 0 0;font-size:var(--xl);font-weight:300;line-height:1.2;letter-spacing:-.01em}.facts,h2 small{color:var(--ink-2)}.facts{display:flex;flex-wrap:wrap;gap:2px 28px;margin:10px 0 0;font-size:var(--m)}.facts span,.where span{white-space:nowrap}.facts b,h2{font-weight:600}.facts b{color:var(--ink)}.cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr)}h2{margin:0;padding-top:8px;border-top:1px solid var(--ink);font-size:var(--m);display:flex;justify-content:space-between;align-items:baseline}h2 small{font-size:var(--s);font-weight:400}ul.list{list-style:none;margin:0;padding:0}.drow{border-bottom:1px solid var(--rule)}.dbtn{display:grid;grid-template-columns:var(--dcols);align-items:center;column-gap:12px;width:100%;padding:9px 0;border:0;background:0 0;text-align:left;cursor:pointer}.dbtn>*{opacity:var(--o,1);line-height:20px}.dbtn:hover,.drow.open .dbtn{background:linear-gradient(var(--wash),var(--wash)) no-repeat center/calc(100% + 16px) 100%}.dn{font-size:var(--m);white-space:nowrap}.drow:first-child .dn{font-weight:600}.dbtn .wx{font-size:var(--s);white-space:nowrap}.dbtn .lo,.dbtn .wx{color:var(--ink-2)}.dbtn .hi,.dbtn .lo,.dbtn .rain{font-size:var(--m);text-align:right}.dbtn .hi{font-weight:500}.dbtn .rain{color:var(--ink-2)}.dbtn .rain.wet{color:var(--ink);font-weight:600}.rng{position:relative;height:12px}.rng::before{left:0;right:0;top:50%;background:var(--rule)}.rng .nm{top:0;bottom:0;background:var(--norm)}.dv i,.rng .fc,.rng .nm{position:absolute}.rng .fc{background:var(--ink);min-width:2px}.ddet{padding:2px 0 16px;font-size:var(--s);color:var(--ink-2)}.ddet p,.kv dd{margin:0}.ddet .src{margin-top:10px;white-space:pre;overflow-x:auto;line-height:1.8}.wrow{display:grid;grid-template-columns:var(--wcols);align-items:center;column-gap:10px;padding:10px 0;border-bottom:1px solid var(--rule)}.wc{font-size:var(--m);text-align:right}.cdet-text p.sub,.wc.low{color:var(--ink-2)}.wrow>*{opacity:var(--o,1)}.wd{font-size:var(--m);white-space:nowrap}.wa,.whl{text-align:right}.wa{font-size:var(--m);font-weight:500}.whl{white-space:nowrap}.whl,.wr{font-size:var(--m);color:var(--ink-2)}.wr.wetter{color:var(--ink);font-weight:600}.dv{position:relative;height:8px}.dv::after,.dv::before,.rng::before{content:"";position:absolute}.dv::before{left:50%;top:-4px;bottom:-4px;width:1px;background:var(--ink-2);z-index:2}.dv::after{left:0;right:0;top:3px;background:var(--rule)}.dv i{top:0;bottom:0;z-index:1}.conf i.on,.dv .warm{background:var(--ink)}.dv .cool{background:var(--paper)}.conf{display:inline-flex;gap:3px;justify-content:flex-end}.conf i{width:6px;height:6px;border:1px solid var(--ink)}.note{margin:10px 0 0;font-size:var(--s);color:var(--ink-2);line-height:1.7}.sw{display:inline-block;width:16px;vertical-align:middle;margin-right:6px}.note .sw:not(:first-child),.sw+.sw{margin-left:14px}.sw-fc{background:var(--ink)}.sw-nm{height:12px;background:var(--norm)}.dhead,.whead{display:grid;align-items:end;column-gap:10px;padding:8px 0 5px;font-size:var(--m);color:var(--ink-2);border-bottom:1px solid var(--rule)}.dhead>span,.whead>span{font-size:var(--s);line-height:1.3;white-space:nowrap}.dhead{grid-template-columns:var(--dcols)}.whead{grid-template-columns:var(--wcols)}.dhead .r,.whead .r{text-align:right}.whead .scale{display:flex;justify-content:space-between;gap:8px}.whead .vs{white-space:normal}.cal,.dow{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}.dow{font-size:var(--s);color:var(--ink-2);padding-bottom:5px}.dow span{padding:0 8px}.cell{display:flex;flex-direction:column;align-items:flex-start;min-height:80px;padding:6px 8px 7px;border:0;border-bottom:1px solid #d6d6d6;background:0 0;text-align:left;cursor:pointer}.cell.blank{cursor:default}.cell::before{content:"";position:absolute;inset:0;pointer-events:none;background-image:radial-gradient(circle,var(--ink) .9px,transparent 1.3px);background-size:4px 4px;opacity:calc(var(--rp,0)*.42)}.cell,.cell>*{position:relative}.cell[aria-pressed=true]::before{opacity:0}.cell:hover:not(.blank){background:#f8f8f8}.cell[aria-pressed=true]{background:var(--wash);box-shadow:inset 0 0 0 1px var(--ink)}.cell:focus-visible{outline-offset:-2px}.cell .d{font-size:var(--s);color:var(--ink-2);line-height:18px;padding:0 4px;margin-left:-4px;white-space:nowrap}.cell.today .d{background:var(--ink);color:var(--paper)}.cell .v{opacity:var(--o,1)}.cell .hi{font-size:var(--l);font-weight:400;line-height:1.2;margin-top:4px}.cell .lo,.cell .rn{font-size:var(--s);color:var(--ink-2);line-height:1.35}.cell .rn{margin-top:auto;padding-top:4px;line-height:14px;white-space:nowrap}.cell .rn.wet{font-weight:600;color:var(--ink)}.readout{margin:12px 0 6px;font-size:var(--m);min-height:1.6em;color:var(--ink-2)}.hint{color:var(--ink-3)}.cdet{margin-top:12px}.cdet>.hint{margin:0;font-size:var(--s)}.cdet.open{border-bottom:1px solid var(--ink)}.cdet-top{display:flex;align-items:baseline;gap:14px}.cdet-top b{font-size:var(--m)}.cdet-top .ago{font-size:var(--s);color:var(--ink-2)}.cdet-top .x{margin-left:auto;background:0 0;border:1px solid var(--ink);font-size:var(--s);padding:0 9px;line-height:20px;cursor:pointer}.cdet-body{display:grid;grid-template-columns:auto minmax(0,1fr);gap:10px 40px;margin-top:10px;align-items:start}.cdet-temp{display:flex;align-items:baseline;gap:10px;white-space:nowrap}.cdet-temp .h{font-size:var(--xl);font-weight:200;line-height:1}.cdet-temp .l{font-size:var(--l);font-weight:300;color:var(--ink-2)}.cdet-temp .r{font-size:var(--m);margin-left:10px}.cdet-temp .r.wet,.cdet-top b,.readout b,.srcs summary{font-weight:600}.cdet-text p{margin:0 0 3px;font-size:var(--m)}.readout b{color:var(--ink);margin-right:2ch}.readout span{margin-right:2.4ch;white-space:nowrap;display:inline-block}.chart{width:100%}.chart svg{display:block;max-width:100%;touch-action:pan-y}.chart .g{stroke-width:1}.chart .band{fill:var(--wash)}.chart .norm{fill:none;stroke:var(--ink-3);stroke-width:1;stroke-dasharray:2 3}.chart .hi,.chart .lo{stroke:var(--ink);stroke-width:1.75;stroke-linecap:round}.chart .lo{stroke-width:1}.chart .rain{fill:var(--ink)}.chart .base,.chart .sel{stroke:var(--ink);stroke-width:1}.chart .sel{stroke-dasharray:1 2}.chart .hit{fill:transparent;cursor:crosshair}.chart text{font-family:var(--mono);font-size:var(--s);fill:var(--ink-2)}.legend{display:flex;flex-wrap:wrap;gap:4px 24px;margin:10px 0 0}.legend span{display:inline-flex;align-items:center;gap:8px;white-space:nowrap}.legend i{display:inline-block;width:18px}.legend .l-fc{height:2px;background:var(--ink)}.legend .l-band{height:9px;background:var(--wash)}.legend .l-norm{height:0;border-top:1px dashed var(--ink-3)}.legend .l-rain{width:4px;height:9px;background:var(--ink)}.srcs summary{cursor:pointer;font-size:var(--m);list-style:none;display:flex;align-items:baseline;gap:16px}.cross,.legend,.srcs summary small,footer{font-size:var(--s);color:var(--ink-2)}.srcs summary small{font-weight:400;margin-left:auto}.srcs summary::after{font-weight:400;margin-left:12px;content:none}.srcs[open] summary::after{content:"-"}.cross,footer{max-width:72ch}.cross{margin:16px 0 0}footer{margin-top:40px;padding-top:12px;border-top:1px dashed var(--rule-fixed)}footer p{margin:0 0 4px}.top{border-bottom:1px solid var(--ink)}.mark{background:var(--ink);color:var(--paper);padding:0 8px;font-weight:600}.tag,.units{font-size:var(--s)}.tag{color:var(--ink-2);margin-left:-12px}.units{gap:0}.units button{border:0;padding:0 7px}.units button::before{content:"["}.units button::after{content:"]"}.units button[aria-pressed=true]::after,.units button[aria-pressed=true]::before{content:" "}.zipwrap{position:relative;display:inline-block}#zip,#zip:focus{box-shadow:none;caret-color:transparent}.cur{position:absolute;top:calc(50% + .42em);left:calc(var(--n,0)*1ch);width:.62ch;height:2px;background:var(--ink);transform:translateY(-50%);pointer-events:none;visibility:hidden;animation:cursor-blink 1s steps(1,end) infinite}.ask .cur{font-size:var(--xxl)}.zipwrap:focus-within .cur{visibility:visible}@media (prefers-reduced-motion:reduce){.cur{animation:none}}.panel>h2{font-size:var(--m)}.panel>h2::before{content:"[ "}.panel>h2::after{content:" ]"}.cross::before,.intro::before,.note::before,footer p::before{content:"# ";color:var(--ink-3)}.head{text-transform:lowercase}.facts i{font-style:normal}.facts i::after{content:":";margin-right:1ch}.panel{position:relative;border:1px solid var(--ink);padding:20px 14px 12px}.panel>h2{position:absolute;top:0;left:10px;transform:translateY(-55%);margin:0;padding:0 6px;border:0;background:var(--paper);display:block;font-weight:600;line-height:1.4}.month{margin-top:40px}.cols{gap:28px}.cols,.srcs,.trend{margin-top:36px}.dhead,.drow,.whead,.wrow{border-bottom-style:dashed;border-bottom-color:var(--rule-fixed)}.dow{margin-top:0;border-bottom:1px dashed var(--ink)}.cell{border-bottom:1px dashed var(--rule-fixed)}.cell[aria-pressed=true]{background:color-mix(in srgb,var(--paper) 86%,#000)!important;color:var(--ink)!important;box-shadow:none!important}.cell.today[aria-pressed=true] .d,.cell[aria-pressed=true] *,.cell[aria-pressed=true] .d,.cell[aria-pressed=true] .hi,.cell[aria-pressed=true] .lo,.cell[aria-pressed=true] .rn{color:var(--ink)!important;background-color:transparent!important}.cell[aria-pressed=true] .v{opacity:1!important}.cell::before{display:none!important}.cell:hover:not(.blank):not([aria-pressed=true]){background:var(--hover)}.dv::after,.rng::before{background:0 0;border-top:1px dashed #c4c4c4;height:0}.rng .nm,.sw-nm{background-color:transparent;background-image:radial-gradient(circle,#6e6e6e .85px,transparent 1.25px);background-size:3px 3px;background-position:0 0}.rng .fc,.sw-fc{background:repeating-linear-gradient(90deg,var(--ink)0 5px,transparent 5px 7px)}.rng .fc{top:4px;bottom:4px;background:repeating-linear-gradient(90deg,var(--ink)0 5px,var(--paper) 5px 7px);box-shadow:0 0 0 1px var(--paper)}.sw-fc{height:4px}.dv .warm{background:repeating-linear-gradient(90deg,var(--ink)0 5px,transparent 5px 7px)}.dv .cool{background-color:var(--paper);background-image:radial-gradient(circle,var(--ink) .85px,transparent 1.25px);background-size:3px 3px;border:1px solid var(--ink)}.dbtn:hover,.drow.open .dbtn{background:linear-gradient(var(--hover),var(--hover)) no-repeat center/calc(100% + 16px) 100%}.kv dt,.readout i{font-style:normal;color:var(--ink-2)}.readout i::after{content:":";margin-right:.6ch}.cdet.open{border-top:1px dashed var(--ink);border-bottom:0;padding:12px 0 2px;margin-top:0}.kv{display:grid;grid-template-columns:12ch minmax(0,1fr);gap:3px 1.5ch;margin:0}.kv dt::after{content:":"}.chart .g{stroke:var(--rule-fixed);stroke-dasharray:1 3}.chart .band{fill:url(#dotband);opacity:.6}.legend .l-band{background:radial-gradient(circle,#000 .85px,transparent 1.25px)0 0/3px 3px;opacity:.6}.srcs[open] summary::before{content:"[-]"}.status{position:sticky;bottom:0;z-index:5;margin:40px -32px -72px;padding:3px 32px calc(3px + env(safe-area-inset-bottom,0));background:var(--ink);color:var(--paper);font-size:var(--s);display:flex;gap:3ch;white-space:nowrap;overflow:hidden}.status span{overflow:hidden;text-overflow:ellipsis;min-width:0}.status .mode,.status .r{flex-shrink:0}.status .r{margin-left:auto}.status .mode{background:var(--paper);color:var(--ink);padding:0 6px;margin-left:-6px}@media (max-width:860px){.cols{grid-template-columns:minmax(0,1fr);gap:48px}}@media (max-width:560px){:root{--s:11px;--m:13px;--l:17px;--xl:28px;--xxl:40px}main{padding:16px 16px 72px}.top{gap:14px}.ask{padding:72px 0 12px}body:not(.idle) .ask{padding:32px 0 0}.ask #zip,.ask .gt{font-size:var(--xxl)}.head{font-size:var(--xl);margin-top:20px}.month{margin-top:28px}.facts{gap:2px 20px;font-size:var(--m)}.cols{margin-top:36px;gap:36px}:root{--dcols:6ch 5.5ch 3.5ch minmax(36px,1fr) 3.5ch 4ch;--wcols:6.5ch 6ch minmax(44px,1fr) 7ch 8.5ch}.cell .d,.dbtn .wx,.whead>span{font-size:var(--s)}.dbtn,.dhead,.whead,.wrow{column-gap:8px}.wd,.whead,.wrow{font-size:var(--m)}.whl{display:none}.srcs,.trend{margin-top:40px}.dow span{padding:0 4px}.cell{min-height:64px}.cell .d{margin-left:-2px;padding:0 2px}.cell .hi{font-size:var(--l);margin-top:4px}.cell .lo,.cell .rn{font-size:var(--s)}.cell .rl,.status .hide-sm{display:none}.cell.today .d{padding:0 1px;margin-left:-1px;letter-spacing:-.03em}.cdet-body{grid-template-columns:minmax(0,1fr);gap:8px}.panel{padding:18px 8px 8px}.panel>h2{left:6px}.cell{padding:4px 3px 5px}.status{margin:32px -16px -72px;padding-left:16px;padding-right:16px;gap:2ch}.kv{grid-template-columns:12.5ch minmax(0,1fr)}.srcs{padding:10px 8px}.tag{display:none}}@media (min-width:1200px){:root{--s:clamp(12px,.72vw,15px);--m:clamp(14px,.88vw,18px);--l:clamp(20px,1.35vw,28px);--xl:clamp(38px,2.7vw,56px);--xxl:clamp(52px,4.3vw,88px)}main{max-width:none;width:100%;min-height:100vh;padding:clamp(24px,3vw,56px) clamp(28px,4.2vw,88px) 90px}.top{min-height:54px;padding-bottom:14px}.ask{padding:clamp(100px,14vh,220px)0 24px}body:not(.idle) .ask{padding:32px 0 0}.intro{max-width:64ch;margin-top:36px}.hero{margin-top:24px}.head{margin-top:34px}.facts{gap:4px 3vw;margin-top:16px}.month{margin-top:clamp(44px,5vh,72px)}.cols{grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:clamp(28px,3vw,64px);margin-top:48px}.srcs,.trend{margin-top:clamp(44px,5vh,72px)}.panel{padding:28px 22px 18px}.status{margin-left:calc(-1*clamp(28px,4.2vw,88px));margin-right:calc(-1*clamp(28px,4.2vw,88px));margin-bottom:-90px;padding:6px clamp(28px,4.2vw,88px) calc(6px + env(safe-area-inset-bottom,0))}}@media (min-width:1800px){.cols{grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr)}.panel{padding:32px 28px 22px}}@media (max-width:1199px){main{width:100%}}@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}.out{grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(14px,1.5vw,26px);align-items:start}.module:not([open])>.module-title::before{content:"[+]"}.module-title small{font-size:var(--s);font-weight:400;color:var(--ink-2);margin-left:auto}.top::after{content:"";height:1px;position:absolute;left:0;right:0;bottom:-1px;background:repeating-linear-gradient(90deg,transparent 0 22px,var(--ink) 22px 24px,transparent 24px 40px);opacity:.22;animation:scanline 12s linear infinite}.top{position:relative}.status .mode{animation:status-pulse 3.6s steps(1,end) infinite}@media (max-width:1100px){.out{grid-template-columns:repeat(2,minmax(0,1fr))}.out>.month,.out>.srcs,.out>.trend{grid-column:1/-1}}@media (max-width:680px){.out{grid-template-columns:minmax(0,1fr);gap:24px}.out>.month,.out>.srcs,.out>.trend{grid-column:1}.out>.cols{display:contents}.ask{gap:10px}.out>.hero{grid-column:1}.module.panel{padding:18px 8px 8px}.module-title{padding-bottom:8px}}@media (prefers-reduced-motion:reduce){.status .mode,.top::after{animation:none}}@media (min-width:1200px){main{width:100%;max-width:1440px;margin-inline:auto}}.out{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-auto-flow:row;gap:10px 16px;align-content:start}.out[hidden]{display:none}.out>.hero{grid-column:1/-1;grid-row:1;min-width:0;margin:0}.out>.cols>.module,.out>.month{min-width:0;margin:0;align-self:start}.out>.month{grid-column:1;grid-row:2/span 3}.out>.cols{display:contents}.out>.cols>.module{grid-column:2}.out>.cols>.module:nth-child(1){grid-row:2}.out>.cols>.module:nth-child(3){grid-row:3}.out>.cols>.module.signal{grid-row:4}.out>.trend{grid-column:1/-1;grid-row:5;min-width:0;margin:0}.out>.srcs{grid-column:1/-1;grid-row:6;align-self:start}.module,.out>.srcs{margin:0;min-width:0}.module-title{position:relative;display:flex;align-items:baseline;gap:1ch;cursor:pointer;list-style:none;font-size:var(--m);font-weight:600;line-height:1.3;padding:0 0 6px;border-bottom:1px dashed var(--rule-fixed)}.module-title::-webkit-details-marker,.srcs summary::-webkit-details-marker{display:none}.module-title::before{content:"[-]";font-weight:400}.module[open]>.module-title{animation:module-in .24s ease-out}.module .cal,.module .dhead,.module .dow,.module .note,.module .whead{margin-top:6px}.module.panel{padding:10px 12px 8px}.signals{display:grid;grid-template-columns:1fr;gap:0}.signal-row{display:grid;grid-template-columns:8ch minmax(0,1fr);gap:8px;padding:4px 0;border-bottom:1px solid var(--rule);align-items:baseline}.signal-row:last-child{border-bottom:0}.signal-key{color:var(--ink-2);font-size:var(--s);text-transform:lowercase}.signal-value{font-size:var(--m);font-weight:600;overflow-wrap:anywhere}.signal-sub{display:block;color:var(--ink-2);font-size:var(--s);font-weight:400;margin-top:2px}.srcs{border:1px solid var(--ink);padding:8px 10px}.srcs summary::before{content:"[+]";font-weight:400;margin-right:1ch}.srcs .log{margin-top:10px}.trend .chart{margin-top:4px;min-width:0;max-width:100%;overflow:hidden}.trend .chart svg{display:block;width:100%;max-width:100%;height:auto}.trend .legend{margin-top:4px;gap:3px 14px}@media (min-width:1100px) and (min-height:800px){main{width:100%;max-width:1600px;margin-inline:auto;padding:10px 24px 18px}.top{min-height:34px;padding-bottom:5px}body:not(.idle) .ask{padding:8px 0 0}.hero{margin-top:4px}.head{margin-top:6px;font-size:clamp(28px,2vw,36px);line-height:1.1}.facts{gap:2px 16px;margin-top:4px}.out{gap:8px 14px}.module.panel{padding:8px 10px 7px}.module-title{padding-bottom:4px;line-height:1.2}.module .cal,.module .dhead,.module .dow,.module .note,.module .whead{margin-top:4px}.signal-row{padding:3px 0}.out>.trend{margin-top:0}.status{position:static;margin:8px 0 0;padding:5px 0 0}}@media (min-width:1100px) and (min-height:800px) and (max-height:950px){main{padding-top:6px;padding-bottom:10px}.head{font-size:clamp(26px,1.8vw,32px)}.module.panel{padding:7px 9px 6px}.signal-row{padding:2px 0}}@media (max-width:900px){.out{grid-template-columns:minmax(0,1fr);gap:16px}.out>.hero{grid-column:1;grid-row:auto}.out>.cols>.module,.out>.month{grid-column:1;grid-row:auto}.out>.cols{display:contents}.out>.cols>.module.signal,.out>.cols>.module:nth-child(1),.out>.cols>.module:nth-child(3){grid-column:1;grid-row:auto}.out>.srcs,.out>.trend{grid-column:1;grid-row:auto}.module.panel{padding:16px 10px 10px}}@media (prefers-reduced-motion:reduce){.module[open]>.module-title,.status .mode,.top::after{animation:none}}@media (min-width:901px){.out>.cols>.module[open]{align-self:stretch;display:flex;flex-direction:column}.out>.cols>.module[open]>.note{margin-top:auto;padding-top:6px}.out>.cols>.module[open]>.signals{margin-bottom:6px}.out>.month[open]{align-self:stretch}}/* one type scale: headline matches location line; big temp matches calendar highs; one weight for body text */.head{font-size:var(--m);font-weight:600;line-height:inherit;letter-spacing:0;margin-top:6px}.cdet-temp .h,.cdet-temp .l{font-size:var(--l);font-weight:400;line-height:1.2}.chart .band{fill:url(#dotband)}#dotband circle{fill:var(--ink)}.legend .l-band{background:radial-gradient(circle,var(--ink) .85px,transparent 1.25px) 0 0/3px 3px}.cdet-l{min-width:0}.wxart{margin:10px 0 0;font:inherit;font-size:var(--m);line-height:1.2;white-space:pre;color:var(--ink-2);overflow:hidden}</style>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=M+PLUS+1+Code:wght@100..700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --s:12px;--m:14px;--l:20px;--xl:36px;--xxl:48px;
+  --dcols:6.5ch 6ch 3.5ch minmax(48px,1fr) 3.5ch 4ch;
+  --wcols:6ch 6ch minmax(96px,1fr) 8ch 7ch 9ch;
+  --paper:#ffffff;
+  --ink:#000000;
+  --ink-2:color-mix(in srgb,var(--ink) 88%,var(--paper));
+  --ink-3:color-mix(in srgb,var(--ink) 72%,var(--paper));
+  --rule:color-mix(in srgb,var(--ink) 14%,var(--paper));
+  --track:color-mix(in srgb,var(--ink) 8%,var(--paper));
+  --norm:color-mix(in srgb,var(--ink) 22%,var(--paper));
+  --wash:color-mix(in srgb,var(--ink) 4%,var(--paper));
+  --rule-fixed:color-mix(in srgb,var(--ink) 24%,var(--paper));
+  --hover:color-mix(in srgb,var(--ink) 7%,var(--paper));
+  --mono:"M PLUS 1 Code", ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  box-sizing:border-box;
+  padding-top:env(safe-area-inset-top,0px);
+  padding-bottom:env(safe-area-inset-bottom,0px);
+}
+*,*::before,*::after{box-sizing:inherit}
+html{height:100%;scroll-padding-top:env(safe-area-inset-top,0px)}
+body{
+  margin:0;min-height:100%;
+  background:var(--paper);color:var(--ink);
+  font:var(--base-weight,400) var(--m)/1.6 var(--mono);
+  font-variant-numeric:tabular-nums;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+a{color:var(--ink);text-underline-offset:3px;text-decoration-thickness:1px}
+button{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+#zip[aria-invalid="true"]{box-shadow:inset 0 -2px 0 var(--ink)}
+.chart svg:focus-visible{outline-offset:4px}
+.status{padding-bottom:max(3px, env(safe-area-inset-bottom,0px))}
+main{max-width:1040px;margin:0 auto;padding:20px 32px 72px}
+
+/* header: mark, prompt (once loaded), units */
+.top{position:relative;display:flex;align-items:center;gap:24px;min-height:44px;padding-bottom:8px;border-bottom:1px solid var(--ink)}
+.mark{font-weight:600;text-decoration:none}
+.units{display:flex;margin-left:auto}
+.units button{background:none;border:1px solid var(--ink);padding:0 9px;line-height:22px;cursor:pointer;font-size:var(--s)}
+.units button + button{border-left:0}
+.units button[aria-pressed="true"]{background:var(--ink);color:var(--paper)}
+.theme-toggle{background:transparent;border:1px solid var(--rule);padding:2px 8px;font-size:var(--s);cursor:pointer}
+.theme-toggle:hover,.theme-toggle:focus-visible{background:var(--wash)}
+#themePanel{position:absolute;z-index:20;right:32px;top:54px;width:min(360px,calc(100vw - 24px));padding:14px;background:var(--paper);border:1px solid var(--ink);box-shadow:0 8px 28px color-mix(in srgb,var(--ink) 12%,transparent)}
+.theme-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px}.theme-close{border:1px solid var(--rule-fixed);background:transparent;color:var(--ink);font:inherit;font-size:var(--s);padding:2px 7px;cursor:pointer}.theme-close:hover{background:var(--ink);color:var(--paper)}
+#themePanel[hidden]{display:none}
+.theme-presets{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;margin:10px 0 14px}
+.theme-preset{display:flex;align-items:center;gap:8px;text-align:left;border:1px solid var(--rule);background:var(--paper);color:var(--ink);padding:7px;cursor:pointer;font-size:var(--s)}
+.theme-preset[aria-pressed="true"]{border-color:var(--ink);outline:1px solid var(--ink);outline-offset:-3px}
+.swatch{width:20px;height:20px;display:inline-block;border:1px solid color-mix(in srgb,var(--ink) 25%,transparent);flex:none}
+.theme-controls{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.theme-control{display:flex;flex-direction:column;gap:4px;font-size:var(--s);color:var(--ink-2)}
+.theme-control{min-width:0;color:var(--ink)}
+.hex-entry{display:flex;align-items:center;gap:6px;border:1px solid var(--rule-fixed);padding:4px 6px;min-width:0}
+.color-chip{width:18px;height:18px;border:1px solid var(--rule-fixed);background:#fff;flex:none}
+.hex-entry input{width:100%;min-width:0;border:0;outline:none;background:transparent;color:var(--ink);font:inherit;font-size:var(--s);text-transform:uppercase}
+.color-swatches{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:4px;margin-top:7px}
+.color-swatch{height:19px;min-width:0;border:1px solid var(--rule-fixed);padding:0;cursor:pointer;background:var(--swatch)}
+.color-swatch[aria-pressed="true"]{outline:2px solid var(--ink);outline-offset:1px}
+.theme-share{display:flex;justify-content:space-between;align-items:center;gap:8px;border-top:1px solid var(--rule);padding-top:9px;margin-top:12px;font-size:var(--s);color:var(--ink-2)}
+.theme-share button{border:1px solid var(--rule-fixed);background:transparent;color:var(--ink);font:inherit;font-size:var(--s);padding:3px 7px;cursor:pointer}
+.theme-share button:hover{background:var(--ink);color:var(--paper)}
+.theme-weight{margin-top:12px;font-size:var(--s);color:var(--ink-2)}
+.theme-weight input{width:100%;accent-color:var(--ink)}
+@media(max-width:680px){#themePanel{position:fixed;top:58px;right:12px;max-height:calc(100dvh - 72px);overflow:auto}.theme-controls{grid-template-columns:1fr 1fr}}
+
+/* prompt */
+#ask{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin:0}
+.gt{font-weight:200;line-height:1.1}
+#zip{
+  font-family:var(--mono);font-weight:200;line-height:1.1;
+  padding:2px 0;border:0;border-radius:0;background:none;color:var(--ink);
+  box-shadow:inset 0 -1px 0 var(--ink);caret-color:var(--ink);
+}
+#zip::placeholder{color:var(--ink-3)}
+#zip:focus{outline:none;box-shadow:inset 0 -2px 0 var(--ink)}
+.go{background:var(--ink);color:var(--paper);border:0;padding:3px 10px;font-size:var(--s);cursor:pointer}
+.ask .gt,.ask #zip{font-size:var(--xxl)}
+.ask #zip{width:8.4ch}
+
+.ask{padding:120px 0 16px;transition:padding .3s ease}
+body:not(.idle) .ask{padding:28px 0 0}
+.intro{max-width:54ch;color:var(--ink-2);margin:28px 0 0}
+body:not(.idle) .intro{display:none}
+
+.log{margin:24px 0 0;font-size:var(--s);line-height:1.8;white-space:pre;overflow-x:auto;color:var(--ink-2)}
+.log:empty{display:none}
+.log b{font-weight:400;color:var(--ink)}
+.log .err{display:inline-block;white-space:normal;max-width:60ch;margin-top:6px;vertical-align:top;color:var(--ink)}
+.log .wait::after{content:"";display:inline-block;width:.62em;height:1.05em;background:var(--ink);vertical-align:-3px;animation:blink 1s steps(1) infinite}
+@keyframes blink{50%{opacity:0}}
+body.ready #log{display:none}
+body.loading .out:not([hidden]){opacity:.78}
+body.loading .status .mode::after{content:' /';}
+
+/* output */
+.out[hidden]{display:none}
+.hero{margin-top:8px}
+.where{margin:0;font-size:var(--m);color:var(--ink-2)}
+.where span{margin-right:3ch;white-space:nowrap}
+.head{margin:26px 0 0;font-size:var(--xl);font-weight:300;line-height:1.2;letter-spacing:-.01em}
+.facts{display:flex;flex-wrap:wrap;gap:2px 28px;margin:10px 0 0;font-size:var(--m);color:var(--ink-2)}
+.facts span{white-space:nowrap}
+.facts b{font-weight:600;color:var(--ink)}
+
+.cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:56px;margin-top:44px}
+h2{margin:0;padding-top:8px;border-top:1px solid var(--ink);font-size:var(--m);font-weight:600;display:flex;justify-content:space-between;align-items:baseline}
+h2 small{font-size:var(--s);font-weight:400;color:var(--ink-2)}
+ul.list{list-style:none;margin:0;padding:0}
+
+/* this week */
+.drow{border-bottom:1px solid var(--rule)}
+.dbtn{
+  display:grid;grid-template-columns:var(--dcols);
+  align-items:center;column-gap:12px;width:100%;
+  padding:9px 0;border:0;background:none;text-align:left;cursor:pointer;
+}
+.dbtn > *{opacity:var(--o,1);line-height:20px}
+.dbtn:hover{background:linear-gradient(var(--wash),var(--wash)) no-repeat center/calc(100% + 16px) 100%}
+.drow.open .dbtn{background:linear-gradient(var(--wash),var(--wash)) no-repeat center/calc(100% + 16px) 100%}
+.dn{font-size:var(--m);white-space:nowrap}
+.drow:first-child .dn{font-weight:600}
+.dbtn .wx{font-size:var(--s);color:var(--ink-2);white-space:nowrap}
+.dbtn .lo{font-size:var(--m);color:var(--ink-2);text-align:right}
+.dbtn .hi{font-size:var(--m);font-weight:500;text-align:right}
+.dbtn .rain{font-size:var(--m);text-align:right;color:var(--ink-2)}
+.dbtn .rain.wet{color:var(--ink);font-weight:600}
+.rng{position:relative;height:12px}
+.rng::before{content:"";position:absolute;left:0;right:0;top:50%;height:1px;background:var(--rule)}
+.rng .nm{position:absolute;top:0;bottom:0;background:var(--norm)}
+.rng .fc{position:absolute;top:4px;bottom:4px;background:var(--ink);min-width:2px}
+.ddet{padding:2px 0 16px;font-size:var(--s);color:var(--ink-2)}
+.ddet p{margin:0}
+.ddet .src{margin-top:10px;white-space:pre;overflow-x:auto;line-height:1.8}
+.ddet .src b{font-weight:400;color:var(--ink)}
+
+/* weeks ahead */
+.wrow{
+  display:grid;grid-template-columns:var(--wcols);
+  align-items:center;column-gap:10px;padding:10px 0;border-bottom:1px solid var(--rule);
+}
+.wc{font-size:var(--m);text-align:right}
+.wc.low{color:var(--ink-2)}
+.wrow > *{opacity:var(--o,1)}
+.wd{font-size:var(--m);white-space:nowrap}
+.wa{font-size:var(--m);font-weight:500;text-align:right}
+.whl{font-size:var(--m);color:var(--ink-2);text-align:right;white-space:nowrap}
+.wr{font-size:var(--m);color:var(--ink-2)}
+.wr.wetter{color:var(--ink);font-weight:600}
+.dv{position:relative;height:8px}
+.dv::before{content:"";position:absolute;left:50%;top:-4px;bottom:-4px;width:1px;background:var(--ink-2);z-index:2}
+.dv::after{content:"";position:absolute;left:0;right:0;top:3px;height:1px;background:var(--rule)}
+.dv i{position:absolute;top:0;bottom:0;z-index:1}
+.dv .warm{background:var(--ink)}
+.dv .cool{border:1px solid var(--ink);background:var(--paper)}
+.conf{display:inline-flex;gap:3px;justify-content:flex-end}
+.conf i{width:6px;height:6px;border:1px solid var(--ink)}
+.conf i.on{background:var(--ink)}
+.note{margin:10px 0 0;font-size:var(--s);color:var(--ink-2);line-height:1.7}
+.sw{display:inline-block;width:16px;vertical-align:middle;margin-right:6px}
+.sw + .sw,.note .sw:not(:first-child){margin-left:14px}
+.sw-fc{height:4px;background:var(--ink)}
+.sw-nm{height:12px;background:var(--norm)}
+
+/* column labels */
+.dhead,.whead{display:grid;align-items:end;column-gap:10px;padding:8px 0 5px;font-size:var(--m);color:var(--ink-2);border-bottom:1px solid var(--rule)}
+.dhead > span,.whead > span{font-size:var(--s);line-height:1.3;white-space:nowrap}
+.dhead{grid-template-columns:var(--dcols)}
+.whead{grid-template-columns:var(--wcols)}
+.dhead .r,.whead .r{text-align:right}
+.whead .scale{display:flex;justify-content:space-between;gap:8px}
+.whead .vs{white-space:normal}
+
+/* month calendar */
+.dow,.cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr))}
+.month{margin-top:36px}
+.dow{margin-top:10px;font-size:var(--s);color:var(--ink-2);padding-bottom:5px;border-bottom:1px solid var(--ink)}
+.dow span{padding:0 8px}
+.cell{
+  position:relative;display:flex;flex-direction:column;align-items:flex-start;
+  min-height:80px;padding:6px 8px 7px;
+  border:0;border-bottom:1px solid #d6d6d6;background:none;text-align:left;cursor:pointer;
+}
+.cell.blank{cursor:default}
+.cell::before{content:"";position:absolute;inset:0;pointer-events:none;
+  background-image:radial-gradient(circle,var(--ink) .9px,transparent 1.3px);background-size:4px 4px;opacity:calc(var(--rp,0) * .42)}
+.cell > *{position:relative}
+.cell[aria-pressed="true"]::before{opacity:0}
+.cell:hover:not(.blank){background:#f8f8f8}
+.cell[aria-pressed="true"]{background:var(--wash);box-shadow:inset 0 0 0 1px var(--ink)}
+.cell:focus-visible{outline-offset:-2px}
+.cell .d{font-size:var(--s);color:var(--ink-2);line-height:18px;padding:0 4px;margin-left:-4px;white-space:nowrap}
+.cell.today .d{background:var(--ink);color:var(--paper)}
+.cell .v{opacity:var(--o,1)}
+.cell .hi{font-size:var(--l);font-weight:400;line-height:1.2;margin-top:4px}
+.cell .lo{font-size:var(--s);color:var(--ink-2);line-height:1.35}
+.cell .rn{margin-top:auto;padding-top:4px;font-size:var(--s);line-height:14px;color:var(--ink-2);white-space:nowrap}
+.cell .rn.wet{font-weight:600;color:var(--ink)}
+
+/* trend chart */
+.trend{margin-top:48px}
+.readout{margin:12px 0 6px;font-size:var(--m);min-height:1.6em;color:var(--ink-2)}
+.hint{color:var(--ink-3)}
+.cdet{margin-top:12px}
+.cdet > .hint{margin:0;font-size:var(--s)}
+.cdet.open{border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);padding:12px 0 14px}
+.cdet-top{display:flex;align-items:baseline;gap:14px}
+.cdet-top b{font-size:var(--m);font-weight:600}
+.cdet-top .ago{font-size:var(--s);color:var(--ink-2)}
+.cdet-top .x{margin-left:auto;background:none;border:1px solid var(--ink);font-size:var(--s);padding:0 9px;line-height:20px;cursor:pointer}
+.cdet-body{display:grid;grid-template-columns:minmax(0,.72fr) minmax(0,1.28fr);gap:16px 28px;margin-top:14px;align-items:start}
+/* Detail source comparison spans the full module width beneath both columns. */
+.cdet.open{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);column-gap:28px}
+.cdet.open>.cdet-body{display:contents}
+.cdet.open>.cdet-top{grid-column:1/-1;grid-row:1;min-width:0}
+.cdet.open .cdet-main{grid-column:1;grid-row:2}
+.cdet.open .cdet-side{grid-column:2;grid-row:2}
+.cdet.open>.src{grid-column:1 / -1;grid-row:3;width:100%;min-width:0;box-sizing:border-box;justify-self:stretch;white-space:normal;overflow:visible;letter-spacing:0;line-height:1.65}
+@media(max-width:760px){.cdet.open>.cdet-body{display:grid;grid-template-columns:minmax(0,1fr);gap:16px}.cdet.open .cdet-main,.cdet.open .cdet-side{grid-column:1;grid-row:auto}.cdet.open>.src{grid-column:1;grid-row:auto}}
+.cdet-main{min-width:0;min-height:100%;padding-right:8px}.cdet-side{min-width:0;display:flex;flex-direction:column;gap:0}.cdet-side .kv{margin:0;text-align:left;grid-template-columns:minmax(8ch,.38fr) minmax(0,.62fr);gap:8px 14px;width:100%}.cdet-side .kv dt,.cdet-side .kv dd{text-align:left;min-width:0;overflow-wrap:anywhere;word-break:normal}.cdet .src{margin-top:18px;padding-top:12px;border-top:1px dashed var(--rule);font-size:var(--s);white-space:pre-wrap;overflow-wrap:anywhere;word-break:normal;max-width:100%;overflow-x:auto;line-height:1.7;color:var(--ink-2)}
+.cdet-temp{display:flex;align-items:baseline;gap:10px;white-space:nowrap}
+.cdet-temp .h{font-size:var(--xl);font-weight:200;line-height:1}
+.cdet-temp .l{font-size:var(--l);font-weight:300;color:var(--ink-2)}
+.cdet-temp .r{font-size:var(--m);margin-left:10px}
+.cdet-temp .r.wet{font-weight:600}
+.cdet-text p{margin:0 0 3px;font-size:var(--m)}
+.cdet-text p.sub{color:var(--ink-2)}
+.cdet .src{display:block;width:100%;box-sizing:border-box;grid-column:1/-1;margin-top:12px;padding-top:12px;border-top:1px dashed var(--rule);font-size:var(--s);white-space:pre-wrap;overflow-wrap:anywhere;word-break:normal;max-width:100%;overflow-x:auto;line-height:1.65;color:var(--ink-2)}
+.cdet .src b{font-weight:400;color:var(--ink)}
+.cdet .src .hd{color:var(--ink-3)}
+.cdet .src-row{display:grid;grid-template-columns:minmax(0,1fr) 12ch 6ch 24ch;align-items:baseline;gap:10px;width:100%;min-width:0;padding:3px 0;box-sizing:border-box}
+.cdet .src-row>span{min-width:0}
+.cdet .src-row .src-name{display:flex;align-items:baseline;gap:7px;white-space:nowrap;min-width:0;width:100%;overflow:hidden}
+.cdet .src-row .src-name::after,.cdet .src-row .src-temp::before,.cdet .src-row .src-rain::before,.cdet .src-row .src-extra::before{content:"";flex:1;min-width:8px;border-bottom:1px dotted var(--ink-3);transform:translateY(-3px)}
+.cdet .src-row .src-temp{display:flex;align-items:baseline;justify-content:flex-end;gap:7px;font-weight:600;color:var(--ink);white-space:nowrap;text-align:right;width:100%}
+.cdet .src-row .src-rain{display:flex;align-items:baseline;justify-content:flex-end;gap:7px;white-space:nowrap;text-align:right;width:100%}
+.cdet .src-row .src-extra{display:flex;align-items:baseline;justify-content:flex-end;gap:7px;white-space:nowrap;text-align:right;width:100%}
+.cdet .src-row.src-head{padding-bottom:5px;margin-bottom:3px;border-bottom:1px solid var(--rule)}
+.cdet .src-row.src-head>span{color:var(--ink-3);font-weight:400;text-align:right}.cdet .src-row.src-head>span:first-child{text-align:left}.cdet .src-row.src-head>span:last-child::before{content:"runs"}
+@media(max-width:760px){.cdet .src-row{grid-template-columns:minmax(0,1fr) 10ch 5ch;gap:7px}.cdet .src-row .src-extra{grid-column:1/-1;justify-content:flex-end;text-align:right;padding-left:0}.cdet .src-row .src-name::after,.cdet .src-row .src-temp::before,.cdet .src-row .src-rain::before,.cdet .src-row .src-extra::before{min-width:4px}.cdet .src-row.src-head>span:last-child{display:none}}
+.ascii-wrap{margin-top:12px;padding-top:9px;border-top:1px dashed var(--rule);font-size:var(--s);color:var(--ink-2)}
+.ascii-title{color:var(--ink);font-weight:600;margin-bottom:5px}
+.ascii-plot{margin:0;white-space:pre;overflow-x:auto;line-height:1.55;color:var(--ink-2)}
+.ascii-plot b{color:var(--ink);font-weight:600}
+.source-guide{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px 18px;margin-top:12px;padding-top:10px;border-top:1px dashed var(--rule)}
+.source-guide article{min-width:0}
+.source-guide b{display:block;color:var(--ink);font-size:var(--s);font-weight:600;margin-bottom:3px}
+.source-guide p{font-size:var(--s);color:var(--ink-2);margin:0;line-height:1.5}
+@media(max-width:760px){.source-guide{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.readout b{font-weight:600;color:var(--ink);margin-right:2ch}
+.readout span{margin-right:2.4ch;white-space:nowrap;display:inline-block}
+.chart{width:100%}
+.chart svg{display:block;max-width:100%;touch-action:pan-y}
+.chart .g{stroke:var(--rule);stroke-width:1}
+.chart .band{fill:var(--wash)}
+.chart .norm{fill:none;stroke:var(--ink-3);stroke-width:1;stroke-dasharray:2 3}
+.chart .hi{stroke:var(--ink);stroke-width:1.75;stroke-linecap:round}
+.chart .lo{stroke:var(--ink);stroke-width:1;stroke-linecap:round}
+.chart .rain{fill:var(--ink)}
+.chart .base{stroke:var(--ink);stroke-width:1}
+.chart .sel{stroke:var(--ink);stroke-width:1;stroke-dasharray:1 2}
+.chart .hit{fill:transparent;cursor:crosshair}
+.chart text{font-family:var(--mono);font-size:var(--s);fill:var(--ink-2)}
+.legend{display:flex;flex-wrap:wrap;gap:4px 24px;margin:10px 0 0;font-size:var(--s);color:var(--ink-2)}
+.legend span{display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.legend i{display:inline-block;width:18px}
+.legend .l-fc{height:2px;background:var(--ink)}
+.legend .l-band{height:9px;background:var(--wash)}
+.legend .l-norm{height:0;border-top:1px dashed var(--ink-3)}
+.legend .l-rain{width:4px;height:9px;background:var(--ink)}
+
+/* sources */
+.srcs{margin-top:48px;border-top:1px solid var(--ink);padding-top:10px}
+.srcs summary{cursor:pointer;font-size:var(--m);font-weight:600;list-style:none;display:flex;align-items:baseline;gap:16px}
+.srcs summary::-webkit-details-marker{display:none}
+.srcs summary small{font-weight:400;font-size:var(--s);color:var(--ink-2);margin-left:auto}
+.srcs summary::after{content:"+";font-weight:400;margin-left:12px}
+.srcs[open] summary::after{content:"-"}
+.srcs .log{margin-top:14px}
+.cross{font-size:var(--s);color:var(--ink-2);margin:16px 0 0;max-width:72ch}
+
+footer{margin-top:40px;padding-top:12px;border-top:1px solid var(--rule);font-size:var(--s);color:var(--ink-2);max-width:72ch}
+footer p{margin:0 0 4px}
+
+
+/* ================= console layer ================= */
+.top{border-bottom:1px solid var(--ink)}
+.mark{background:var(--ink);color:var(--paper);padding:0 8px;font-weight:600}
+.tag{color:var(--ink-2);font-size:var(--s);margin-left:-12px}
+.units{gap:0;font-size:var(--s)}
+.units button{border:0;padding:0 7px}
+.units button::before{content:"["} .units button::after{content:"]"}
+.units button[aria-pressed="true"]::before,.units button[aria-pressed="true"]::after{content:" "}
+
+/* prompt with a terminal block cursor */
+.zipwrap{position:relative;display:inline-block}
+#zip,#zip:focus{box-shadow:none;caret-color:transparent}
+.cur{position:absolute;top:calc(50% + .42em);left:calc(var(--n,0) * 1ch);width:.62ch;height:2px;
+  background:var(--ink);transform:translateY(-50%);pointer-events:none;visibility:hidden;
+  animation:cursor-blink 1s steps(1,end) infinite}
+.ask .cur{font-size:var(--xxl)}
+.zipwrap:focus-within .cur{visibility:visible}
+@keyframes cursor-blink{50%{opacity:0}}
+@media(prefers-reduced-motion:reduce){.cur{animation:none}}
+.go{background:none;color:var(--ink);padding:0;font-size:var(--m)}
+.go::before{content:"[ "} .go::after{content:" ]"}
+.go:hover{background:var(--ink);color:var(--paper)}
+
+/* comments */
+.intro::before,.note::before,.cross::before,footer p::before{content:"# ";color:var(--ink-3)}
+
+/* hero */
+.head{text-transform:lowercase}
+.facts i{font-style:normal}
+.facts i::after{content:":";margin-right:1ch}
+
+/* framed panels with titles on the border */
+.panel{position:relative;border:1px solid var(--ink);padding:20px 14px 12px}
+.panel > h2{position:absolute;top:0;left:10px;transform:translateY(-55%);margin:0;padding:0 6px;border:0;
+  background:var(--paper);display:block;font-size:var(--m);font-weight:600;line-height:1.4}
+.panel > h2::before{content:"[ "} .panel > h2::after{content:" ]"}
+.month{margin-top:36px}
+.cols{margin-top:36px;gap:28px}
+.trend,.srcs{margin-top:36px}
+
+/* rules become dashed */
+.drow,.wrow,.dhead,.whead{border-bottom-style:dashed;border-bottom-color:var(--rule-fixed)}
+.dow{margin-top:0;border-bottom:1px dashed var(--ink)}
+.cell{border-bottom:1px dashed var(--rule-fixed)}
+
+/* calendar: today in inverse like cal(1), selected day fully inverse */
+.cell[aria-pressed="true"]{background:#000 !important;color:#fff !important;box-shadow:none !important}
+.cell[aria-pressed="true"] *,.cell[aria-pressed="true"] .d,.cell[aria-pressed="true"] .lo,.cell[aria-pressed="true"] .rn,.cell[aria-pressed="true"] .hi,.cell.today[aria-pressed="true"] .d{color:#fff !important;background-color:transparent !important}
+.cell[aria-pressed="true"] .v{opacity:1 !important}
+.cell::before{display:none !important}
+
+.cell:hover:not(.blank):not([aria-pressed="true"]){background:var(--hover)}
+
+/* block-character bars */
+.rng::before{background:none;border-top:1px dashed #c4c4c4;height:0}
+.rng .nm,.sw-nm{background-color:transparent;background-image:radial-gradient(circle,#6e6e6e .85px,transparent 1.25px);background-size:3px 3px;background-position:0 0}
+.rng .fc,.sw-fc{background:repeating-linear-gradient(90deg,var(--ink) 0 5px,transparent 5px 7px)}
+.rng .fc{top:4px;bottom:4px;background:repeating-linear-gradient(90deg,var(--ink) 0 5px,var(--paper) 5px 7px);box-shadow:0 0 0 1px var(--paper)}
+.sw-fc{height:4px}
+.dv::after{background:none;border-top:1px dashed #c4c4c4;height:0}
+.dv .warm{background:repeating-linear-gradient(90deg,var(--ink) 0 5px,transparent 5px 7px)}
+.dv .cool{background-color:var(--paper);background-image:radial-gradient(circle,var(--ink) .85px,transparent 1.25px);background-size:3px 3px;border:1px solid var(--ink)}
+.drow.open .dbtn,.dbtn:hover{background:linear-gradient(var(--hover),var(--hover)) no-repeat center/calc(100% + 16px) 100%}
+
+/* readouts and details as key: value */
+.readout i,.kv dt{font-style:normal;color:var(--ink-2)}
+.readout i::after{content:":";margin-right:.6ch}
+.cdet.open{border-top:1px dashed var(--ink);border-bottom:0;padding:12px 0 2px;margin-top:0}
+.kv{display:grid;grid-template-columns:minmax(0,12ch) minmax(0,1fr);gap:4px 1.5ch;margin:0;min-width:0}
+.kv dt::after{content:":"}
+.kv dd{margin:0}
+
+/* chart */
+.chart .g{stroke:var(--rule-fixed);stroke-dasharray:1 3}
+.chart .band{fill:url(#dotband);opacity:.48}
+/* Theme-aware forecast shading: use the current foreground color for dots so it stays visible on dark themes. */
+.chart .band{stroke:var(--ink);stroke-width:.5;stroke-opacity:.55}
+.legend .l-band{background:radial-gradient(circle,var(--ink) .95px,transparent 1.4px) 0 0/3px 3px;opacity:.8}
+.legend .l-band{background:radial-gradient(circle,#000 .85px,transparent 1.25px) 0 0/3px 3px;opacity:.6}
+
+/* sources */
+.srcs{border:1px solid var(--ink);padding:10px 14px}
+.srcs summary{font-weight:600}
+.srcs summary::after{content:none}
+.srcs summary::before{content:"[+]";font-weight:400;margin-right:1ch}
+.srcs[open] summary::before{content:"[-]"}
+
+/* status line */
+.status{position:sticky;bottom:0;z-index:5;margin:40px -32px -72px;padding:3px 32px calc(3px + env(safe-area-inset-bottom,0px));
+  background:var(--ink);color:var(--paper);font-size:var(--s);display:flex;gap:3ch;white-space:nowrap;overflow:hidden}
+.status span{overflow:hidden;text-overflow:ellipsis;min-width:0}
+.status .mode,.status .r{flex-shrink:0}
+.status .r{margin-left:auto}
+.status .mode{background:var(--paper);color:var(--ink);padding:0 6px;margin-left:-6px}
+footer{border-top:1px dashed var(--rule-fixed)}
+
+@media (max-width:860px){
+  .cols{grid-template-columns:minmax(0,1fr);gap:48px}
+}
+@media (max-width:560px){
+  :root{--s:11px;--m:13px;--l:17px;--xl:28px;--xxl:40px}
+  main{padding:16px 16px 72px}
+  .top{gap:14px}
+  .ask{padding:72px 0 12px}
+  body:not(.idle) .ask{padding:32px 0 0}
+  .ask .gt,.ask #zip{font-size:var(--xxl)}
+  .head{font-size:var(--xl);margin-top:20px}
+  .month{margin-top:28px}
+  .facts{gap:2px 20px;font-size:var(--m)}
+  .cols{margin-top:36px;gap:36px}
+  :root{--dcols:6ch 5.5ch 3.5ch minmax(36px,1fr) 3.5ch 4ch;--wcols:6.5ch 6ch minmax(44px,1fr) 7ch 8.5ch}
+  .dbtn,.dhead,.whead{column-gap:8px}
+  .dbtn .wx{font-size:var(--s)}
+  .wrow{column-gap:8px;font-size:var(--m)}
+  .whead{font-size:var(--m)}
+  .whead > span{font-size:var(--s)}
+  .wd{font-size:var(--m)}
+  .whl{display:none}
+  .trend,.srcs{margin-top:36px}
+  .dow span{padding:0 4px}
+  .cell{min-height:64px;padding:4px 4px 5px}
+  .cell .d{font-size:var(--s);margin-left:-2px;padding:0 2px}
+  .cell .hi{font-size:var(--l);margin-top:4px}
+  .cell .lo{font-size:var(--s)}
+  .cell .rn{font-size:var(--s)}
+  .cell .rl{display:none}
+  .cell.today .d{padding:0 1px;margin-left:-1px;letter-spacing:-.03em}
+  .cdet-body{grid-template-columns:minmax(0,1fr);gap:16px}
+  .cdet-main{padding-right:0;padding-bottom:12px;border-bottom:1px dashed var(--rule)}
+  .cdet-side .kv{grid-template-columns:minmax(8ch,.36fr) minmax(0,.64fr);gap:8px 10px}
+  .cdet .src{font-size:var(--s);white-space:pre-wrap;overflow-wrap:anywhere}
+    }
+@media (max-width:560px){
+  .panel{padding:18px 8px 8px}
+  .panel > h2{left:6px}
+  .cell{padding:4px 3px 5px}
+  .status{margin:32px -16px -72px;padding-left:16px;padding-right:16px;gap:2ch}
+  .status .hide-sm{display:none}
+  .kv{grid-template-columns:minmax(0,12ch) minmax(0,1fr)}
+  .srcs{padding:10px 8px}
+  .tag{display:none}
+}
+/* responsive command-center layout: spacious at desktop, compact on phones */
+@media (min-width:1200px){
+  :root{--s:clamp(12px,.72vw,15px);--m:clamp(14px,.88vw,18px);--l:clamp(20px,1.35vw,28px);--xl:clamp(38px,2.7vw,56px);--xxl:clamp(52px,4.3vw,88px)}
+  main{max-width:none;width:100%;min-height:100vh;padding:clamp(24px,3vw,56px) clamp(28px,4.2vw,88px) 90px}
+  .top{min-height:54px;padding-bottom:14px}
+  .ask{padding:clamp(100px,14vh,220px) 0 24px}
+  body:not(.idle) .ask{padding:32px 0 0}
+  .intro{max-width:64ch;margin-top:36px}
+  .hero{margin-top:24px}
+  .head{margin-top:34px}
+  .facts{gap:4px 3vw;margin-top:16px}
+  .month{margin-top:clamp(44px,5vh,72px)}
+  .cols{grid-template-columns:minmax(0,1.05fr) minmax(0,.95fr);gap:clamp(28px,3vw,64px);margin-top:48px}
+  .trend,.srcs{margin-top:clamp(44px,5vh,72px)}
+  .panel{padding:28px 22px 18px}
+  .status{margin-left:calc(-1 * clamp(28px,4.2vw,88px));margin-right:calc(-1 * clamp(28px,4.2vw,88px));margin-bottom:-90px;padding:6px clamp(28px,4.2vw,88px) calc(6px + env(safe-area-inset-bottom,0px))}
+}
+@media (min-width:1800px){
+  .cols{grid-template-columns:minmax(0,1.1fr) minmax(0,.9fr)}
+  .panel{padding:32px 28px 22px}
+}
+@media (max-width:1199px){
+  main{width:100%}
+}
+@media (prefers-reduced-motion:reduce){
+  *{transition:none !important;animation:none !important}
+}
+
+/* command-center modules: compact grid, expandable panels, restrained motion */
+.out{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:clamp(14px,1.5vw,26px);align-items:start}
+.out[hidden]{display:none}
+.out>.hero{grid-column:1/-1;min-width:0}
+.out>.month{grid-column:span 2;min-width:0}
+.out>.cols{display:contents}
+.out>.cols>.module{min-width:0;margin:0}
+.out>.trend{grid-column:span 2;min-width:0;margin:0}
+.out>.srcs{grid-column:span 1;min-width:0;margin:0;align-self:start}
+.module{margin:0;min-width:0}
+.module-title{position:relative;display:flex;align-items:baseline;gap:1ch;cursor:pointer;list-style:none;font-size:var(--m);font-weight:600;line-height:1.4;padding:0 0 10px;border-bottom:1px dashed var(--rule-fixed)}
+.module-title::-webkit-details-marker{display:none}
+.module-title::before{content:"[-]";font-weight:400}
+.module:not([open])>.module-title::before{content:"[+]"}
+.module-title small{font-size:var(--s);font-weight:400;color:var(--ink-2);margin-left:auto}
+.module[open]>.module-title{animation:module-in .24s ease-out}
+.module .cal,.module .dow,.module .dhead,.module .whead{margin-top:10px}
+.module .note{margin-top:14px}
+@keyframes module-in{from{opacity:.65;transform:translateY(2px)}to{opacity:1;transform:translateY(0)}}
+.top::after{content:"";height:1px;position:absolute;left:0;right:0;bottom:-1px;background:repeating-linear-gradient(90deg,transparent 0 22px,var(--ink) 22px 24px,transparent 24px 40px);opacity:.22;animation:scanline 12s linear infinite}
+.top{position:relative}
+@keyframes scanline{from{background-position:0 0}to{background-position:160px 0}}
+.status .mode{animation:status-pulse 3.6s steps(1,end) infinite}
+@keyframes status-pulse{50%{opacity:.72}}
+@media(max-width:1100px){.out{grid-template-columns:repeat(2,minmax(0,1fr))}.out>.month,.out>.trend{grid-column:1/-1}.out>.srcs{grid-column:1/-1}}
+@media(max-width:680px){.out{grid-template-columns:minmax(0,1fr);gap:24px}.out>.month,.out>.trend,.out>.srcs{grid-column:1}.out>.cols{display:contents}.ask{gap:10px}.out>.hero{grid-column:1}.module.panel{padding:18px 8px 8px}.module-title{padding-bottom:8px}}
+@media(prefers-reduced-motion:reduce){.top::after,.status .mode{animation:none}}
+
+/* desktop content sweet spot: fluid below the cap, centered above it */
+@media (min-width:1200px){
+  main{width:100%;max-width:1440px;margin-inline:auto}
+}
+
+/* desktop dashboard: calendar left, compact module stack right, trend and sources full-width at the bottom */
+.out{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);grid-auto-flow:row;gap:12px;align-content:start}
+.out[hidden]{display:none}
+.out>.hero{grid-column:1/-1;grid-row:1;min-width:0;margin:0}
+.out>.month{grid-column:1;grid-row:2 / span 3;align-self:start;min-width:0;margin:0}
+.out>.cols{display:contents}
+.out>.cols>.module{grid-column:2;min-width:0;margin:0;align-self:stretch;box-sizing:border-box}
+.out>.cols>.module:nth-child(1){grid-row:2}
+.out>.cols>.module:nth-child(3){grid-row:3}
+.out>.cols>.module.signal{grid-row:4;min-height:0}
+.out>.trend{grid-column:1/-1;grid-row:5;min-width:0;margin:0}
+.out>.srcs{grid-column:1/-1;grid-row:6;min-width:0;margin:0;align-self:start}
+.module{margin:0;min-width:0}
+.module-title{position:relative;display:flex;align-items:baseline;gap:1ch;cursor:pointer;list-style:none;font-size:var(--m);font-weight:600;line-height:1.3;padding:0 0 6px;border-bottom:1px dashed var(--rule-fixed)}
+.module-title::-webkit-details-marker{display:none}
+.module-title::before{content:"[-]";font-weight:400}
+.module:not([open])>.module-title::before{content:"[+]"}
+.module-title small{font-size:var(--s);font-weight:400;color:var(--ink-2);margin-left:auto}
+.module[open]>.module-title{animation:module-in .24s ease-out}
+.module .cal,.module .dow,.module .dhead,.module .whead{margin-top:6px}
+.module .note{margin-top:6px}
+.module.panel{padding:10px 12px 8px}
+.signal-row{padding:4px 0}
+.signals{display:grid;grid-template-columns:1fr;gap:0;align-content:space-between;flex:1}
+.signal-row{display:grid;grid-template-columns:8ch minmax(0,1fr);gap:8px;padding:4px 0;border-bottom:1px solid var(--rule);align-items:baseline}
+.out>.cols>.module.signal{display:flex;flex-direction:column}
+.out>.cols>.module.signal .note{margin-top:auto;padding-top:8px}
+.signal-row:last-child{border-bottom:0}
+.signal-key{color:var(--ink-2);font-size:var(--s);text-transform:lowercase}
+.signal-value{font-size:var(--m);font-weight:600;overflow-wrap:anywhere}
+.signal-sub{display:block;color:var(--ink-2);font-size:var(--s);font-weight:400;margin-top:2px}
+.srcs{border:1px solid var(--ink);padding:8px 10px}
+.srcs summary{cursor:pointer;font-size:var(--m);font-weight:600;list-style:none;display:flex;align-items:baseline;gap:16px}
+.srcs summary::-webkit-details-marker{display:none}
+.srcs summary small{font-weight:400;font-size:var(--s);color:var(--ink-2);margin-left:auto}
+.srcs summary::before{content:"[+]";font-weight:400;margin-right:1ch}
+.srcs[open] summary::before{content:"[-]"}
+.srcs .log{margin-top:10px}
+.trend .chart{margin-top:4px;min-width:0;max-width:100%;overflow:hidden}
+.trend .chart svg{display:block;width:100%;max-width:100%;height:auto}
+.trend .legend{margin-top:4px;gap:3px 14px}
+@media(min-width:1100px) and (min-height:800px){
+  main{width:100%;max-width:1600px;margin-inline:auto;padding:10px 24px 18px}
+  .top{min-height:34px;padding-bottom:5px}
+  body:not(.idle) .ask{padding:8px 0 0}
+  .hero{margin-top:4px}
+  .head{margin-top:6px;font-size:clamp(28px,2vw,36px);line-height:1.1}
+  .facts{gap:2px 16px;margin-top:4px}
+  .out{gap:12px}
+  .module.panel{padding:9px 10px 8px}
+  .module-title{padding-bottom:4px;line-height:1.2}
+  .module .cal,.module .dow,.module .dhead,.module .whead{margin-top:4px}
+  .module .note{margin-top:4px}
+  .signal-row{padding:3px 0}
+  .out>.trend{margin-top:0}
+  .status{position:static;margin:8px 0 0;padding:5px 0 0}
+}
+@media(min-width:1100px) and (min-height:800px) and (max-height:950px){
+  main{padding-top:6px;padding-bottom:10px}
+  .head{font-size:clamp(26px,1.8vw,32px)}
+  .module.panel{padding:7px 9px 6px}
+  .signal-row{padding:2px 0}
+}
+@media(max-width:900px){
+  .out{grid-template-columns:minmax(0,1fr);gap:12px}
+  .out>.hero,.out>.month,.out>.cols>.module,.out>.srcs,.out>.trend{grid-column:1;grid-row:auto}
+  .out>.month{grid-row:auto}
+  .out>.cols{display:contents}
+  .out>.cols>.module:nth-child(1),.out>.cols>.module:nth-child(3),.out>.cols>.module.signal{grid-column:1;grid-row:auto}
+  .out>.trend,.out>.srcs{grid-column:1;grid-row:auto}
+  .module.panel{padding:16px 10px 10px}
+}
+@media(prefers-reduced-motion:reduce){.top::after,.status .mode,.module[open]>.module-title{animation:none}}
+
+</style>
 </head>
-<body class="ready" style="font-weight: 400;">
+<body class="idle">
 <main>
-<header class="top" id="top">
-<a class="mark" href="#" id="home">longcast</a><span class="tag" id="tag">35-day outlook</span>
-<div class="units" role="group" aria-label="Temperature unit">
-<button type="button" data-u="f" aria-pressed="true">°F</button>
-<button type="button" data-u="c" aria-pressed="false">°C</button>
-<button type="button" id="themeButton" class="theme-toggle" aria-expanded="false" aria-controls="themePanel">theme +</button>
-</div>
-<section id="themePanel" aria-label="Appearance settings" hidden="">
-<div class="module-title">appearance <small>color / type</small></div>
-<div class="theme-presets" id="themePresets">
-<button class="theme-preset" type="button" data-theme="mono" aria-pressed="false"><span class="swatch" style="background:#fff;border-color:#000"></span>paper / ink</button>
-<button class="theme-preset" type="button" data-theme="dark" aria-pressed="false"><span class="swatch" style="background:#101419;border-color:#e7edf2"></span>night console</button>
-<button class="theme-preset" type="button" data-theme="cream" aria-pressed="false"><span class="swatch" style="background:#f3ead7;border-color:#352c20"></span>warm cream</button>
-<button class="theme-preset" type="button" data-theme="seafoam" aria-pressed="true"><span class="swatch" style="background:#d9eee5;border-color:#174d43"></span>seafoam</button>
-<button class="theme-preset" type="button" data-theme="blueyellow" aria-pressed="false"><span class="swatch" style="background:#173b70;border-color:#ffe66d"></span>signal / yellow</button>
-<button class="theme-preset" type="button" data-theme="plum" aria-pressed="false"><span class="swatch" style="background:#251d2d;border-color:#e6c9ff"></span>plum terminal</button>
-</div>
-<div class="theme-controls">
-<div class="theme-control"><label for="themeBg">background</label><div class="hex-entry"><span class="color-chip" id="bgChip" aria-hidden="true" style="background: rgb(217, 238, 229);"></span><input id="themeBg" type="text" value="#d9eee5" maxlength="7" spellcheck="false" aria-label="Background hex color"></div><div class="color-swatches" id="bgSwatches" aria-label="Background color choices"><button type="button" class="color-swatch" style="--swatch: #ffffff;" data-color="#ffffff" aria-label="#ffffff" title="#ffffff" aria-pressed="false"></button><button type="button" class="color-swatch" style="--swatch: #f3ead7;" data-color="#f3ead7" aria-label="#f3ead7" title="#f3ead7" aria-pressed="false"></button><button type="button" class="color-swatch" style="--swatch: #d9eee5;" data-color="#d9eee5" aria-label="#d9eee5" title="#d9eee5" aria-pressed="true"></button><button type="button" class="color-swatch" style="--swatch: #b9d5f0;" data-color="#b9d5f0" aria-label="#b9d5f0" title="#b9d5f0" aria-pressed="false"></button><button type="button" class="color-swatch" style="--swatch: #173b70;" data-color="#173b70" aria-label="#173b70" title="#173b70" aria-pressed="false"></button><button type="button" class="color-swatch" style="--swatch: #101419;" data-color="#101419" aria-label="#101419" title="#101419" aria-pressed="false"></button><button type="button" class="color-swatch" style="--swatch: #251d2d;" data-color="#251d2d" aria-label="#251d2d" title="#251d2d" aria-pressed="false"></button><button type="button" class="color-swatch" style="--swatch: #000000;" data-color="#000000" aria-label="#000000" title="#000000" aria-pressed="false"></button><button type="button" class="color-swatch" style="--swatch: #352c20;" data-color="#352c20" aria-label="#352c20" title="#352c20" aria-pressed="false"></button><button type="button" class="color-swatch" style="--swatch: #174d43;" data-color="#174d43" aria-label="#174d43" title="#174d43" aria-pressed="false"></button><button type="button" class="color-swatch" style="--swatch: #ffe66d;" data-color="#ffe66d" aria-label="#ffe66d" title="#ffe66d" aria-pressed="false"></button><button type="button" class="color-swatch" style="--swatch: #e6c9ff;" data-color="#e6c9ff" aria-label="#e6c9ff" title="#e6c9ff" aria-pressed="false"></button></div></div>
-<div class="theme-control"><label for="themeInk">font color</label><div class="hex-entry"><span class="color-chip" id="inkChip" aria-hidden="true" style="background: rgb(23, 77, 67);"></span><input id="themeInk" type="text" value="#174d43" maxlength="7" spellcheck="false" aria-label="Font hex color"></div><div class="color-swatches" id="inkSwatches" aria-label="Font color choices"><button type="button" class="color-swatch" style="--swatch: #ffffff;" data-color="#ffffff" aria-label="#ffffff" title="#ffffff" aria-pressed="false"></button><button type="button" class="color-swatch" style="--swatch: #f3ead7;" data-color="#f3ead7" aria-label="#f3ead7" title="#f3ead7" aria-pressed="false"></button><button type="button" class="color-swatch" style="--swatch: #d9eee5;" data-color="#d9eee5" aria-label="#d9eee5" title="#d9eee5" aria-pressed="false"></button><button type="button" class="color-swatch" style="--swatch: #b9d5f0;" data-color="#b9d5f0" aria-label="#b9d5f0" title="#b9d5f0" aria-pressed="false"></button><button type="button" class="color-swatch" style="--swatch: #173b70;" data-color="#173b70" aria-label="#173b70" title="#173b70" aria-pressed="false"></button><button type="button" class="color-swatch" style="--swatch: #101419;" data-color="#101419" aria-label="#101419" title="#101419" aria-pressed="false"></button><button type="button" class="color-swatch" style="--swatch: #251d2d;" data-color="#251d2d" aria-label="#251d2d" title="#251d2d" aria-pressed="false"></button><button type="button" class="color-swatch" style="--swatch: #000000;" data-color="#000000" aria-label="#000000" title="#000000" aria-pressed="false"></button><button type="button" class="color-swatch" style="--swatch: #352c20;" data-color="#352c20" aria-label="#352c20" title="#352c20" aria-pressed="false"></button><button type="button" class="color-swatch" style="--swatch: #174d43;" data-color="#174d43" aria-label="#174d43" title="#174d43" aria-pressed="true"></button><button type="button" class="color-swatch" style="--swatch: #ffe66d;" data-color="#ffe66d" aria-label="#ffe66d" title="#ffe66d" aria-pressed="false"></button><button type="button" class="color-swatch" style="--swatch: #e6c9ff;" data-color="#e6c9ff" aria-label="#e6c9ff" title="#e6c9ff" aria-pressed="false"></button></div></div>
-</div>
-<label class="theme-weight">font weight <output id="weightValue">400</output><input id="themeWeight" type="range" min="200" max="600" step="50" value="400"></label>
-<div class="theme-share"><span>shareable appearance URL</span><button type="button" id="copyThemeUrl">copied</button></div>
-</section>
-</header>
-<section class="ask" id="askwrap">
-<form id="ask" autocomplete="off" novalidate="" aria-label="Find a weather outlook">
-<label for="zip" class="gt" aria-hidden="true">&gt;</label>
-<span class="zipwrap"><input id="zip" enterkeyhint="go" name="zip" inputmode="numeric" maxlength="5" pattern="[0-9]{5}" autocomplete="postal-code" placeholder="zip code" aria-label="US ZIP code, five digits" aria-describedby="ziphelp" spellcheck="false" title="Press / to jump here" value="94107"><span class="cur" aria-hidden="true" style="--n: 5;"></span></span>
-</form>
-<p class="intro" id="ziphelp">A 35-day outlook, comparing available forecasts with 30 years of local climate.</p>
-<noscript><p class="intro" style="color:#000">This page needs JavaScript and network access. Download the file and open it in a web browser.</p></noscript>
-<div class="log" id="log" aria-live="polite">  locating ........ <b>ok</b>    san francisco, ca
-  nws ............. <b>ok</b>    7 days  office mtr
-  gfs ............. <b>ok</b>    16 days
-  ecmwf ........... <b>ok</b>    15 days
-  icon ............ <b>ok</b>    7 days
-  gem ............. <b>ok</b>    10 days
-  gfs ens ......... <b>ok</b>    33 days  31 members
-  ecmwf ens ....... <b>ok</b>    11 days  51 members
-  gem ens ......... <b>ok</b>    35 days  21 members
-  ecmwf ec46 ...... <b>ok</b>    36 days  51 members
-  climate average .. <b>ok</b>    30 years  1996 to 2025</div>
-</section>
-<section class="out" id="out">
-<div class="hero">
-<p class="where" id="where"><span>San Francisco, CA</span><span>next 35 days</span></p>
-<h1 class="head" id="head">Close to average</h1>
-<p class="facts" id="facts"><span><i>highs</i><b>-1°</b> vs average</span><span><i>rainy days</i><b>4</b> (average 5)</span><span><i>warmest</i><b>oct 13 to 17</b></span></p>
-</div>
-<details class="module panel month" open=""><summary class="module-title" id="cal-title">calendar <small>next 35 days</small></summary>
-<div class="dow" aria-hidden="true"><span>mo</span><span>tu</span><span>we</span><span>th</span><span>fr</span><span>sa</span><span>su</span></div>
-<div class="cal" id="cal"><div class="cell blank" aria-hidden="true"></div><button type="button" class="cell today" data-i="0" aria-pressed="true" aria-label="tue oct 13, today: high 70, low 50" style="--o:0.95;--rp:0.00"><span class="d">oct 13</span><span class="hi v">70</span><span class="lo v">50</span><span class="rn v"></span></button><button type="button" class="cell" data-i="1" aria-pressed="false" aria-label="wed oct 14: high 70, low 52" style="--o:0.95;--rp:0.00"><span class="d">14</span><span class="hi v">70</span><span class="lo v">52</span><span class="rn v"></span></button><button type="button" class="cell" data-i="2" aria-pressed="false" aria-label="thu oct 15: high 80, low 53" style="--o:0.95;--rp:0.00"><span class="d">15</span><span class="hi v">80</span><span class="lo v">53</span><span class="rn v"></span></button><button type="button" class="cell" data-i="3" aria-pressed="false" aria-label="fri oct 16: high 83, low 58" style="--o:0.90;--rp:0.00"><span class="d">16</span><span class="hi v">83</span><span class="lo v">58</span><span class="rn v"></span></button><button type="button" class="cell" data-i="4" aria-pressed="false" aria-label="sat oct 17: high 75, low 58" style="--o:0.83;--rp:0.00"><span class="d">17</span><span class="hi v">75</span><span class="lo v">58</span><span class="rn v"></span></button><button type="button" class="cell" data-i="5" aria-pressed="false" aria-label="sun oct 18: high 65, low 56" style="--o:0.86;--rp:0.00"><span class="d">18</span><span class="hi v">65</span><span class="lo v">56</span><span class="rn v"></span></button><button type="button" class="cell" data-i="6" aria-pressed="false" aria-label="mon oct 19: high 63, low 54" style="--o:0.83;--rp:0.00"><span class="d">19</span><span class="hi v">63</span><span class="lo v">54</span><span class="rn v"></span></button><button type="button" class="cell" data-i="7" aria-pressed="false" aria-label="tue oct 20: high 64, low 54" style="--o:0.77;--rp:0.00"><span class="d">20</span><span class="hi v">64</span><span class="lo v">54</span><span class="rn v"></span></button><button type="button" class="cell" data-i="8" aria-pressed="false" aria-label="wed oct 21: high 65, low 55" style="--o:0.71;--rp:0.00"><span class="d">21</span><span class="hi v">65</span><span class="lo v">55</span><span class="rn v"></span></button><button type="button" class="cell" data-i="9" aria-pressed="false" aria-label="thu oct 22: high 66, low 55" style="--o:0.68;--rp:0.00"><span class="d">22</span><span class="hi v">66</span><span class="lo v">55</span><span class="rn v"></span></button><button type="button" class="cell" data-i="10" aria-pressed="false" aria-label="fri oct 23: high 67, low 54" style="--o:0.70;--rp:0.00"><span class="d">23</span><span class="hi v">67</span><span class="lo v">54</span><span class="rn v"></span></button><button type="button" class="cell" data-i="11" aria-pressed="false" aria-label="sat oct 24: high 69, low 55" style="--o:0.68;--rp:0.00"><span class="d">24</span><span class="hi v">69</span><span class="lo v">55</span><span class="rn v"></span></button><button type="button" class="cell" data-i="12" aria-pressed="false" aria-label="sun oct 25: high 67, low 55" style="--o:0.66;--rp:0.00"><span class="d">25</span><span class="hi v">67</span><span class="lo v">55</span><span class="rn v"></span></button><button type="button" class="cell" data-i="13" aria-pressed="false" aria-label="mon oct 26: high 66, low 55" style="--o:0.66;--rp:0.00"><span class="d">26</span><span class="hi v">66</span><span class="lo v">55</span><span class="rn v"></span></button><button type="button" class="cell" data-i="14" aria-pressed="false" aria-label="tue oct 27: high 67, low 55" style="--o:0.66;--rp:0.00"><span class="d">27</span><span class="hi v">67</span><span class="lo v">55</span><span class="rn v"></span></button><button type="button" class="cell" data-i="15" aria-pressed="false" aria-label="wed oct 28: high 66, low 55" style="--o:0.66;--rp:0.00"><span class="d">28</span><span class="hi v">66</span><span class="lo v">55</span><span class="rn v"></span></button><button type="button" class="cell" data-i="16" aria-pressed="false" aria-label="thu oct 29: high 65, low 54" style="--o:0.66;--rp:0.00"><span class="d">29</span><span class="hi v">65</span><span class="lo v">54</span><span class="rn v"></span></button><button type="button" class="cell" data-i="17" aria-pressed="false" aria-label="fri oct 30: high 64, low 53" style="--o:0.67;--rp:0.00"><span class="d">30</span><span class="hi v">64</span><span class="lo v">53</span><span class="rn v"></span></button><button type="button" class="cell" data-i="18" aria-pressed="false" aria-label="sat oct 31: high 64, low 54" style="--o:0.67;--rp:0.00"><span class="d">31</span><span class="hi v">64</span><span class="lo v">54</span><span class="rn v"></span></button><button type="button" class="cell" data-i="19" aria-pressed="false" aria-label="sun nov 1: high 63, low 54" style="--o:0.66;--rp:0.00"><span class="d">nov 1</span><span class="hi v">63</span><span class="lo v">54</span><span class="rn v"></span></button><button type="button" class="cell" data-i="20" aria-pressed="false" aria-label="mon nov 2: high 63, low 55" style="--o:0.68;--rp:0.00"><span class="d">2</span><span class="hi v">63</span><span class="lo v">55</span><span class="rn v"></span></button><button type="button" class="cell" data-i="21" aria-pressed="false" aria-label="tue nov 3: high 63, low 54" style="--o:0.70;--rp:0.00"><span class="d">3</span><span class="hi v">63</span><span class="lo v">54</span><span class="rn v"></span></button><button type="button" class="cell" data-i="22" aria-pressed="false" aria-label="wed nov 4: high 63, low 55" style="--o:0.66;--rp:0.00"><span class="d">4</span><span class="hi v">63</span><span class="lo v">55</span><span class="rn v"></span></button><button type="button" class="cell" data-i="23" aria-pressed="false" aria-label="thu nov 5: high 63, low 54" style="--o:0.67;--rp:0.00"><span class="d">5</span><span class="hi v">63</span><span class="lo v">54</span><span class="rn v"></span></button><button type="button" class="cell" data-i="24" aria-pressed="false" aria-label="fri nov 6: high 62, low 54" style="--o:0.66;--rp:0.00"><span class="d">6</span><span class="hi v">62</span><span class="lo v">54</span><span class="rn v"></span></button><button type="button" class="cell" data-i="25" aria-pressed="false" aria-label="sat nov 7: high 62, low 53" style="--o:0.66;--rp:0.00"><span class="d">7</span><span class="hi v">62</span><span class="lo v">53</span><span class="rn v"></span></button><button type="button" class="cell" data-i="26" aria-pressed="false" aria-label="sun nov 8: high 61, low 53" style="--o:0.68;--rp:0.00"><span class="d">8</span><span class="hi v">61</span><span class="lo v">53</span><span class="rn v"></span></button><button type="button" class="cell" data-i="27" aria-pressed="false" aria-label="mon nov 9: high 61, low 52" style="--o:0.66;--rp:0.00"><span class="d">9</span><span class="hi v">61</span><span class="lo v">52</span><span class="rn v"></span></button><button type="button" class="cell" data-i="28" aria-pressed="false" aria-label="tue nov 10: high 60, low 53, 20% chance of rain" style="--o:0.68;--rp:0.20"><span class="d">10</span><span class="hi v">60</span><span class="lo v">53</span><span class="rn v"><span class="rl">rain </span>20%</span></button><button type="button" class="cell" data-i="29" aria-pressed="false" aria-label="wed nov 11: high 60, low 53, 20% chance of rain" style="--o:0.66;--rp:0.22"><span class="d">11</span><span class="hi v">60</span><span class="lo v">53</span><span class="rn v"><span class="rl">rain </span>20%</span></button><button type="button" class="cell" data-i="30" aria-pressed="false" aria-label="thu nov 12: high 59, low 53, 30% chance of rain" style="--o:0.70;--rp:0.27"><span class="d">12</span><span class="hi v">59</span><span class="lo v">53</span><span class="rn v"><span class="rl">rain </span>30%</span></button><button type="button" class="cell" data-i="31" aria-pressed="false" aria-label="fri nov 13: high 59, low 52" style="--o:0.69;--rp:0.00"><span class="d">13</span><span class="hi v">59</span><span class="lo v">52</span><span class="rn v"></span></button><button type="button" class="cell" data-i="32" aria-pressed="false" aria-label="sat nov 14: high 59, low 52, 30% chance of rain" style="--o:0.66;--rp:0.25"><span class="d">14</span><span class="hi v">59</span><span class="lo v">52</span><span class="rn v"><span class="rl">rain </span>30%</span></button><button type="button" class="cell" data-i="33" aria-pressed="false" aria-label="sun nov 15: high 58, low 51, 30% chance of rain" style="--o:0.66;--rp:0.31"><span class="d">15</span><span class="hi v">58</span><span class="lo v">51</span><span class="rn v"><span class="rl">rain </span>30%</span></button><button type="button" class="cell" data-i="34" aria-pressed="false" aria-label="mon nov 16: high 58, low 51, 30% chance of rain" style="--o:0.66;--rp:0.26"><span class="d">16</span><span class="hi v">58</span><span class="lo v">51</span><span class="rn v"><span class="rl">rain </span>30%</span></button><div class="cell blank" aria-hidden="true"></div><div class="cell blank" aria-hidden="true"></div><div class="cell blank" aria-hidden="true"></div><div class="cell blank" aria-hidden="true"></div><div class="cell blank" aria-hidden="true"></div><div class="cell blank" aria-hidden="true"></div></div>
-<div class="cdet open" id="cdet" aria-live="polite"><div class="cdet-top"><b>tue oct 13</b><span class="ago">today</span></div><div class="cdet-body"><div class="cdet-temp"><span class="h">70°</span><span class="l">50°</span><span class="r">rain 0%</span></div><dl class="kv"><dt>vs average</dt><dd>1° warmer than the average high of 70°</dd><dt>average</dt><dd>70° / 54°</dd><dt>likely high</dt><dd>67° to 71°</dd><dt>rain</dt><dd>0% chance, probably dry</dd><dt>confidence</dt><dd>high, the forecasts agree closely</dd><dt>sources</dt><dd>8 of 9 reach this date</dd></dl></div><div class="src"><span class="hd">source         high / low  rain</span>
-gfs .......... <b> 73 / 50 </b>    0%
-ecmwf ........ <b> 73 / 51 </b>    0%
-icon ......... <b> 70 / 54 </b>    0%
-gem .......... <b> 65 / 49 </b>    0%
-gfs ens ...... <b> 70 / 51 </b>    0%   31 runs, high 69 to 71
-ecmwf ens .... <b> 71 / 50 </b>    0%   51 runs, high 70 to 71
-gem ens ...... <b> 70 / 49 </b>    0%   21 runs, high 69 to 71
-ecmwf ec46 ... <b> 68 / 48 </b>    0%   51 runs, high 67 to 68</div></div>
-</details>
-<div class="cols">
-<details class="module panel" open="">
-<summary class="module-title">this week</summary>
-<div class="dhead" aria-hidden="true"><span></span><span></span><span class="r">low</span><span></span><span class="r">high</span><span class="r">rain</span></div>
-<ul class="list" id="week"><li class="drow"><button type="button" class="dbtn" data-i="0" aria-expanded="false" aria-label="today: high 70, low 50" style="--o:0.93"><span class="dn">today</span><span class="wx">cloudy</span><span class="lo">50°</span><span class="rng"><i class="nm" style="left:11.4%;width:48.8%"></i><i class="fc" style="left:0.0%;width:62.2%"></i></span><span class="hi">70°</span><span class="rain"></span></button></li><li class="drow"><button type="button" class="dbtn" data-i="1" aria-expanded="false" aria-label="wed oct 14: high 70, low 52" style="--o:0.93"><span class="dn">wed 14</span><span class="wx">clear</span><span class="lo">52°</span><span class="rng"><i class="nm" style="left:11.1%;width:48.2%"></i><i class="fc" style="left:5.9%;width:54.8%"></i></span><span class="hi">70°</span><span class="rain"></span></button></li><li class="drow"><button type="button" class="dbtn" data-i="2" aria-expanded="false" aria-label="thu oct 15: high 80, low 53" style="--o:0.93"><span class="dn">thu 15</span><span class="wx">clear</span><span class="lo">53°</span><span class="rng"><i class="nm" style="left:10.8%;width:47.6%"></i><i class="fc" style="left:8.0%;width:82.9%"></i></span><span class="hi">80°</span><span class="rain"></span></button></li><li class="drow"><button type="button" class="dbtn" data-i="3" aria-expanded="false" aria-label="fri oct 16: high 83, low 58" style="--o:0.87"><span class="dn">fri 16</span><span class="wx">clear</span><span class="lo">58°</span><span class="rng"><i class="nm" style="left:10.5%;width:47.6%"></i><i class="fc" style="left:25.2%;width:74.8%"></i></span><span class="hi">83°</span><span class="rain"></span></button></li><li class="drow"><button type="button" class="dbtn" data-i="4" aria-expanded="false" aria-label="sat oct 17: high 75, low 58" style="--o:0.78"><span class="dn">sat 17</span><span class="wx">clear</span><span class="lo">58°</span><span class="rng"><i class="nm" style="left:10.2%;width:47.6%"></i><i class="fc" style="left:24.2%;width:51.9%"></i></span><span class="hi">75°</span><span class="rain"></span></button></li><li class="drow"><button type="button" class="dbtn" data-i="5" aria-expanded="false" aria-label="sun oct 18: high 65, low 56" style="--o:0.82"><span class="dn">sun 18</span><span class="wx">cloudy</span><span class="lo">56°</span><span class="rng"><i class="nm" style="left:10.2%;width:47.6%"></i><i class="fc" style="left:17.0%;width:28.6%"></i></span><span class="hi">65°</span><span class="rain"></span></button></li><li class="drow"><button type="button" class="dbtn" data-i="6" aria-expanded="false" aria-label="mon oct 19: high 63, low 54" style="--o:0.78"><span class="dn">mon 19</span><span class="wx">cloudy</span><span class="lo">54°</span><span class="rng"><i class="nm" style="left:9.9%;width:47.9%"></i><i class="fc" style="left:13.2%;width:25.3%"></i></span><span class="hi">63°</span><span class="rain"></span></button></li></ul>
-<p class="note"><i class="sw sw-fc"></i>forecast low to high <i class="sw sw-nm"></i>average range for that date. Tap a day to compare sources.</p>
-</details>
-<details class="module panel signal" open="">
-<summary class="module-title">forecast signals <small>35-day scan</small></summary>
-<div id="signals" class="signals" aria-live="polite"><div class="signal-row"><span class="signal-key">peak high</span><span class="signal-value">83°<span class="signal-sub">oct 16</span></span></div><div class="signal-row"><span class="signal-key">coldest low</span><span class="signal-value">50°<span class="signal-sub">oct 13</span></span></div><div class="signal-row"><span class="signal-key">rain chance</span><span class="signal-value">30%<span class="signal-sub">nov 15</span></span></div><div class="signal-row"><span class="signal-key">warm anomaly</span><span class="signal-value">+14°<span class="signal-sub">oct 16 vs 30-year avg</span></span></div></div>
-<p class="note">Extremes are relative to this outlook, not historical records.</p>
-</details>
-<details class="module panel" open="">
-<summary class="module-title">weeks ahead</summary>
-<div class="whead" aria-hidden="true"><span>week of</span><span class="r vs">vs average</span><span class="scale"><span>cooler</span><span>warmer</span></span><span class="r whl">high/low</span><span>rain</span><span class="r">confidence</span></div>
-<ul class="list" id="weeks"><li class="wrow" style="--o:0.60" aria-label="oct 20 to 26: highs -1 degrees vs average, rain typical, low confidence" title="oct 20 to 26"><span class="wd">oct 20</span><span class="wa">-1°</span><span class="dv" aria-hidden="true"><i class="cool" style="right:50%;width:11.7%"></i></span><span class="whl">66 / 55°</span><span class="wr ">typical</span><span class="wc low">low</span></li><li class="wrow" style="--o:0.56" aria-label="oct 27 to nov 2: highs -1 degrees vs average, rain typical, low confidence" title="oct 27 to nov 2"><span class="wd">oct 27</span><span class="wa">-1°</span><span class="dv" aria-hidden="true"><i class="cool" style="right:50%;width:11.3%"></i></span><span class="whl">64 / 54°</span><span class="wr ">typical</span><span class="wc low">low</span></li><li class="wrow" style="--o:0.56" aria-label="nov 3 to 9: highs -1 degrees vs average, rain typical, low confidence" title="nov 3 to 9"><span class="wd">nov 3</span><span class="wa">-1°</span><span class="dv" aria-hidden="true"><i class="cool" style="right:50%;width:12.5%"></i></span><span class="whl">62 / 53°</span><span class="wr ">typical</span><span class="wc low">low</span></li><li class="wrow" style="--o:0.57" aria-label="nov 10 to 16: highs -3 degrees vs average, rain typical, low confidence" title="nov 10 to 16"><span class="wd">nov 10</span><span class="wa">-3°</span><span class="dv" aria-hidden="true"><i class="cool" style="right:50%;width:25.2%"></i></span><span class="whl">59 / 52°</span><span class="wr ">typical</span><span class="wc low">low</span></li></ul>
-<p class="note" id="wnote">Compared with the 30-year average for the same dates. Confidence is a rough signal from model spread and forecast lead time, not a probability. After oct 20, read these as tendencies, not exact numbers.</p>
-</details>
-</div>
-<details class="module panel trend" open="">
-<summary class="module-title">temperature trend</summary>
-<p class="readout" id="readout2"><b>today</b><span><i>high</i>70°</span><span><i>low</i>50°</span><span><i>rain</i>0%</span><span><i>average</i>70° / 54°</span></p>
-<div class="chart" id="chart"><svg width="1530" height="240" viewBox="0 0 1530 240" role="group" tabindex="0" aria-label="Temperature trend for the next 35 days. Use left and right arrow keys to inspect dates; Home and End jump to the first and last date."><defs><pattern id="dotband" width="3" height="3" patternUnits="userSpaceOnUse"><circle cx="1.5" cy="1.5" r="0.75" fill="#000"></circle></pattern></defs><line class="g" x1="34" x2="1524" y1="190.0" y2="190.0"></line><text x="28" y="194.0" text-anchor="end">40</text><line class="g" x1="34" x2="1524" y1="153.6" y2="153.6"></line><text x="28" y="157.6" text-anchor="end">50</text><line class="g" x1="34" x2="1524" y1="117.2" y2="117.2"></line><text x="28" y="121.2" text-anchor="end">60</text><line class="g" x1="34" x2="1524" y1="80.8" y2="80.8"></line><text x="28" y="84.8" text-anchor="end">70</text><line class="g" x1="34" x2="1524" y1="44.4" y2="44.4"></line><text x="28" y="48.4" text-anchor="end">80</text><line class="g" x1="34" x2="1524" y1="8.0" y2="8.0"></line><text x="28" y="12.0" text-anchor="end">90</text><line class="g" x1="296.9" x2="296.9" y1="8" y2="214"></line><text x="296.9" y="234" text-anchor="middle">oct 19</text><line class="g" x1="603.7" x2="603.7" y1="8" y2="214"></line><text x="603.7" y="234" text-anchor="middle">oct 26</text><line class="g" x1="910.5" x2="910.5" y1="8" y2="214"></line><text x="910.5" y="234" text-anchor="middle">nov 2</text><line class="g" x1="1217.2" x2="1217.2" y1="8" y2="214"></line><text x="1217.2" y="234" text-anchor="middle">nov 9</text><line class="g" x1="1524.0" x2="1524.0" y1="8" y2="214"></line><text x="1524.0" y="234" text-anchor="middle">nov 16</text><polygon class="band" points="34.0,76.9 77.8,72.5 121.6,39.9 165.5,33.3 209.3,43.0 253.1,79.2 296.9,84.8 340.8,75.8 384.6,61.9 428.4,57.2 472.2,65.2 516.1,65.1 559.9,63.4 603.7,62.0 647.5,62.8 691.4,68.3 735.2,69.6 779.0,74.2 822.8,73.6 866.6,74.0 910.5,71.6 954.3,77.7 998.1,78.1 1041.9,80.5 1085.8,80.4 1129.6,83.1 1173.4,85.0 1217.2,88.2 1261.1,90.0 1304.9,90.5 1348.7,99.6 1392.5,99.0 1436.4,94.7 1480.2,100.0 1524.0,101.4 1524.0,146.2 1480.2,142.0 1436.4,139.3 1392.5,137.8 1348.7,137.0 1304.9,134.9 1261.1,133.7 1217.2,136.6 1173.4,130.5 1129.6,133.2 1085.8,137.6 1041.9,132.0 998.1,132.4 954.3,127.5 910.5,123.6 866.6,129.9 822.8,126.8 779.0,130.0 735.2,126.7 691.4,127.7 647.5,126.3 603.7,123.6 559.9,121.0 516.1,121.6 472.2,120.4 428.4,118.4 384.6,117.9 340.8,121.3 296.9,119.5 253.1,107.5 209.3,77.5 165.5,53.4 121.6,61.8 77.8,86.9 34.0,90.8"></polygon><polyline class="norm" points="34.0,81.5 77.8,82.6 121.6,83.7 165.5,84.1 209.3,84.4 253.1,84.4 296.9,84.4 340.8,85.5 384.6,86.6 428.4,87.7 472.2,89.2 516.1,90.6 559.9,91.4 603.7,92.1 647.5,93.2 691.4,93.9 735.2,95.0 779.0,95.7 822.8,97.2 866.6,98.3 910.5,99.7 954.3,101.2 998.1,102.3 1041.9,103.0 1085.8,103.7 1129.6,104.1 1173.4,104.8 1217.2,105.9 1261.1,107.0 1304.9,108.1 1348.7,109.2 1392.5,109.9 1436.4,110.3 1480.2,111.0 1524.0,111.7"></polyline><polyline class="norm" points="34.0,139.4 77.8,139.8 121.6,140.1 165.5,140.5 209.3,140.9 253.1,140.9 296.9,141.2 340.8,142.0 384.6,142.3 428.4,143.0 472.2,143.8 516.1,144.5 559.9,145.2 603.7,146.0 647.5,146.7 691.4,147.0 735.2,147.8 779.0,148.1 822.8,148.9 866.6,149.6 910.5,150.7 954.3,151.4 998.1,151.8 1041.9,152.5 1085.8,153.2 1129.6,153.6 1173.4,154.0 1217.2,154.7 1261.1,155.1 1304.9,155.8 1348.7,156.1 1392.5,156.9 1436.4,157.6 1480.2,158.3 1524.0,159.1"></polyline><line class="hi" x1="34.0" y1="79.2" x2="77.8" y2="81.0" stroke-opacity="0.88"></line><line class="lo" x1="34.0" y1="153.0" x2="77.8" y2="145.9" stroke-opacity="0.88"></line><line class="hi" x1="77.8" y1="81.0" x2="121.6" y2="45.1" stroke-opacity="0.88"></line><line class="lo" x1="77.8" y1="145.9" x2="121.6" y2="143.5" stroke-opacity="0.88"></line><line class="hi" x1="121.6" y1="45.1" x2="165.5" y2="34.4" stroke-opacity="0.82"></line><line class="lo" x1="121.6" y1="143.5" x2="165.5" y2="123.1" stroke-opacity="0.82"></line><line class="hi" x1="165.5" y1="34.4" x2="209.3" y2="62.6" stroke-opacity="0.69"></line><line class="lo" x1="165.5" y1="123.1" x2="209.3" y2="124.2" stroke-opacity="0.69"></line><line class="hi" x1="209.3" y1="62.6" x2="253.1" y2="98.8" stroke-opacity="0.65"></line><line class="lo" x1="209.3" y1="124.2" x2="253.1" y2="132.8" stroke-opacity="0.65"></line><line class="hi" x1="253.1" y1="98.8" x2="296.9" y2="107.3" stroke-opacity="0.65"></line><line class="lo" x1="253.1" y1="132.8" x2="296.9" y2="137.3" stroke-opacity="0.65"></line><line class="hi" x1="296.9" y1="107.3" x2="340.8" y2="102.4" stroke-opacity="0.55"></line><line class="lo" x1="296.9" y1="137.3" x2="340.8" y2="137.6" stroke-opacity="0.55"></line><line class="hi" x1="340.8" y1="102.4" x2="384.6" y2="97.3" stroke-opacity="0.41"></line><line class="lo" x1="340.8" y1="137.6" x2="384.6" y2="135.5" stroke-opacity="0.41"></line><line class="hi" x1="384.6" y1="97.3" x2="428.4" y2="95.6" stroke-opacity="0.31"></line><line class="lo" x1="384.6" y1="135.5" x2="428.4" y2="135.1" stroke-opacity="0.31"></line><line class="hi" x1="428.4" y1="95.6" x2="472.2" y2="91.8" stroke-opacity="0.29"></line><line class="lo" x1="428.4" y1="135.1" x2="472.2" y2="140.4" stroke-opacity="0.29"></line><line class="hi" x1="472.2" y1="91.8" x2="516.1" y2="85.9" stroke-opacity="0.29"></line><line class="lo" x1="472.2" y1="140.4" x2="516.1" y2="135.6" stroke-opacity="0.29"></line><line class="hi" x1="516.1" y1="85.9" x2="559.9" y2="90.2" stroke-opacity="0.24"></line><line class="lo" x1="516.1" y1="135.6" x2="559.9" y2="134.1" stroke-opacity="0.24"></line><line class="hi" x1="559.9" y1="90.2" x2="603.7" y2="95.8" stroke-opacity="0.22"></line><line class="lo" x1="559.9" y1="134.1" x2="603.7" y2="136.8" stroke-opacity="0.22"></line><line class="hi" x1="603.7" y1="95.8" x2="647.5" y2="91.0" stroke-opacity="0.22"></line><line class="lo" x1="603.7" y1="136.8" x2="647.5" y2="136.1" stroke-opacity="0.22"></line><line class="hi" x1="647.5" y1="91.0" x2="691.4" y2="96.6" stroke-opacity="0.22"></line><line class="lo" x1="647.5" y1="136.1" x2="691.4" y2="136.9" stroke-opacity="0.22"></line><line class="hi" x1="691.4" y1="96.6" x2="735.2" y2="100.7" stroke-opacity="0.22"></line><line class="lo" x1="691.4" y1="136.9" x2="735.2" y2="140.3" stroke-opacity="0.22"></line><line class="hi" x1="735.2" y1="100.7" x2="779.0" y2="102.5" stroke-opacity="0.23"></line><line class="lo" x1="735.2" y1="140.3" x2="779.0" y2="142.1" stroke-opacity="0.23"></line><line class="hi" x1="779.0" y1="102.5" x2="822.8" y2="104.3" stroke-opacity="0.24"></line><line class="lo" x1="779.0" y1="142.1" x2="822.8" y2="139.8" stroke-opacity="0.24"></line><line class="hi" x1="822.8" y1="104.3" x2="866.6" y2="105.5" stroke-opacity="0.24"></line><line class="lo" x1="822.8" y1="139.8" x2="866.6" y2="137.8" stroke-opacity="0.24"></line><line class="hi" x1="866.6" y1="105.5" x2="910.5" y2="106.9" stroke-opacity="0.24"></line><line class="lo" x1="866.6" y1="137.8" x2="910.5" y2="137.0" stroke-opacity="0.24"></line><line class="hi" x1="910.5" y1="106.9" x2="954.3" y2="105.1" stroke-opacity="0.28"></line><line class="lo" x1="910.5" y1="137.0" x2="954.3" y2="139.2" stroke-opacity="0.28"></line><line class="hi" x1="954.3" y1="105.1" x2="998.1" y2="105.8" stroke-opacity="0.26"></line><line class="lo" x1="954.3" y1="139.2" x2="998.1" y2="135.9" stroke-opacity="0.26"></line><line class="hi" x1="998.1" y1="105.8" x2="1041.9" y2="107.6" stroke-opacity="0.23"></line><line class="lo" x1="998.1" y1="135.9" x2="1041.9" y2="138.5" stroke-opacity="0.23"></line><line class="hi" x1="1041.9" y1="107.6" x2="1085.8" y2="109.4" stroke-opacity="0.23"></line><line class="lo" x1="1041.9" y1="138.5" x2="1085.8" y2="140.3" stroke-opacity="0.23"></line><line class="hi" x1="1085.8" y1="109.4" x2="1129.6" y2="109.1" stroke-opacity="0.22"></line><line class="lo" x1="1085.8" y1="140.3" x2="1129.6" y2="143.5" stroke-opacity="0.22"></line><line class="hi" x1="1129.6" y1="109.1" x2="1173.4" y2="112.4" stroke-opacity="0.24"></line><line class="lo" x1="1129.6" y1="143.5" x2="1173.4" y2="144.3" stroke-opacity="0.24"></line><line class="hi" x1="1173.4" y1="112.4" x2="1217.2" y2="113.8" stroke-opacity="0.24"></line><line class="lo" x1="1173.4" y1="144.3" x2="1217.2" y2="144.7" stroke-opacity="0.24"></line><line class="hi" x1="1217.2" y1="113.8" x2="1261.1" y2="117.5" stroke-opacity="0.24"></line><line class="lo" x1="1217.2" y1="144.7" x2="1261.1" y2="143.5" stroke-opacity="0.24"></line><line class="hi" x1="1261.1" y1="117.5" x2="1304.9" y2="117.4" stroke-opacity="0.24"></line><line class="lo" x1="1261.1" y1="143.5" x2="1304.9" y2="143.9" stroke-opacity="0.24"></line><line class="hi" x1="1304.9" y1="117.4" x2="1348.7" y2="121.0" stroke-opacity="0.27"></line><line class="lo" x1="1304.9" y1="143.9" x2="1348.7" y2="144.2" stroke-opacity="0.27"></line><line class="hi" x1="1348.7" y1="121.0" x2="1392.5" y2="119.7" stroke-opacity="0.31"></line><line class="lo" x1="1348.7" y1="144.2" x2="1392.5" y2="147.6" stroke-opacity="0.31"></line><line class="hi" x1="1392.5" y1="119.7" x2="1436.4" y2="119.3" stroke-opacity="0.25"></line><line class="lo" x1="1392.5" y1="147.6" x2="1436.4" y2="147.6" stroke-opacity="0.25"></line><line class="hi" x1="1436.4" y1="119.3" x2="1480.2" y2="123.6" stroke-opacity="0.22"></line><line class="lo" x1="1436.4" y1="147.6" x2="1480.2" y2="149.8" stroke-opacity="0.22"></line><line class="hi" x1="1480.2" y1="123.6" x2="1524.0" y2="125.8" stroke-opacity="0.22"></line><line class="lo" x1="1480.2" y1="149.8" x2="1524.0" y2="149.6" stroke-opacity="0.22"></line><rect class="rain" x="292.9" y="212.7" width="8.0" height="1.3" fill-opacity="0.63"></rect><rect class="rain" x="336.8" y="211.9" width="8.0" height="2.1" fill-opacity="0.50"></rect><rect class="rain" x="380.6" y="212.5" width="8.0" height="1.5" fill-opacity="0.37"></rect><rect class="rain" x="424.4" y="212.4" width="8.0" height="1.6" fill-opacity="0.30"></rect><rect class="rain" x="468.2" y="212.7" width="8.0" height="1.3" fill-opacity="0.34"></rect><rect class="rain" x="512.1" y="212.9" width="8.0" height="1.1" fill-opacity="0.29"></rect><rect class="rain" x="555.9" y="213.0" width="8.0" height="1.0" fill-opacity="0.25"></rect><rect class="rain" x="599.7" y="212.7" width="8.0" height="1.3" fill-opacity="0.25"></rect><rect class="rain" x="643.5" y="212.7" width="8.0" height="1.3" fill-opacity="0.25"></rect><rect class="rain" x="687.4" y="212.9" width="8.0" height="1.1" fill-opacity="0.25"></rect><rect class="rain" x="731.2" y="211.8" width="8.0" height="2.2" fill-opacity="0.26"></rect><rect class="rain" x="775.0" y="212.4" width="8.0" height="1.6" fill-opacity="0.27"></rect><rect class="rain" x="818.8" y="212.4" width="8.0" height="1.6" fill-opacity="0.28"></rect><rect class="rain" x="862.6" y="211.7" width="8.0" height="2.3" fill-opacity="0.25"></rect><rect class="rain" x="906.5" y="212.1" width="8.0" height="1.9" fill-opacity="0.29"></rect><rect class="rain" x="950.3" y="212.1" width="8.0" height="1.9" fill-opacity="0.33"></rect><rect class="rain" x="994.1" y="211.4" width="8.0" height="2.6" fill-opacity="0.25"></rect><rect class="rain" x="1037.9" y="212.1" width="8.0" height="1.9" fill-opacity="0.26"></rect><rect class="rain" x="1081.8" y="212.0" width="8.0" height="2.0" fill-opacity="0.25"></rect><rect class="rain" x="1125.6" y="211.8" width="8.0" height="2.2" fill-opacity="0.25"></rect><rect class="rain" x="1169.4" y="212.5" width="8.0" height="1.5" fill-opacity="0.29"></rect><rect class="rain" x="1213.2" y="211.7" width="8.0" height="2.3" fill-opacity="0.25"></rect><rect class="rain" x="1257.1" y="211.1" width="8.0" height="2.9" fill-opacity="0.28"></rect><rect class="rain" x="1300.9" y="210.9" width="8.0" height="3.1" fill-opacity="0.25"></rect><rect class="rain" x="1344.7" y="210.2" width="8.0" height="3.8" fill-opacity="0.35"></rect><rect class="rain" x="1388.5" y="211.3" width="8.0" height="2.7" fill-opacity="0.32"></rect><rect class="rain" x="1432.4" y="210.5" width="8.0" height="3.5" fill-opacity="0.25"></rect><rect class="rain" x="1476.2" y="209.7" width="8.0" height="4.3" fill-opacity="0.25"></rect><rect class="rain" x="1520.0" y="210.3" width="8.0" height="3.7" fill-opacity="0.25"></rect><line class="base" x1="34" x2="1524" y1="214" y2="214"></line><text x="28" y="214" text-anchor="end">rain</text><text x="38" y="18">°F</text><line class="sel" id="selLine" x1="34.0" x2="34.0" y1="8" y2="214" style="visibility:visible"></line><rect class="hit" x="30" y="0" width="1498" height="214"></rect></svg></div>
-<p class="legend"><span><i class="l-fc"></i>forecast high and low</span><span><i class="l-band"></i>likely range of the high</span><span><i class="l-norm"></i>30-year average</span><span><i class="l-rain"></i>chance of rain</span></p>
-</details>
-<details class="srcs" id="srcs" open="">
-<summary>sources <small id="srcsum">10 of 10 responded, updated 7:19 pm</small></summary>
-<div class="log" id="srclog">  nws ............. <b>ok  </b>  7 days  office mtr
-  gfs ............. <b>ok  </b>  16 days
-  ecmwf ........... <b>ok  </b>  15 days
-  icon ............ <b>ok  </b>  7 days
-  gem ............. <b>ok  </b>  10 days
-  gfs ens ......... <b>ok  </b>  33 days  31 members  adjusted -4° / +1°
-  ecmwf ens ....... <b>ok  </b>  11 days  51 members  adjusted -1° / -2°
-  gem ens ......... <b>ok  </b>  35 days  21 members  adjusted 0° / +4°
-  ecmwf ec46 ...... <b>ok  </b>  36 days  51 members  adjusted -8° / +2°
-  climate average .. <b>ok  </b>  30 years  1996 to 2025</div>
-<p class="cross" id="cross">Ensembles are shifted so their first week lines up with the higher-resolution models. Compare with the <a href="https://forecast.weather.gov/MapClick.php?lat=37.7621&amp;lon=-122.3971" target="_blank" rel="noopener">NWS point forecast</a>, the <a href="https://www.cpc.ncep.noaa.gov/products/predictions/814day/" target="_blank" rel="noopener">CPC 8 to 14 day outlook</a>, or the <a href="https://www.cpc.ncep.noaa.gov/products/predictions/WK34/" target="_blank" rel="noopener">CPC week 3 to 4 outlook</a>.</p>
-</details>
-</section>
-<footer>
-<p>Forecast data from <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> (CC BY 4.0) and the <a href="https://www.weather.gov/" target="_blank" rel="noopener">National Weather Service</a>. Averages from ERA5 reanalysis via Open-Meteo.</p>
-<p>Long-range forecasts show tendencies, not promises. Not for safety-critical decisions.</p>
-</footer>
-<div class="status" id="status" role="status" aria-live="polite" aria-atomic="true"><span class="mode">longcast</span><span id="st-mid">94107  san francisco, ca</span><span class="r" id="st-r">10/10 ok  7:19 pm</span></div>
+  <header class="top" id="top">
+    <a class="mark" href="#" id="home">longcast</a><span class="tag" id="tag">35-day outlook</span>
+    <div class="units" role="group" aria-label="Temperature unit">
+      <button type="button" data-u="f" aria-pressed="true">°F</button>
+      <button type="button" data-u="c" aria-pressed="false">°C</button>
+      <button type="button" id="themeButton" class="theme-toggle" aria-expanded="false" aria-controls="themePanel">theme +</button>
+    </div>
+    <section id="themePanel" hidden aria-label="Appearance settings">
+      <div class="theme-head"><div class="module-title">appearance <small>color / type</small></div><button type="button" id="closeTheme" class="theme-close" aria-label="Collapse theme picker">close ×</button></div>
+      <div class="theme-presets" id="themePresets">
+        <button class="theme-preset" type="button" data-theme="mono"><span class="swatch" style="background:#fff;border-color:#000"></span>paper / ink</button>
+        <button class="theme-preset" type="button" data-theme="dark"><span class="swatch" style="background:#101419;border-color:#e7edf2"></span>night console</button>
+        <button class="theme-preset" type="button" data-theme="cream"><span class="swatch" style="background:#f3ead7;border-color:#352c20"></span>warm cream</button>
+        <button class="theme-preset" type="button" data-theme="seafoam"><span class="swatch" style="background:#d9eee5;border-color:#174d43"></span>seafoam</button>
+        <button class="theme-preset" type="button" data-theme="blueyellow"><span class="swatch" style="background:#173b70;border-color:#ffe66d"></span>signal / yellow</button>
+        <button class="theme-preset" type="button" data-theme="plum"><span class="swatch" style="background:#251d2d;border-color:#e6c9ff"></span>plum terminal</button>
+      </div>
+      <div class="theme-controls">
+        <div class="theme-control"><label for="themeBg">background</label><div class="hex-entry"><span class="color-chip" id="bgChip" aria-hidden="true"></span><input id="themeBg" type="text" value="#ffffff" maxlength="7" spellcheck="false" aria-label="Background hex color"></div><div class="color-swatches" id="bgSwatches" aria-label="Background color choices"></div></div>
+        <div class="theme-control"><label for="themeInk">font color</label><div class="hex-entry"><span class="color-chip" id="inkChip" aria-hidden="true"></span><input id="themeInk" type="text" value="#000000" maxlength="7" spellcheck="false" aria-label="Font hex color"></div><div class="color-swatches" id="inkSwatches" aria-label="Font color choices"></div></div>
+      </div>
+      <label class="theme-weight">font weight <output id="weightValue">400</output><input id="themeWeight" type="range" min="200" max="600" step="50" value="400"></label>
+      <div class="theme-share"><span>shareable appearance URL</span><button type="button" id="copyThemeUrl">copy URL</button></div>
+    </section>
+  </header>
+
+  <section class="ask" id="askwrap">
+    <form id="ask" autocomplete="off" novalidate aria-label="Find a weather outlook">
+      <label for="zip" class="gt" aria-hidden="true">&gt;</label>
+      <span class="zipwrap"><input id="zip" name="zip" inputmode="numeric" maxlength="5" pattern="[0-9]{5}" autocomplete="postal-code" placeholder="zip code" aria-label="US ZIP code, five digits" aria-describedby="ziphelp" spellcheck="false" title="Press / to jump here"><span class="cur" aria-hidden="true"></span></span>
+      <button type="submit" class="go" aria-label="Get 35-day outlook">enter</button>
+    </form>
+    <p class="intro" id="ziphelp">A 35-day outlook, comparing available forecasts with 30 years of local climate.</p>
+    <noscript><p class="intro" style="color:#000">This page needs JavaScript and network access. Download the file and open it in a web browser.</p></noscript>
+    <div class="log" id="log" aria-live="polite"></div>
+  </section>
+
+  <section class="out" id="out" hidden>
+    <div class="hero">
+      <p class="where" id="where"></p>
+      <h1 class="head" id="head"></h1>
+      <p class="facts" id="facts"></p>
+    </div>
+
+    <details class="module panel month" open><summary class="module-title" id="cal-title">calendar <small>next 35 days</small></summary>
+      <div class="dow" aria-hidden="true"><span>mo</span><span>tu</span><span>we</span><span>th</span><span>fr</span><span>sa</span><span>su</span></div>
+      <div class="cal" id="cal"></div>
+      <div class="cdet" id="cdet" aria-live="polite"></div>
+    </details>
+
+    <div class="cols">
+      <details class="module panel" open>
+        <summary class="module-title">this week</summary>
+        <div class="dhead" aria-hidden="true"><span></span><span></span><span class="r">low</span><span></span><span class="r">high</span><span class="r">rain</span></div>
+        <ul class="list" id="week"></ul>
+        <p class="note"><i class="sw sw-fc"></i>forecast low to high <i class="sw sw-nm"></i>average range for that date. Tap a day to compare sources.</p>
+      </details>
+      <details class="module panel signal" open>
+        <summary class="module-title">forecast signals <small>35-day scan</small></summary>
+        <div id="signals" class="signals" aria-live="polite"></div>
+        <p class="note">Extremes are relative to this outlook, not historical records.</p>
+      </details>
+      <details class="module panel" open>
+        <summary class="module-title">weeks ahead</summary>
+        <div class="whead" aria-hidden="true"><span>week of</span><span class="r vs">vs average</span><span class="scale"><span>cooler</span><span>warmer</span></span><span class="r whl">high/low</span><span>rain</span><span class="r">confidence</span></div>
+        <ul class="list" id="weeks"></ul>
+        <p class="note" id="wnote"></p>
+      </details>
+    </div>
+
+    <details class="module panel trend" open>
+      <summary class="module-title">temperature trend</summary>
+      <p class="readout" id="readout2"></p>
+      <div class="chart" id="chart"></div>
+      <p class="legend"><span><i class="l-fc"></i>forecast high and low</span><span><i class="l-band"></i>likely range of the high</span><span><i class="l-norm"></i>30-year average</span><span><i class="l-rain"></i>chance of rain</span></p>
+    </details>
+
+    <details class="srcs" id="srcs" open>
+      <summary>sources <small id="srcsum"></small></summary>
+      <div class="log" id="srclog"></div>
+      <p class="cross" id="cross"></p>
+      <div class="source-guide" aria-label="About the forecast sources">
+        <article><b>gfs / NOAA</b><p>US global forecast model. The ensemble runs many versions to show a range of plausible outcomes.</p></article>
+        <article><b>ecmwf</b><p>European global model, often useful for medium-range patterns. Ensemble spread helps indicate uncertainty.</p></article>
+        <article><b>icon / DWD</b><p>German global model. An independent forecast signal to compare against the US and European systems.</p></article>
+        <article><b>gem / ECCC</b><p>Canadian global model. Adds another independent view of temperature and precipitation trends.</p></article>
+        <article><b>ensemble spread</b><p>Wider member-to-member spread usually means lower confidence. Agreement is a signal, not a guarantee.</p></article>
+        <article><b>climate baseline</b><p>30-year averages provide seasonal context; they are not a prediction for any one day.</p></article>
+        <article><b>lead time</b><p>Daily detail is most useful early in the outlook. Later weeks are better read as broad tendencies.</p></article>
+        <article><b>adjustments</b><p>Long-range ensembles are aligned to the higher-resolution first-week outlook to reduce early bias.</p></article>
+      </div>
+    </details>
+  </section>
+
+  <footer>
+    <p>Forecast data from <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> (CC BY 4.0) and the <a href="https://www.weather.gov/" target="_blank" rel="noopener">National Weather Service</a>. Averages from ERA5 reanalysis via Open-Meteo.</p>
+    <p>Long-range forecasts show tendencies, not promises. Not for safety-critical decisions.</p>
+  </footer>
+  <div class="status" id="status" role="status" aria-live="polite" aria-atomic="true"><span class="mode">longcast</span><span id="st-mid">type a zip code</span><span class="r" id="st-r"></span></div>
 </main>
-<script>(()=>{"use strict";const e=.04,t=[{key:"gfs",name:"gfs",id:"gfs_seamless",org:"NOAA"},{key:"ecmwf",name:"ecmwf",id:"ecmwf_ifs025",org:"ECMWF"},{key:"icon",name:"icon",id:"icon_seamless",org:"DWD"},{key:"gem",name:"gem",id:"gem_seamless",org:"ECCC"}],n=[{key:"gfse",name:"gfs ens",id:"gfs05",days:35},{key:"ecmwfe",name:"ecmwf ens",id:"ecmwf_ifs025",days:15},{key:"geme",name:"gem ens",id:"gem_global",days:35}],a=e=>document.querySelector(e),o=document.body,r="The weather services could not be reached from here. Previews inside apps (Claude, the iPhone Files app, email) block outside requests. Download the file and open it in Chrome, Safari, or Firefox. If it is already open in a browser, check your connection.",i={get(e){try{const t=localStorage.getItem(e);return t?JSON.parse(t):null}catch(e){return null}},set(e,t){try{localStorage.setItem(e,JSON.stringify(t))}catch(e){}}},s={unit:"c"===i.get("lc:unit")?"c":"f",model:null,sel:0,open:null},l=e=>"number"==typeof e&&isFinite(e),c=(e,t,n)=>Math.min(n,Math.max(t,e)),d=e=>{const t=e.filter(l);return t.length?t.reduce((e,t)=>e+t,0)/t.length:null},u=e=>{const t=e.filter(l).sort((e,t)=>e-t);if(!t.length)return null;const n=t.length>>1;return t.length%2?t[n]:(t[n-1]+t[n])/2},h=(e,t)=>{if(!e.length)return null;const n=(e.length-1)*t,a=Math.floor(n),o=Math.ceil(n);return e[a]+(e[o]-e[a])*(n-a)},p=e=>String(e).replace(/[&<>"']/g,e=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[e])),m=["jan","feb","mar","apr","may","jun","jul","aug","sep","oct","nov","dec"],f=["sun","mon","tue","wed","thu","fri","sat"],g=[0,31,59,90,120,151,181,212,243,273,304,334],y=e=>{const[t,n,a]=e.split("-").map(Number);return new Date(Date.UTC(t,n-1,a))},$=e=>e.toISOString().slice(0,10),w=(e,t)=>{const n=y(e);return n.setUTCDate(n.getUTCDate()+t),$(n)},v=e=>{const t=y(e);return m[t.getUTCMonth()]+" "+t.getUTCDate()},b=e=>f[y(e).getUTCDay()],k=e=>Math.min(364,g[+e.slice(5,7)-1]+ +e.slice(8,10)-1),x=(e,t)=>{const n=y(e),a=y(t);return n.getUTCMonth()===a.getUTCMonth()?`${v(e)} to ${a.getUTCDate()}`:`${v(e)} to ${v(t)}`},E=e=>"c"===s.unit?5*(e-32)/9:e,_=e=>l(e)?String(Math.round(E(e))):"",M=e=>{const t=Math.round("c"===s.unit?5*e/9:e);return(t>0?"+":"")+t},S=e=>l(e)?10*Math.round(10*e)+"%":"",C=e=>e>=.6?"high":e>=.3?"medium":"low",L=(e,t)=>e+"?"+Object.entries(t).map(([e,t])=>e+"="+encodeURIComponent(t).replace(/%2C/g,",")).join("&");async function T(e,t=15e3){const n=new AbortController,a=setTimeout(()=>n.abort(),t);try{const t=await fetch(e,{signal:n.signal});if(!t.ok){let e="http "+t.status;try{const n=await t.json();n&&n.reason&&(e+=" "+n.reason)}catch(e){}throw new Error(e)}return await t.json()}catch(e){if("AbortError"===e.name){const e=new Error("timed out");throw e.network=!0,e}if(e instanceof TypeError){const e=new Error("blocked or offline");throw e.network=!0,e}throw e}finally{clearTimeout(a)}}function A(e,t,n){const a=e&&e.daily;if(!a||!Array.isArray(a.time))throw new Error("no daily data");const o=e=>Object.keys(a).filter(t=>t===e||t.startsWith(e+"_")).map(e=>a[e]),r={...n,kind:t,time:a.time,hi:o("temperature_2m_max"),lo:o("temperature_2m_min"),pr:o("precipitation_sum")};"det"===t&&(r.pop=o("precipitation_probability_max")[0]||null,r.code=o("weather_code")[0]||null);let i=-1;if(r.hi.forEach(e=>e.forEach((e,t)=>{l(e)&&t>i&&(i=t)})),r.span=i+1,r.members=r.hi.filter(e=>e.some(l)).length,!r.members)throw new Error("empty response");return r}function I(e){const t=[],n=e=>e+" "+".".repeat(Math.max(2,16-e.length))+" ",a=()=>{e.innerHTML=t.map(e=>{if("msg"===e.status)return`  <span class="err">${p(e.detail)}</span>`;if("wait"===e.status)return`  ${p(n(e.name))}<span class="wait" aria-label="loading"></span>`;const t="ok"===e.status?"<b>ok</b>  ":"<b>fail</b>";return`  ${p(n(e.name))}${t}${e.detail?"  "+p(e.detail):""}`}).join("\n")};return{add(e,n){t.push({id:e,name:n,status:"wait",detail:""}),a()},set(e,n,o){const r=t.find(t=>t.id===e);r&&(r.status=n,r.detail=o||"",a())},msg(e){t.push({id:"m"+t.length,name:"",status:"msg",detail:e}),a()},clear(){t.length=0,e.innerHTML=""}}}const j=e=>(.55+.45*e).toFixed(2),D=e=>e.n&&l(e.hi)?e.hi-e.n.hi:null;function U(){const e=s.model.rows.slice(0,7),t=[];if(e.forEach(e=>[e.hi,e.lo,e.n&&e.n.hi,e.n&&e.n.lo].forEach(e=>{l(e)&&t.push(e)})),!t.length)return void(a("#week").innerHTML='<li class="note">Temperature data unavailable.</li>');const n=Math.min(...t),o=Math.max(...t),r=Math.max(1,o-n),i=e=>((e-n)/r*100).toFixed(1),c=(e,t)=>((t-e)/r*100).toFixed(1);a("#week").innerHTML=e.map((e,t)=>{const n=s.open===t,a=0===t?"today":`${b(e.date)} ${y(e.date).getUTCDate()}`,o=e.n?`<i class="nm" style="left:${i(e.n.lo)}%;width:${c(e.n.lo,e.n.hi)}%"></i>`:"",r=l(e.hi)&&l(e.lo)?`<i class="fc" style="left:${i(e.lo)}%;width:${c(e.lo,e.hi)}%"></i>`:"",d=l(e.pop)&&e.pop>=.2?S(e.pop):"",u=`${0===t?"today":b(e.date)+" "+v(e.date)}: high ${_(e.hi)}, low ${_(e.lo)}${d?", "+d+" chance of rain":""}`;return`<li class="drow${n?" open":""}"><button type="button" class="dbtn" data-i="${t}" aria-expanded="${n}" aria-label="${p(u)}" style="--o:${j(e.conf)}"><span class="dn">${a}</span><span class="wx">${e.wx||""}</span><span class="lo">${_(e.lo)}°</span><span class="rng">${o}${r}</span><span class="hi">${_(e.hi)}°</span><span class="rain${l(e.pop)&&e.pop>=.5?" wet":""}">${d}</span></button>`+(n?function(e){const t=[];e.n&&t.push(`Average ${_(e.n.hi)}° / ${_(e.n.lo)}°.`),l(e.p10)&&l(e.p90)&&t.push(`Likely high ${_(e.p10)}° to ${_(e.p90)}°.`),t.push(`${e.reach} of ${s.model.srcCount} sources.`);const n=s.model.perSource(e.date).map(e=>{const t=`${(_(e.hi)||"-").padStart(3)} / ${(_(e.lo)||"-").padEnd(3)}`,n=l(e.pop)?S(e.pop).padStart(5):"     ",a=e.n?`   ${e.n} runs`:"";return`${p((e=>e+" "+".".repeat(Math.max(2,13-e.length))+" ")(e.name))}<b>${t}</b>${n}${a}`});return`<div class="ddet"><p>${t.join(" ")}</p>${n.length?`<div class="src">${n.join("\n")}</div>`:""}</div>`}(e):"")+"</li>"}).join("")}function F(e){const t=null!=e?e:s.sel;a("#readout2").innerHTML=null==t?'<span class="hint">Tap or hover the chart to read a date.</span>':function(e){const t=0===e.d?"today":`${b(e.date)} ${v(e.date)}`,n=[`<i>high</i>${_(e.hi)}°`,`<i>low</i>${_(e.lo)}°`];return l(e.pop)&&n.push(`<i>rain</i>${S(e.pop)}`),e.n&&n.push(`<i>average</i>${_(e.n.hi)}° / ${_(e.n.lo)}°`),`<b>${t}</b>`+n.map(e=>`<span>${e}</span>`).join("")}(s.model.rows[t])}const B=String.raw`    .--.
- .-(    ).
-(___.__)__)`,H={clear:String.raw`  \   |   /
-   .-"""-.
--- (     ) --
-   '-...-'
-  /   |   \ `,partly:String.raw`  \  |  /
- -- ( ) --
-   .--.
-.-(    ).
-(___.__)__)`,cloudy:B+"\n"+String.raw`  .-(   ).
- (___.__)_)`,fog:String.raw` _ - _ - _ -
-  _ - _ - _
- - _ - _ - _
-  _ - _ - _`,drizzle:B+"\n"+String.raw` . . . . .
-  . . . .`,rain:B+"\n"+String.raw` ' ' ' ' '
-  ' ' ' '`,snow:B+"\n"+String.raw` *  *  *  *
-   *  *  *`,storm:B+"\n"+String.raw`  /_  /_
-   /    /`};function z(){const e=a("#cdet"),t=s.model.rows[s.sel];e.className="cdet open";const n=`${b(t.date)} ${v(t.date)}`,o=0===t.d?"today":1===t.d?"tomorrow":`in ${t.d} days`,r=l(t.pop)?`rain ${S(t.pop)}`:"",i=[];if(t.n&&l(t.hi)){const e=Math.round(E(t.hi)-E(t.n.hi));i.push(["vs average",0===e?`right at the average high of ${_(t.n.hi)}°`:`${Math.abs(e)}° ${e>0?"warmer":"cooler"} than the average high of ${_(t.n.hi)}°`]),i.push(["average",`${_(t.n.hi)}° / ${_(t.n.lo)}°`])}var c;l(t.p10)&&l(t.p90)&&i.push(["likely high",`${_(t.p10)}° to ${_(t.p90)}°`]),l(t.pop)&&t.pop>=.2&&l(t.rainIf)?i.push(["rain",`${S(t.pop)} chance, ${t.rainIf<.05&&"c"!==s.unit?"light if it does":"about "+(c=t.rainIf,(l(c)?"c"===s.unit?Math.round(25.4*c)+" mm":c>0&&c<.05?"<0.1 in":c.toFixed(1)+" in":"")+" if it does")}`]):l(t.pop)&&i.push(["rain",`${S(t.pop)} chance, probably dry`]);const d=C(t.conf);i.push(["confidence",`${d}, ${"high"===d?"the forecasts agree closely":"medium"===d?"the forecasts roughly agree":"the forecasts disagree, treat it as a tendency"}`]);const u=s.model.perSource(t.date),h=u.length&&u.every(e=>e.n);i.push(["sources",`${t.reach} of ${s.model.srcCount} reach this date${h?", all long-range ensembles":""}`]),e.innerHTML=`<div class="cdet-top"><b>${n}</b><span class="ago">${o}</span></div><div class="cdet-body"><div class="cdet-l"><div class="cdet-temp"><span class="h">${_(t.hi)}°</span><span class="l">${_(t.lo)}°</span>${r?`<span class="r${t.pop>=.5?" wet":""}">${r}</span>`:""}</div><pre class="wxart" aria-hidden="true">${(e=>p(H[e.wx||(l(e.pop)&&e.pop>=.4?"rain":"clear")]))(t)}</pre></div><dl class="kv">${i.map(([e,t])=>`<dt>${e}</dt><dd>${t}</dd>`).join("")}</dl></div>`}function N(e){const t=document.getElementById("selLine");if(!t||!s.chartX)return;if(null==e)return void(t.style.visibility="hidden");const n=s.chartX(e).toFixed(1);t.setAttribute("x1",n),t.setAttribute("x2",n),t.style.visibility="visible"}function O(){const e=s.model.rows,t=a("#chart"),n=Math.max(300,Math.round(t.clientWidth||1e3)),o=n<560?200:240,r=34,i=n-r-6,d=o-8-50,u=e.length,h=[];if(e.forEach(e=>[e.hi,e.lo,e.p10,e.p90,e.n&&e.n.hi,e.n&&e.n.lo].forEach(e=>{l(e)&&h.push(E(e))})),!h.length)return void(t.innerHTML="");const p="c"===s.unit?5:10,m=Math.floor((Math.min(...h)-1)/p)*p;let f=Math.ceil((Math.max(...h)+1)/p)*p;f-m<2*p&&(f=m+2*p);const g=e=>r+(u>1?e*i/(u-1):i/2),$=e=>8+d-(e-m)/(f-m)*d,w=e=>$(E(e)),b=e=>e.toFixed(1),k=t=>{const n=[];let a=[];return e.forEach((e,o)=>{t(e)?a.push(o):a.length&&(n.push(a),a=[])}),a.length&&n.push(a),n};let x=`<svg width="${n}" height="${o}" viewBox="0 0 ${n} ${o}" role="group" tabindex="0" aria-label="Temperature trend for the next ${u} days. Use left and right arrow keys to inspect dates; Home and End jump to the first and last date."><defs><pattern id="dotband" width="3" height="3" patternUnits="userSpaceOnUse"><circle cx="1.5" cy="1.5" r="0.75" fill="#000"/></pattern></defs>`;for(let e=m;e<=f;e+=p)x+=`<line class="g" x1="34" x2="${n-6}" y1="${b($(e))}" y2="${b($(e))}"/><text x="28" y="${b($(e)+4)}" text-anchor="end">${e}</text>`;const _=8+d+10,M=14;e.forEach((e,t)=>{1===y(e.date).getUTCDay()&&(x+=`<line class="g" x1="${b(g(t))}" x2="${b(g(t))}" y1="8" y2="${_+M}"/><text x="${b(g(t))}" y="${o-6}" text-anchor="middle">${v(e.date)}</text>`)}),k(e=>l(e.p10)&&l(e.p90)).forEach(t=>{const n=t.map(t=>`${b(g(t))},${b(w(e[t].p90))}`),a=t.slice().reverse().map(t=>`${b(g(t))},${b(w(e[t].p10))}`);x+=`<polygon class="band" points="${n.concat(a).join(" ")}"/>`}),k(e=>e.n).forEach(t=>{x+=`<polyline class="norm" points="${t.map(t=>`${b(g(t))},${b(w(e[t].n.hi))}`).join(" ")}"/>`,x+=`<polyline class="norm" points="${t.map(t=>`${b(g(t))},${b(w(e[t].n.lo))}`).join(" ")}"/>`});for(let t=1;t<u;t++){const n=e[t-1],a=e[t],o=(.22+.78*(n.conf+a.conf)/2).toFixed(2);l(n.hi)&&l(a.hi)&&(x+=`<line class="hi" x1="${b(g(t-1))}" y1="${b(w(n.hi))}" x2="${b(g(t))}" y2="${b(w(a.hi))}" stroke-opacity="${o}"/>`),l(n.lo)&&l(a.lo)&&(x+=`<line class="lo" x1="${b(g(t-1))}" y1="${b(w(n.lo))}" x2="${b(g(t))}" y2="${b(w(a.lo))}" stroke-opacity="${o}"/>`)}const S=Math.max(2,Math.min(8,i/u*.42));e.forEach((e,t)=>{if(!l(e.pop)||e.pop<.05)return;const n=Math.max(1,e.pop*M);x+=`<rect class="rain" x="${b(g(t)-S/2)}" y="${b(_+M-n)}" width="${b(S)}" height="${b(n)}" fill-opacity="${(.25+.75*e.conf).toFixed(2)}"/>`}),x+=`<line class="base" x1="34" x2="${n-6}" y1="${_+M}" y2="${_+M}"/>`,x+=`<text x="28" y="${_+M}" text-anchor="end">rain</text>`,x+=`<text x="38" y="18">°${s.unit.toUpperCase()}</text>`;const C=b(g(null==s.sel?0:s.sel));x+=`<line class="sel" id="selLine" x1="${C}" x2="${C}" y1="8" y2="${_+M}" style="visibility:${null==s.sel?"hidden":"visible"}"/>`,x+=`<rect class="hit" x="30" y="0" width="${i+8}" height="${_+M}"/>`,t.innerHTML=x+"</svg>";const L=t.querySelector("svg"),T=e=>{const t=L.getBoundingClientRect(),a=(e.clientX-t.left)*(n/t.width);return c(Math.round((a-r)/(i/Math.max(1,u-1))),0,u-1)};L.addEventListener("pointermove",e=>{if("mouse"===e.pointerType){const t=T(e);F(t),N(t)}}),L.addEventListener("pointerleave",()=>{F(),N(s.sel)}),L.addEventListener("click",e=>{const t=T(e);t!==s.sel&&W(t)}),L.addEventListener("keydown",e=>{if(!["ArrowLeft","ArrowRight","Home","End"].includes(e.key))return;e.preventDefault();const t=null==s.sel?0:s.sel,n="Home"===e.key?0:"End"===e.key?u-1:c(t+("ArrowRight"===e.key?1:-1),0,u-1);n!==s.sel&&W(n)}),s.chartX=g}function P(e,t){const n=document.getElementById("st-mid"),a=document.getElementById("st-r");n&&(n.textContent=e),a&&(a.textContent=t||"")}function q(){if(!s.model)return;const e=s.model.status.filter(e=>e.ok).length;P(`${V.value}  ${s.model.loc.name.toLowerCase()}, ${s.model.loc.region.toLowerCase()}`,`${e}/${s.model.status.length} ok  ${s.model.updated}`),function(){const{rows:e,loc:t}=s.model,n=e.map(D).filter(l),o=n.length>=7?d(n):null;a("#head").textContent=null==o?"The next 35 days":Math.round(o)>=2?"Warmer than average":Math.round(o)<=-2?"Cooler than average":"Close to average",a("#where").innerHTML=[`${t.name}, ${t.region}`,"next 35 days"].map(e=>`<span>${p(e)}</span>`).join(""),a("#tag").textContent="35-day outlook",a("#cal-title small").textContent="next 35 days";const r=[];if(null!=o){const e=Math.round("c"===s.unit?5*o/9:o);r.push(0===e?"<i>highs</i><b>at average</b>":`<i>highs</i><b>${M(o)}°</b> vs average`)}const i=Math.round(e.reduce((e,t)=>e+(t.pop||0),0)),c=e.every(e=>e.n)?Math.round(e.reduce((e,t)=>e+t.n.wet,0)):null;r.push(`<i>rainy days</i><b>${i}</b>${null!=c?` (average ${c})`:""}`);const u=function(e){const t=e.map(D);let n={v:-1/0,i:0},a={v:1/0,i:0};for(let e=0;e+5<=t.length;e++){const o=d(t.slice(e,e+5));l(o)&&(o>n.v&&(n={v:o,i:e}),o<a.v&&(a={v:o,i:e}))}const o=n.v>=4,r=a.v<=-4;if(!o&&!r)return null;const i=o&&(!r||n.v>=-a.v),s=i?n:a;return{word:i?"warmest":"coolest",range:x(e[s.i].date,e[s.i+4].date)}}(e);u&&r.push(`<i>${u.word}</i><b>${u.range}</b>`),a("#facts").innerHTML=r.map(e=>`<span>${e}</span>`).join("")}(),U(),function(){const e=s.model.rows,t=e.filter(e=>l(e.hi)),n=e.filter(e=>l(e.lo)),o=e.filter(e=>l(e.pop)),r=t.reduce((e,t)=>!e||t.hi>e.hi?t:e,null),i=n.reduce((e,t)=>!e||t.lo<e.lo?t:e,null),c=o.reduce((e,t)=>!e||t.pop>e.pop?t:e,null),d=e.map(e=>({r:e,a:D(e)})).filter(e=>l(e.a)).reduce((e,t)=>!e||t.a>e.a?t:e,null),u=[["peak high",r,r?`${_(r.hi)}°`:"unavailable",r?v(r.date):""],["coldest low",i,i?`${_(i.lo)}°`:"unavailable",i?v(i.date):""],["rain chance",c,c?S(c.pop):"unavailable",c?v(c.date):""],["warm anomaly",d&&d.r,d?`${M(d.a)}°`:"unavailable",d?`${v(d.r.date)} vs 30-year avg`:""]];a("#signals").innerHTML=u.map(([e,t,n,a])=>`<div class="signal-row"><span class="signal-key">${e}</span><span class="signal-value">${n}<span class="signal-sub">${p(a)}</span></span></div>`).join("")}(),function(){const e=s.model.rows,t=[];for(let n=1;n<5;n++){const a=e.slice(7*n,7*n+7).filter(e=>l(e.hi));if(!a.length)continue;const o=d(a.map(e=>e.hi)),r=d(a.map(e=>e.lo)),i=a.every(e=>e.n)?d(a.map(e=>e.n.hi)):null,s=a.reduce((e,t)=>e+(t.pop||0),0),c=a.every(e=>e.n)?a.reduce((e,t)=>e+t.n.wet,0):null,u=d(a.map(e=>e.conf));let h=`${Math.round(s)} wet`,m="";l(c)&&(s>=c+1&&s>=1.25*c?(h="wetter",m="wetter"):h=s<=c-1&&s<=.75*c?"drier":"typical");const f=l(i)?o-i:null;let g="";if(l(f)){const e=Math.max(1.5,Math.min(50,Math.abs(f)/6*50)).toFixed(1);g=f>=0?`<i class="warm" style="left:50%;width:${e}%"></i>`:`<i class="cool" style="right:50%;width:${e}%"></i>`}const y=x(a[0].date,a[a.length-1].date),$=C(u),w=`${y}: highs ${l(f)?M(f)+" degrees vs average":_(o)}, rain ${h}, ${$} confidence`;t.push(`<li class="wrow" style="--o:${j(u)}" aria-label="${p(w)}" title="${p(y)}"><span class="wd">${v(a[0].date)}</span><span class="wa">${l(f)?M(f)+"°":""}</span><span class="dv" aria-hidden="true">${g}</span><span class="whl">${_(o)} / ${_(r)}°</span><span class="wr ${m}">${h}</span><span class="wc ${"low"===$?"low":""}">${$}</span></li>`)}a("#weeks").innerHTML=t.join("");const n=e.find(e=>e.d>=3&&e.conf<.3);a("#wnote").textContent="Compared with the 30-year average for the same dates. Confidence is a rough signal from model spread and forecast lead time, not a probability."+(n?` After ${v(w(n.date,-1))}, read these as tendencies, not exact numbers.`:"")}(),function(){const e=s.model.rows,t=(y(e[0].date).getUTCDay()+6)%7;let n="";for(let e=0;e<t;e++)n+='<div class="cell blank" aria-hidden="true"></div>';e.forEach((e,t)=>{const a=y(e.date).getUTCDate(),o=0===t||1===a?v(e.date):String(a),r=l(e.pop)&&e.pop>=.2?e.pop:0,i=`${b(e.date)} ${v(e.date)}${0===t?", today":""}: high ${_(e.hi)}, low ${_(e.lo)}${r?", "+S(e.pop)+" chance of rain":""}`;var c;n+=`<button type="button" class="cell${0===t?" today":""}" data-i="${t}" aria-pressed="${s.sel===t}" aria-label="${p(i)}" style="--o:${c=e.conf,(.66+.34*c).toFixed(2)};--rp:${r.toFixed(2)}"><span class="d">${o}</span><span class="hi v">${l(e.hi)?_(e.hi):"·"}</span><span class="lo v">${_(e.lo)}</span><span class="rn v${r>=.5?" wet":""}">${r?`<span class="rl">rain </span>${S(r)}`:""}</span></button>`});const o=(7-(t+e.length)%7)%7;for(let e=0;e<o;e++)n+='<div class="cell blank" aria-hidden="true"></div>';a("#cal").innerHTML=n}(),z(),F(),O(),function(){const e=s.model.status;a("#srclog").innerHTML=e.map(e=>{let t=e.detail||"";return e.ok&&e.off&&("0"!==M(e.off.hi)||"0"!==M(e.off.lo))&&(t+=`  adjusted ${M(e.off.hi)}° / ${M(e.off.lo)}°`),`  ${p((n=e.name,n+" "+".".repeat(Math.max(2,16-n.length))+" "))}<b>${e.ok?"ok  ":"fail"}</b>${t?"  "+p(t):""}`;var n}).join("\n");const t=e.filter(e=>e.ok).length;a("#srcsum").textContent=`${t} of ${e.length} responded, updated ${s.model.updated}`;const n=s.model.loc.lat.toFixed(4),o=s.model.loc.lon.toFixed(4);a("#cross").innerHTML=`Ensembles are shifted so their first week lines up with the higher-resolution models. Compare with the <a href="https://forecast.weather.gov/MapClick.php?lat=${n}&lon=${o}" target="_blank" rel="noopener">NWS point forecast</a>, the <a href="https://www.cpc.ncep.noaa.gov/products/predictions/814day/" target="_blank" rel="noopener">CPC 8 to 14 day outlook</a>, or the <a href="https://www.cpc.ncep.noaa.gov/products/predictions/WK34/" target="_blank" rel="noopener">CPC week 3 to 4 outlook</a>.`}()}function W(e){s.model&&null!=e&&e!==s.sel&&(s.sel=e,document.querySelectorAll("#cal .cell[data-i]").forEach(e=>e.setAttribute("aria-pressed",String(+e.dataset.i===s.sel))),z(),F(),N(s.sel))}const R=a("#ask");let J=0;async function X(p){const m=++J;Y=p,i.set("lc:last",p);try{const e=(location.hash||"").match(/~[0-9a-f]{6}-[0-9a-f]{6}-\d{3}$/i);history.replaceState(null,"","#"+p+(e?e[0]:""))}catch(e){}V.value=p,K(),o.classList.remove("idle","ready"),o.classList.add("loading");const f=I(a("#log"));let g;f.clear(),f.add("loc","locating"),P(`${p}  locating`,"");try{g=await async function(e){const t="lc:zip:"+e,n=i.get(t);if(n)return n;let a=null,o=0;try{const t=await T("https://api.zippopotam.us/us/"+e,8e3),n=t&&t.places&&t.places[0];n&&(a={lat:+n.latitude,lon:+n.longitude,name:n["place name"],region:n["state abbreviation"],via:"zippopotam.us"})}catch(e){e.network&&o++}if(!a)try{const t=((await T(L("https://geocoding-api.open-meteo.com/v1/search",{name:e,count:10,country_code:"US",language:"en",format:"json"}),8e3)).results||[]).find(t=>(t.postcodes||[]).includes(e));t&&(a={lat:t.latitude,lon:t.longitude,name:t.name,region:t.admin1||"",via:"open-meteo geocoding"})}catch(e){if(!e.network)throw e;o++}if(!a&&o>0){const e=new Error("network");throw e.network=!0,e}if(!a||!l(a.lat)||!l(a.lon))throw new Error("no match");return i.set(t,a),a}(p)}catch(e){if(m!==J)return;return f.set("loc","fail",e.network?"blocked or offline":""),f.msg(e.network?r:`No place found for ${p}. Check the 5-digit zip and try again.`),P(`${p}  ${e.network?"offline":"no match"}`,e.network?"check connection / retry":"check ZIP / retry"),o.classList.remove("loading"),void(s.model&&o.classList.add("ready"))}if(m!==J)return;g.zip=p,f.set("loc","ok",`${g.name}, ${g.region}`.toLowerCase());const y={latitude:g.lat.toFixed(4),longitude:g.lon.toFixed(4),timezone:"auto",temperature_unit:"fahrenheit",precipitation_unit:"inch"},v=[];let b=0;const x=()=>{b++,P(`${p}  loading`,`${b}/${v.length} sources`)},E=(e,t,n,a)=>{f.add(e,t),v.push(n().then(n=>(m===J&&(f.set(e,"ok",a(n)),x()),{key:e,name:t,ok:!0,v:n,detail:a(n)}),n=>(m===J&&(f.set(e,"fail",n.message||"error"),x()),{key:e,name:t,ok:!1,detail:n.message||"error"})))};E("nws","nws",()=>async function(e,t){const n=await T("https://api.weather.gov/points/"+e.toFixed(4)+","+t.toFixed(4),1e4),a=n&&n.properties&&n.properties.forecast;if(!a)throw new Error("outside nws coverage");const o=await T(a,1e4),r=o&&o.properties&&o.properties.periods||[];if(!r.length)throw new Error("no periods");const i={},s={},c={};r.forEach(e=>{const t=String(e.startTime).slice(0,10),n="C"===e.temperatureUnit?9*e.temperature/5+32:e.temperature,a=e.probabilityOfPrecipitation&&e.probabilityOfPrecipitation.value;l(a)&&(c[t]=Math.max(c[t]||0,a)),l(n)&&(e.isDaytime?i[t]=n:s[w(t,1)]=n)});const d=new Set(Object.keys(i).concat(Object.keys(s))).size;return{key:"nws",name:"nws",kind:"nws",hi:i,lo:s,pop:c,office:n.properties.cwa||"",span:d}}(g.lat,g.lon),e=>`${e.span} days  office ${e.office.toLowerCase()}`),t.forEach(e=>E(e.key,e.name,()=>T(L("https://api.open-meteo.com/v1/forecast",{...y,daily:"temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,weather_code",forecast_days:16,models:e.id})).then(t=>A(t,"det",e)),e=>`${e.span} days`)),n.forEach(e=>E(e.key,e.name,()=>T(L("https://ensemble-api.open-meteo.com/v1/ensemble",{...y,daily:"temperature_2m_max,temperature_2m_min,precipitation_sum",forecast_days:e.days,models:e.id})).then(t=>A(t,"ens",e)),e=>`${e.span} days  ${e.members} members`)),E("ec46","ecmwf ec46",()=>T(L("https://seasonal-api.open-meteo.com/v1/seasonal",{...y,daily:"temperature_2m_max,temperature_2m_min,precipitation_sum",forecast_days:36})).then(e=>A(e,"ens",{key:"ec46",name:"ecmwf ec46"})),e=>`${e.span} days  ${e.members} members`);const _="lc:norm:v1:"+g.lat.toFixed(2)+","+g.lon.toFixed(2),M=(new Date).getFullYear()-1,S=M-29;E("norm","climate average",async()=>{const t=i.get(_);if(t&&Array.isArray(t.n)&&365===t.n.length)return{n:t.n,cached:!0};const n=function(t){const n=t&&t.daily;if(!n||!n.time)throw new Error("no archive data");const a=n.temperature_2m_max,o=n.temperature_2m_min,r=n.precipitation_sum,i=Array.from({length:365},()=>[]);n.time.forEach((e,t)=>{l(a[t])&&l(o[t])&&i[k(e)].push(t)});const s=[];for(let t=0;t<365;t++){const n=[],c=[],u=[];for(let e=-7;e<=7;e++)i[(t+e+365)%365].forEach(e=>{n.push(a[e]),c.push(o[e]),l(r[e])&&u.push(r[e])});if(!n.length){s.push(null);continue}n.sort((e,t)=>e-t);const p=e=>Math.round(10*e)/10;s.push({hi:p(d(n)),lo:p(d(c)),p10:p(h(n,.1)),p90:p(h(n,.9)),pr:Math.round(1e3*d(u))/1e3,wet:Math.round(u.filter(t=>t>=e).length/Math.max(1,u.length)*100)/100})}return s}(await T(L("https://archive-api.open-meteo.com/v1/archive",{...y,start_date:`${S}-01-01`,end_date:`${M}-12-31`,daily:"temperature_2m_max,temperature_2m_min,precipitation_sum"}),3e4));return i.set(_,{n:n}),{n:n,cached:!1}},e=>e.cached?"30 years  cached":`30 years  ${S} to ${M}`);const C=await Promise.all(v);if(m!==J)return;const j=C.filter(e=>e.ok&&"norm"!==e.key).map(e=>e.v),D=C.find(e=>"norm"===e.key),U=D&&D.ok?D.v.n:null,F=j.filter(e=>e.time&&e.time.length);if(!F.length)return f.msg(r),P(`${p}  unavailable`,"retry or check connection"),o.classList.remove("loading"),void(s.model&&o.classList.add("ready"));const B={};F.forEach(e=>{B[e.time[0]]=(B[e.time[0]]||0)+1});const H=Object.keys(B).sort((e,t)=>B[t]-B[e])[0]||(()=>{const e=new Date;return $(new Date(Date.UTC(e.getFullYear(),e.getMonth(),e.getDate())))})(),z=function(t,n,a){const o=n.filter(e=>"det"===e.kind),r=n.filter(e=>"ens"===e.kind),i=n.find(e=>"nws"===e.kind);n.forEach(e=>{e.time&&(e.idx=new Map(e.time.map((e,t)=>[e,t])))});const s=(e,t,n,a)=>{const o=e.idx.get(a);if(null==o||!e[t][n])return null;const r=e[t][n][o];return l(r)?r:null},p=(e,t)=>{const n=o.map(n=>s(n,e,0,t)).filter(l);return i&&"pr"!==e&&l(i[e][t])&&n.push(i[e][t]),n};return r.forEach(e=>{e.off={hi:0,lo:0},["hi","lo"].forEach(n=>{const a=[];for(let o=1;o<=7&&o<t.length;o++){const r=u(p(n,t[o])),i=u(e[n].map((a,r)=>s(e,n,r,t[o])));l(r)&&l(i)&&a.push(r-i)}a.length>=3&&(e.off[n]=c(d(a),-8,8))})}),{rows:t.map((t,n)=>{const m=[],f=[],g=[];r.forEach(e=>{for(let n=0;n<e.hi.length;n++){const a=s(e,"hi",n,t);null!=a&&m.push(a+e.off.hi);const o=s(e,"lo",n,t);null!=o&&f.push(o+e.off.lo);const r=s(e,"pr",n,t);null!=r&&g.push(r)}});const y=p("hi",t),$=p("lo",t),w=p("pr",t),v=(e,t)=>{const n=u(e),a=t.length>=5?u(t):null;if(null==n)return a;if(null==a)return n;const o=e.length>=2?.5:.3;return o*n+(1-o)*a},b=v(y,m),x=v($,f);let E=null,_=null;if(m.length>=8){const e=m.slice().sort((e,t)=>e-t);E=h(e,.1),_=h(e,.9)}else y.length>=2&&(E=Math.min(...y),_=Math.max(...y));const M=[];g.length>=8&&M.push(g.filter(t=>t>=e).length/g.length);const S=o.map(e=>e.pop&&e.idx.has(t)?e.pop[e.idx.get(t)]:null).filter(l);S.length&&M.push(d(S)/100),i&&l(i.pop[t])&&M.push(i.pop[t]/100),!M.length&&w.length&&M.push(w.filter(t=>t>=e).length/w.length);const C=M.length?c(d(M),0,1):null,L=d(g.length>=8?g:w),T=d((g.length>=8?g:w).filter(t=>t>=e)),A=o.map(e=>e.code&&e.idx.has(t)?e.code[e.idx.get(t)]:null).filter(l),I=A.length>=2&&n<10?function(e){const t=["clear","partly","cloudy","fog","drizzle","rain","snow","storm"],n={};return e.forEach(e=>{const t=(e=>e>=95?"storm":e>=71&&e<=77||85===e||86===e?"snow":e>=61&&e<=67||e>=80&&e<=82?"rain":e>=51&&e<=57?"drizzle":45===e||48===e?"fog":3===e?"cloudy":2===e?"partly":"clear")(e);n[t]=(n[t]||0)+1}),Object.keys(n).sort((e,a)=>n[a]-n[e]||t.indexOf(a)-t.indexOf(e))[0]}(A):null,j=a?a[k(t)]:null;let D;D=j&&l(E)&&l(_)&&j.p90>j.p10?c(1-(_-E)/(j.p90-j.p10),0,1):c(1-n/30,0,1),n<=2&&(D=Math.max(D,.85));const U=o.filter(e=>null!=s(e,"hi",0,t)).length+r.filter(e=>e.hi.some((n,a)=>null!=s(e,"hi",a,t))).length+(i&&(l(i.hi[t])||l(i.lo[t]))?1:0);return{date:t,d:n,hi:b,lo:x,p10:E,p90:_,pop:C,rain:L,rainIf:T,wx:I,n:j,conf:D,reach:U,members:m.length}}),perSource:t=>{const n=[];return i&&(l(i.hi[t])||l(i.lo[t]))&&n.push({name:"nws",hi:i.hi[t],lo:i.lo[t],pop:l(i.pop[t])?i.pop[t]/100:null}),o.forEach(e=>{const a=s(e,"hi",0,t),o=s(e,"lo",0,t);if(null==a&&null==o)return;const r=e.pop&&e.idx.has(t)?e.pop[e.idx.get(t)]:null;n.push({name:e.name,hi:a,lo:o,pop:l(r)?r/100:null})}),r.forEach(a=>{const o=[],r=[],i=[];for(let e=0;e<a.hi.length;e++){const n=s(a,"hi",e,t);null!=n&&o.push(n+a.off.hi);const l=s(a,"lo",e,t);null!=l&&r.push(l+a.off.lo);const c=s(a,"pr",e,t);null!=c&&i.push(c)}if(!o.length)return;const l=o.slice().sort((e,t)=>e-t);n.push({name:a.name,hi:u(o),lo:u(r),pop:i.length?i.filter(t=>t>=e).length/i.length:null,n:o.length,r10:h(l,.1),r90:h(l,.9)})}),n},srcCount:n.length}}(Array.from({length:35},(e,t)=>w(H,t)),j,U);z.loc=g,z.status=C.map(e=>({name:e.name,ok:e.ok,detail:e.detail,off:e.ok&&e.v&&e.v.off})),z.updated=(new Date).toLocaleTimeString([],{hour:"numeric",minute:"2-digit"}).toLowerCase(),s.model=z,s.sel=0,s.open=null,o.classList.remove("loading"),o.classList.add("ready"),a("#out").hidden=!1,q()}const V=a("#zip");let Y=null;const Z=document.querySelector(".cur");function K(){const e="number"==typeof V.selectionStart&&document.activeElement===V?V.selectionStart:V.value.length;Z.style.setProperty("--n",String(e))}let G;["input","keyup","click","focus","blur","select"].forEach(e=>V.addEventListener(e,()=>requestAnimationFrame(K))),V.addEventListener("input",()=>{const e=V.value.replace(/\D/g,"").slice(0,5);e!==V.value&&(V.value=e),e.length<5&&(Y=null),V.removeAttribute("aria-invalid"),K()}),R.addEventListener("submit",e=>{e.preventDefault();const t=V.value.replace(/\D/g,"");if(/^\d{5}$/.test(t))t===Y&&s.model&&s.model.loc.zip===t&&35===s.model.rows.length||X(t);else{const e=I(a("#log"));e.clear(),e.msg("Enter a 5-digit US ZIP code."),V.setAttribute("aria-invalid","true"),V.focus(),P("invalid input","enter 5 digits")}}),a("#cal").addEventListener("click",e=>{const t=e.target.closest(".cell[data-i]");if(t){W(+t.dataset.i);{const e=window.matchMedia&&window.matchMedia("(prefers-reduced-motion: reduce)").matches;a("#cdet").scrollIntoView({block:"nearest",behavior:e?"auto":"smooth"})}}}),a("#week").addEventListener("click",e=>{const t=e.target.closest(".dbtn");if(!t)return;const n=+t.dataset.i;s.open=s.open===n?null:n,U();const a=document.querySelector(`#week .dbtn[data-i="${n}"]`);a&&a.focus()}),document.querySelectorAll(".units button[data-u]").forEach(e=>e.addEventListener("click",()=>{s.unit=e.dataset.u,i.set("lc:unit",s.unit),document.querySelectorAll(".units button[data-u]").forEach(e=>e.setAttribute("aria-pressed",String(e.dataset.u===s.unit))),q()})),a("#home").addEventListener("click",e=>{e.preventDefault(),J++,s.model=null,Y=null;try{history.replaceState(null,"",location.pathname+location.search)}catch(e){}o.className="idle",a("#out").hidden=!0,a("#log").innerHTML="",V.value="",P("type a zip code",""),V.focus(),K()}),document.addEventListener("keydown",e=>{"/"===e.key&&document.activeElement!==V&&(e.preventDefault(),V.focus(),V.select())}),window.addEventListener("resize",()=>{clearTimeout(G),G=setTimeout(()=>{s.model&&O()},120)});const Q=document.getElementById("themeButton"),ee=document.getElementById("themePanel"),te=document.getElementById("themeBg"),ne=document.getElementById("themeInk"),ae=document.getElementById("themeWeight"),oe=document.getElementById("weightValue"),re=document.getElementById("bgChip"),ie=document.getElementById("inkChip"),se={mono:{bg:"#ffffff",ink:"#000000",weight:400},dark:{bg:"#101419",ink:"#e7edf2",weight:400},cream:{bg:"#f3ead7",ink:"#352c20",weight:400},seafoam:{bg:"#d9eee5",ink:"#174d43",weight:400},blueyellow:{bg:"#173b70",ink:"#ffe66d",weight:450},plum:{bg:"#251d2d",ink:"#e6c9ff",weight:400}},le=["#ffffff","#f3ead7","#d9eee5","#b9d5f0","#173b70","#101419","#251d2d","#000000","#352c20","#174d43","#ffe66d","#e6c9ff"];function ce(e){return/^#[0-9a-f]{6}$/i.test(e)}function de(e,t){const n=e=>{const t=(n=e,[1,3,5].map(e=>parseInt(n.slice(e,e+2),16)/255).map(e=>e<=.04045?e/12.92:Math.pow((e+.055)/1.055,2.4)));var n;return.2126*t[0]+.7152*t[1]+.0722*t[2]},a=n(e),o=n(t);return(Math.max(a,o)+.05)/(Math.min(a,o)+.05)}function ue(e,t,n,a="custom",o=!0,r=!0){if(ce(e)&&ce(t)){if(t=function(e,t){if(de(e,t)>=4.5)return t;const n="#000000",a="#ffffff",o=de(e,n)>=de(e,a)?n:a;let r=0,i=1,s=o;for(let n=0;n<18;n++){const n=(r+i)/2,a="#"+[1,3,5].map(e=>Math.round(parseInt(t.slice(e,e+2),16)*(1-n)+parseInt(o.slice(e,e+2),16)*n).toString(16).padStart(2,"0")).join("");de(e,a)>=4.5?(s=a,i=n):r=n}return s}(e=e.toLowerCase(),t.toLowerCase()),n=Math.max(200,Math.min(600,Number(n)||400)),document.documentElement.style.setProperty("--paper",e),document.documentElement.style.setProperty("--ink",t),document.documentElement.style.setProperty("--ink-2","color-mix(in srgb,var(--ink) 88%,var(--paper))"),document.documentElement.style.setProperty("--ink-3","color-mix(in srgb,var(--ink) 72%,var(--paper))"),document.documentElement.style.setProperty("--base-weight",String(n)),document.body.style.fontWeight=String(n),te.value=e,ne.value=t,ae.value=String(n),oe.value=String(n),document.querySelectorAll(".theme-preset").forEach(e=>e.setAttribute("aria-pressed",String(e.dataset.theme===a))),function(e,t){re.style.background=e,ie.style.background=t,document.querySelectorAll("#bgSwatches .color-swatch").forEach(t=>t.setAttribute("aria-pressed",String(t.dataset.color===e.toLowerCase()))),document.querySelectorAll("#inkSwatches .color-swatch").forEach(e=>e.setAttribute("aria-pressed",String(e.dataset.color===t.toLowerCase())))}(e,t),o)try{localStorage.setItem("lc:appearance",JSON.stringify({bg:e,ink:t,weight:n,name:a}))}catch(e){}r&&function(e,t,n){const a=function(){const e=(location.hash||"").match(/^#(\d{5})/);return e?e[1]:""}(),o=`~${e.slice(1).toLowerCase()}-${t.slice(1).toLowerCase()}-${n}`;try{history.replaceState(null,"",location.pathname+location.search+"#"+(a||"")+o)}catch(e){}}(e,t,n)}}function he(e,t){const n=document.getElementById(e);le.forEach(e=>{const a=document.createElement("button");a.type="button",a.className="color-swatch",a.style.setProperty("--swatch",e),a.dataset.color=e,a.setAttribute("aria-label",e),a.title=e,a.addEventListener("click",()=>ue("bg"===t?e:te.value,"ink"===t?e:ne.value,Number(ae.value))),n.appendChild(a)})}function pe(e){const t="bg"===e?te:ne;ce(t.value)?ue("bg"===e?t.value:te.value,"ink"===e?t.value:ne.value,Number(ae.value)):t.setAttribute("aria-invalid","true")}he("bgSwatches","bg"),he("inkSwatches","ink"),Q.addEventListener("click",()=>{const e=ee.hidden;ee.hidden=!e,Q.setAttribute("aria-expanded",String(e)),Q.textContent=e?"theme −":"theme +"}),document.querySelectorAll(".theme-preset").forEach(e=>e.addEventListener("click",()=>{const t=se[e.dataset.theme];ue(t.bg,t.ink,t.weight,e.dataset.theme)})),[te,ne].forEach((e,t)=>{e.addEventListener("change",()=>{pe(0===t?"bg":"ink"),e.removeAttribute("aria-invalid")}),e.addEventListener("keydown",e=>{"Enter"===e.key&&(e.preventDefault(),pe(0===t?"bg":"ink"))})}),ae.addEventListener("input",()=>ue(te.value,ne.value,Number(ae.value))),document.getElementById("copyThemeUrl").addEventListener("click",async()=>{const e=location.href;try{await navigator.clipboard.writeText(e),document.getElementById("copyThemeUrl").textContent="copied"}catch(t){const n=document.createElement("textarea");n.value=e,n.style.position="fixed",n.style.opacity="0",document.body.appendChild(n),n.select();try{document.execCommand("copy"),document.getElementById("copyThemeUrl").textContent="copied"}catch(e){document.getElementById("copyThemeUrl").textContent="select URL"}n.remove()}}),document.addEventListener("keydown",e=>{"Escape"!==e.key||ee.hidden||(ee.hidden=!0,Q.setAttribute("aria-expanded","false"),Q.textContent="theme +",Q.focus())});const me=(location.hash||"").match(/~([0-9a-f]{6})-([0-9a-f]{6})-(\d{3})$/i);if(me)ue("#"+me[1],"#"+me[2],Number(me[3]),"custom",!1,!1);else try{const e=JSON.parse(localStorage.getItem("lc:appearance")||"null");e&&ce(e.bg)&&ce(e.ink)&&ue(e.bg,e.ink,Math.max(200,Math.min(600,Number(e.weight)||400)),e.name||"custom",!1,!0)}catch(e){}document.querySelectorAll(".units button[data-u]").forEach(e=>e.setAttribute("aria-pressed",String(e.dataset.u===s.unit)));const fe=(location.hash||"").match(/^#(\d{5})/),ge=fe?fe[1]:"",ye=/^\d{5}$/.test(ge)?ge:i.get("lc:last");ye&&/^\d{5}$/.test(ye)?X(ye):V.focus()})();</script></body></html>
+
+<script>
+(() => {
+'use strict';
+
+let DAYS = 35;
+const WET = 0.04;            // inches, about 1 mm: a "wet day"
+const API = {
+  fc:  'https://api.open-meteo.com/v1/forecast',
+  ens: 'https://ensemble-api.open-meteo.com/v1/ensemble',
+  sea: 'https://seasonal-api.open-meteo.com/v1/seasonal',
+  arc: 'https://archive-api.open-meteo.com/v1/archive',
+  geo: 'https://geocoding-api.open-meteo.com/v1/search',
+  zip: 'https://api.zippopotam.us/us/',
+  nws: 'https://api.weather.gov/points/'
+};
+const DET = [
+  { key: 'gfs',   name: 'gfs',       id: 'gfs_seamless',  org: 'NOAA' },
+  { key: 'ecmwf', name: 'ecmwf',     id: 'ecmwf_ifs025',  org: 'ECMWF' },
+  { key: 'icon',  name: 'icon',      id: 'icon_seamless', org: 'DWD' },
+  { key: 'gem',   name: 'gem',       id: 'gem_seamless',  org: 'ECCC' }
+];
+const ENS = [
+  { key: 'gfse',   name: 'gfs ens',   id: 'gfs05',        days: 35 },
+  { key: 'ecmwfe', name: 'ecmwf ens', id: 'ecmwf_ifs025', days: 15 },
+  { key: 'geme',   name: 'gem ens',   id: 'gem_global',   days: 35 }
+];
+
+const $ = (s) => document.querySelector(s);
+const body = document.body;
+const BLOCKED = 'The weather services could not be reached from here. Previews inside apps (Claude, the iPhone Files app, email) block outside requests. Download the file and open it in Chrome, Safari, or Firefox. If it is already open in a browser, check your connection.';
+
+/* ---------- storage (per-browser conveniences only) ---------- */
+const store = {
+  get(k) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch (e) { return null; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+};
+
+const st = { unit: store.get('lc:unit') === 'c' ? 'c' : 'f', model: null, sel: 0, open: null };
+
+/* ---------- small utils ---------- */
+const isNum = (x) => typeof x === 'number' && isFinite(x);
+const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+const mean = (a) => { const s = a.filter(isNum); return s.length ? s.reduce((x, y) => x + y, 0) / s.length : null; };
+const median = (a) => {
+  const s = a.filter(isNum).sort((x, y) => x - y);
+  if (!s.length) return null;
+  const m = s.length >> 1;
+  return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2;
+};
+const quant = (sorted, p) => {
+  if (!sorted.length) return null;
+  const i = (sorted.length - 1) * p, lo = Math.floor(i), hi = Math.ceil(i);
+  return sorted[lo] + (sorted[hi] - sorted[lo]) * (i - lo);
+};
+const esc = (s) => String(s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+
+const MON = ['jan', 'feb', 'mar', 'apr', 'may', 'jun', 'jul', 'aug', 'sep', 'oct', 'nov', 'dec'];
+const DOW = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
+const CUM = [0, 31, 59, 90, 120, 151, 181, 212, 243, 273, 304, 334];
+const parseD = (s) => { const [y, m, d] = s.split('-').map(Number); return new Date(Date.UTC(y, m - 1, d)); };
+const iso = (dt) => dt.toISOString().slice(0, 10);
+const addDays = (s, n) => { const d = parseD(s); d.setUTCDate(d.getUTCDate() + n); return iso(d); };
+const label = (s) => { const d = parseD(s); return MON[d.getUTCMonth()] + ' ' + d.getUTCDate(); };
+const dowOf = (s) => DOW[parseD(s).getUTCDay()];
+const doyOf = (s) => Math.min(364, CUM[+s.slice(5, 7) - 1] + (+s.slice(8, 10)) - 1);
+const rangeLabel = (a, b) => {
+  const A = parseD(a), B = parseD(b);
+  return A.getUTCMonth() === B.getUTCMonth() ? `${label(a)} to ${B.getUTCDate()}` : `${label(a)} to ${label(b)}`;
+};
+const localToday = () => { const d = new Date(); return iso(new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()))); };
+
+/* unit display. everything is stored in °F and inches */
+const cv = (f) => st.unit === 'c' ? (f - 32) * 5 / 9 : f;
+const T = (f) => isNum(f) ? String(Math.round(cv(f))) : '';
+const TD = (df) => { const r = Math.round(st.unit === 'c' ? df * 5 / 9 : df); return (r > 0 ? '+' : '') + r; };
+const TA = (df) => Math.round(Math.abs(st.unit === 'c' ? df * 5 / 9 : df));
+const P = (inch) => {
+  if (!isNum(inch)) return '';
+  if (st.unit === 'c') return Math.round(inch * 25.4) + ' mm';
+  if (inch > 0 && inch < 0.05) return '<0.1 in';
+  return inch.toFixed(1) + ' in';
+};
+const pct = (p) => isNum(p) ? Math.round(p * 10) * 10 + '%' : '';
+const confWord = (c) => c >= 0.6 ? 'high' : c >= 0.3 ? 'medium' : 'low';
+
+/* ---------- network ---------- */
+const qs = (base, p) => base + '?' + Object.entries(p)
+  .map(([k, v]) => k + '=' + encodeURIComponent(v).replace(/%2C/g, ','))
+  .join('&');
+
+async function getJSON(url, ms = 15000) {
+  const ctl = new AbortController();
+  const t = setTimeout(() => ctl.abort(), ms);
+  try {
+    const r = await fetch(url, { signal: ctl.signal });
+    if (!r.ok) {
+      let msg = 'http ' + r.status;
+      try { const j = await r.json(); if (j && j.reason) msg += ' ' + j.reason; } catch (e) {}
+      throw new Error(msg);
+    }
+    return await r.json();
+  } catch (e) {
+    if (e.name === 'AbortError') { const er = new Error('timed out'); er.network = true; throw er; }
+    if (e instanceof TypeError) { const er = new Error('blocked or offline'); er.network = true; throw er; }
+    throw e;
+  } finally { clearTimeout(t); }
+}
+
+async function locate(zip) {
+  const ck = 'lc:zip:' + zip;
+  const cached = store.get(ck);
+  if (cached) return cached;
+  let loc = null, netFails = 0;
+  try {
+    const j = await getJSON(API.zip + zip, 8000);
+    const p = j && j.places && j.places[0];
+    if (p) loc = { lat: +p.latitude, lon: +p.longitude, name: p['place name'], region: p['state abbreviation'], via: 'zippopotam.us' };
+  } catch (e) { if (e.network) netFails++; }
+  if (!loc) {
+    try {
+      const g = await getJSON(qs(API.geo, { name: zip, count: 10, country_code: 'US', language: 'en', format: 'json' }), 8000);
+      const hit = (g.results || []).find((r) => (r.postcodes || []).includes(zip));
+      if (hit) loc = { lat: hit.latitude, lon: hit.longitude, name: hit.name, region: hit.admin1 || '', via: 'open-meteo geocoding' };
+    } catch (e) { if (e.network) netFails++; else throw e; }
+  }
+  if (!loc && netFails > 0) { const er = new Error('network'); er.network = true; throw er; }
+  if (!loc || !isNum(loc.lat) || !isNum(loc.lon)) throw new Error('no match');
+  store.set(ck, loc);
+  return loc;
+}
+
+function fromDaily(j, kind, meta) {
+  const d = j && j.daily;
+  if (!d || !Array.isArray(d.time)) throw new Error('no daily data');
+  const pick = (base) => Object.keys(d).filter((k) => k === base || k.startsWith(base + '_')).map((k) => d[k]);
+  const src = { ...meta, kind, time: d.time, hi: pick('temperature_2m_max'), lo: pick('temperature_2m_min'), pr: pick('precipitation_sum') };
+  if (kind === 'det') {
+    src.pop = pick('precipitation_probability_max')[0] || null;
+    src.code = pick('weather_code')[0] || null;
+  }
+  let last = -1;
+  src.hi.forEach((arr) => arr.forEach((v, i) => { if (isNum(v) && i > last) last = i; }));
+  src.span = last + 1;
+  src.members = src.hi.filter((arr) => arr.some(isNum)).length;
+  if (!src.members) throw new Error('empty response');
+  return src;
+}
+
+async function fetchNWS(lat, lon) {
+  const p = await getJSON(API.nws + lat.toFixed(4) + ',' + lon.toFixed(4), 10000);
+  const url = p && p.properties && p.properties.forecast;
+  if (!url) throw new Error('outside nws coverage');
+  const f = await getJSON(url, 10000);
+  const periods = (f && f.properties && f.properties.periods) || [];
+  if (!periods.length) throw new Error('no periods');
+  const hi = {}, lo = {}, pop = {};
+  periods.forEach((per) => {
+    const date = String(per.startTime).slice(0, 10);
+    const t = per.temperatureUnit === 'C' ? per.temperature * 9 / 5 + 32 : per.temperature;
+    const pp = per.probabilityOfPrecipitation && per.probabilityOfPrecipitation.value;
+    if (isNum(pp)) pop[date] = Math.max(pop[date] || 0, pp);
+    if (!isNum(t)) return;
+    if (per.isDaytime) hi[date] = t;
+    else lo[addDays(date, 1)] = t;     // tonight's low lands on tomorrow morning
+  });
+  const days = new Set(Object.keys(hi).concat(Object.keys(lo))).size;
+  return { key: 'nws', name: 'nws', kind: 'nws', hi, lo, pop, office: p.properties.cwa || '', span: days };
+}
+
+function normalsFrom(arc) {
+  const d = arc && arc.daily;
+  if (!d || !d.time) throw new Error('no archive data');
+  const H = d.temperature_2m_max, L = d.temperature_2m_min, R = d.precipitation_sum;
+  const buckets = Array.from({ length: 365 }, () => []);
+  d.time.forEach((t, i) => { if (isNum(H[i]) && isNum(L[i])) buckets[doyOf(t)].push(i); });
+  const out = [];
+  for (let k = 0; k < 365; k++) {
+    const hs = [], ls = [], rs = [];
+    for (let w = -7; w <= 7; w++) {
+      buckets[(k + w + 365) % 365].forEach((i) => { hs.push(H[i]); ls.push(L[i]); if (isNum(R[i])) rs.push(R[i]); });
+    }
+    if (!hs.length) { out.push(null); continue; }
+    hs.sort((a, b) => a - b);
+    const r1 = (x) => Math.round(x * 10) / 10;
+    out.push({
+      hi: r1(mean(hs)), lo: r1(mean(ls)),
+      p10: r1(quant(hs, 0.1)), p90: r1(quant(hs, 0.9)),
+      pr: Math.round(mean(rs) * 1000) / 1000,
+      wet: Math.round(rs.filter((x) => x >= WET).length / Math.max(1, rs.length) * 100) / 100
+    });
+  }
+  return out;
+}
+
+/* ---------- console log ---------- */
+function makeLog(el) {
+  const lines = [];
+  const pad = (name) => name + ' ' + '.'.repeat(Math.max(2, 16 - name.length)) + ' ';
+  const draw = () => {
+    el.innerHTML = lines.map((l) => {
+      if (l.status === 'msg') return `  <span class="err">${esc(l.detail)}</span>`;
+      if (l.status === 'wait') return `  ${esc(pad(l.name))}<span class="wait" aria-label="loading"></span>`;
+      const s = l.status === 'ok' ? '<b>ok</b>  ' : '<b>fail</b>';
+      return `  ${esc(pad(l.name))}${s}${l.detail ? '  ' + esc(l.detail) : ''}`;
+    }).join('\n');
+  };
+  return {
+    add(id, name) { lines.push({ id, name, status: 'wait', detail: '' }); draw(); },
+    set(id, status, detail) { const l = lines.find((x) => x.id === id); if (l) { l.status = status; l.detail = detail || ''; draw(); } },
+    msg(text) { lines.push({ id: 'm' + lines.length, name: '', status: 'msg', detail: text }); draw(); },
+    clear() { lines.length = 0; el.innerHTML = ''; }
+  };
+}
+
+/* ---------- model ---------- */
+function assemble(dates, srcs, norms) {
+  const det = srcs.filter((s) => s.kind === 'det');
+  const ens = srcs.filter((s) => s.kind === 'ens');
+  const nws = srcs.find((s) => s.kind === 'nws');
+  srcs.forEach((s) => { if (s.time) s.idx = new Map(s.time.map((t, i) => [t, i])); });
+  const val = (s, key, m, date) => {
+    const i = s.idx.get(date);
+    if (i == null || !s[key][m]) return null;
+    const v = s[key][m][i];
+    return isNum(v) ? v : null;
+  };
+  const detVals = (key, date) => {
+    const v = det.map((s) => val(s, key, 0, date)).filter(isNum);
+    if (nws && key !== 'pr' && isNum(nws[key][date])) v.push(nws[key][date]);
+    return v;
+  };
+
+  /* Each ensemble gets a fixed offset so its median matches the higher-resolution
+     models over days 2 to 8. This removes sampling bias (3 or 6-hourly output
+     can miss the true afternoon peak) before the long-range days are pooled. */
+  ens.forEach((s) => {
+    s.off = { hi: 0, lo: 0 };
+    ['hi', 'lo'].forEach((key) => {
+      const diffs = [];
+      for (let k = 1; k <= 7 && k < dates.length; k++) {
+        const ref = median(detVals(key, dates[k]));
+        const med = median(s[key].map((_, m) => val(s, key, m, dates[k])));
+        if (isNum(ref) && isNum(med)) diffs.push(ref - med);
+      }
+      if (diffs.length >= 3) s.off[key] = clamp(mean(diffs), -8, 8);
+    });
+  });
+
+  const rows = dates.map((date, d) => {
+    const eh = [], el = [], ep = [];
+    ens.forEach((s) => {
+      for (let m = 0; m < s.hi.length; m++) {
+        const h = val(s, 'hi', m, date); if (h != null) eh.push(h + s.off.hi);
+        const l = val(s, 'lo', m, date); if (l != null) el.push(l + s.off.lo);
+        const p = val(s, 'pr', m, date); if (p != null) ep.push(p);
+      }
+    });
+    const dh = detVals('hi', date), dl = detVals('lo', date), dp = detVals('pr', date);
+    const blend = (dv, ev) => {
+      const a = median(dv), b = ev.length >= 5 ? median(ev) : null;
+      if (a == null) return b;
+      if (b == null) return a;
+      const w = dv.length >= 2 ? 0.5 : 0.3;
+      return w * a + (1 - w) * b;
+    };
+    const hi = blend(dh, eh), lo = blend(dl, el);
+    let p10 = null, p90 = null;
+    if (eh.length >= 8) { const s = eh.slice().sort((a, b) => a - b); p10 = quant(s, 0.1); p90 = quant(s, 0.9); }
+    else if (dh.length >= 2) { p10 = Math.min(...dh); p90 = Math.max(...dh); }
+
+    const parts = [];
+    if (ep.length >= 8) parts.push(ep.filter((x) => x >= WET).length / ep.length);
+    const dpop = det.map((s) => s.pop && s.idx.has(date) ? s.pop[s.idx.get(date)] : null).filter(isNum);
+    if (dpop.length) parts.push(mean(dpop) / 100);
+    if (nws && isNum(nws.pop[date])) parts.push(nws.pop[date] / 100);
+    if (!parts.length && dp.length) parts.push(dp.filter((x) => x >= WET).length / dp.length);
+    const pop = parts.length ? clamp(mean(parts), 0, 1) : null;
+    const rain = mean(ep.length >= 8 ? ep : dp);
+    const rainIf = mean((ep.length >= 8 ? ep : dp).filter((x) => x >= WET));
+
+    const codes = det.map((s) => s.code && s.idx.has(date) ? s.code[s.idx.get(date)] : null).filter(isNum);
+    const wx = codes.length >= 2 && d < 10 ? wxWord(codes) : null;
+
+    const n = norms ? norms[doyOf(date)] : null;
+    let conf;
+    if (n && isNum(p10) && isNum(p90) && n.p90 > n.p10) conf = clamp(1 - (p90 - p10) / (n.p90 - n.p10), 0, 1);
+    else conf = clamp(1 - d / 30, 0, 1);
+    if (d <= 2) conf = Math.max(conf, 0.85);
+
+    const reach = det.filter((s) => val(s, 'hi', 0, date) != null).length
+      + ens.filter((s) => s.hi.some((_, m) => val(s, 'hi', m, date) != null)).length
+      + (nws && (isNum(nws.hi[date]) || isNum(nws.lo[date])) ? 1 : 0);
+
+    return { date, d, hi, lo, p10, p90, pop, rain, rainIf, wx, n, conf, reach, members: eh.length };
+  });
+
+  // per-source readings, used by the day panel
+  const perSource = (date) => {
+    const out = [];
+    if (nws && (isNum(nws.hi[date]) || isNum(nws.lo[date]))) out.push({ name: 'nws', hi: nws.hi[date], lo: nws.lo[date], pop: isNum(nws.pop[date]) ? nws.pop[date] / 100 : null });
+    det.forEach((s) => {
+      const h = val(s, 'hi', 0, date), l = val(s, 'lo', 0, date);
+      if (h == null && l == null) return;
+      const pp = s.pop && s.idx.has(date) ? s.pop[s.idx.get(date)] : null;
+      out.push({ name: s.name, hi: h, lo: l, pop: isNum(pp) ? pp / 100 : null });
+    });
+    ens.forEach((s) => {
+      const hs = [], ls = [], ps = [];
+      for (let m = 0; m < s.hi.length; m++) {
+        const h = val(s, 'hi', m, date); if (h != null) hs.push(h + s.off.hi);
+        const l = val(s, 'lo', m, date); if (l != null) ls.push(l + s.off.lo);
+        const p = val(s, 'pr', m, date); if (p != null) ps.push(p);
+      }
+      if (!hs.length) return;
+      const sh = hs.slice().sort((a, b) => a - b);
+      out.push({ name: s.name, hi: median(hs), lo: median(ls), pop: ps.length ? ps.filter((x) => x >= WET).length / ps.length : null, n: hs.length, r10: quant(sh, 0.1), r90: quant(sh, 0.9) });
+    });
+    return out;
+  };
+
+  return { rows, perSource, srcCount: srcs.length };
+}
+
+function wxWord(codes) {
+  const cat = (c) => c >= 95 ? 'storm' : (c >= 71 && c <= 77) || c === 85 || c === 86 ? 'snow'
+    : (c >= 61 && c <= 67) || (c >= 80 && c <= 82) ? 'rain' : c >= 51 && c <= 57 ? 'drizzle'
+    : c === 45 || c === 48 ? 'fog' : c === 3 ? 'cloudy' : c === 2 ? 'partly' : 'clear';
+  const rank = ['clear', 'partly', 'cloudy', 'fog', 'drizzle', 'rain', 'snow', 'storm'];
+  const count = {};
+  codes.forEach((c) => { const k = cat(c); count[k] = (count[k] || 0) + 1; });
+  return Object.keys(count).sort((a, b) => count[b] - count[a] || rank.indexOf(b) - rank.indexOf(a))[0];
+}
+
+
+/* ---------- render ---------- */
+const ink = (c) => (0.55 + 0.45 * c).toFixed(2);
+const inkCal = (c) => (0.66 + 0.34 * c).toFixed(2);
+const anomOf = (r) => r.n && isNum(r.hi) ? r.hi - r.n.hi : null;
+
+function stretch(rows) {
+  const an = rows.map(anomOf);
+  let best = { v: -Infinity, i: 0 }, worst = { v: Infinity, i: 0 };
+  for (let i = 0; i + 5 <= an.length; i++) {
+    const v = mean(an.slice(i, i + 5));
+    if (!isNum(v)) continue;
+    if (v > best.v) best = { v, i };
+    if (v < worst.v) worst = { v, i };
+  }
+  const warm = best.v >= 4, cool = worst.v <= -4;
+  if (!warm && !cool) return null;
+  const useWarm = warm && (!cool || best.v >= -worst.v);
+  const w = useWarm ? best : worst;
+  return { word: useWarm ? 'warmest' : 'coolest', range: rangeLabel(rows[w.i].date, rows[w.i + 4].date) };
+}
+
+function renderHero() {
+  const { rows, loc } = st.model;
+  const valid = rows.map(anomOf).filter(isNum);
+  const avg = valid.length >= 7 ? mean(valid) : null;
+  $('#head').textContent = avg == null ? `The next ${DAYS} days`
+    : Math.round(avg) >= 2 ? 'Warmer than average' : Math.round(avg) <= -2 ? 'Cooler than average' : 'Close to average';
+  $('#where').innerHTML = [`${loc.name}, ${loc.region}`, `next ${DAYS} days`].map((t) => `<span>${esc(t)}</span>`).join('');
+
+  $('#tag').textContent = `${DAYS}-day outlook`;
+  $('#cal-title small').textContent = `next ${DAYS} days`;
+  const f = [];
+  if (avg != null) {
+    const r = Math.round(st.unit === 'c' ? avg * 5 / 9 : avg);
+    f.push(r === 0 ? '<i>highs</i><b>at average</b>' : `<i>highs</i><b>${TD(avg)}°</b> vs average`);
+  }
+  const wet = Math.round(rows.reduce((a, r) => a + (r.pop || 0), 0));
+  const nwet = rows.every((r) => r.n) ? Math.round(rows.reduce((a, r) => a + r.n.wet, 0)) : null;
+  f.push(`<i>rainy days</i><b>${wet}</b>${nwet != null ? ` (average ${nwet})` : ''}`);
+  const s = stretch(rows);
+  if (s) f.push(`<i>${s.word}</i><b>${s.range}</b>`);
+  $('#facts').innerHTML = f.map((x) => `<span>${x}</span>`).join('');
+}
+
+function renderWeek() {
+  const rows = st.model.rows.slice(0, 7);
+  const vals = [];
+  rows.forEach((r) => [r.hi, r.lo, r.n && r.n.hi, r.n && r.n.lo].forEach((v) => { if (isNum(v)) vals.push(v); }));
+  if (!vals.length) { $('#week').innerHTML = '<li class="note">Temperature data unavailable.</li>'; return; }
+  const mn = Math.min(...vals), mx = Math.max(...vals), span = Math.max(1, mx - mn);
+  const pos = (v) => ((v - mn) / span * 100).toFixed(1);
+  const wid = (a, b) => ((b - a) / span * 100).toFixed(1);
+  $('#week').innerHTML = rows.map((r, i) => {
+    const open = st.open === i;
+    const name = i === 0 ? 'today' : `${dowOf(r.date)} ${parseD(r.date).getUTCDate()}`;
+    const nm = r.n ? `<i class="nm" style="left:${pos(r.n.lo)}%;width:${wid(r.n.lo, r.n.hi)}%"></i>` : '';
+    const fc = isNum(r.hi) && isNum(r.lo) ? `<i class="fc" style="left:${pos(r.lo)}%;width:${wid(r.lo, r.hi)}%"></i>` : '';
+    const rain = isNum(r.pop) && r.pop >= 0.2 ? pct(r.pop) : '';
+    const aria = `${i === 0 ? 'today' : dowOf(r.date) + ' ' + label(r.date)}: high ${T(r.hi)}, low ${T(r.lo)}${rain ? ', ' + rain + ' chance of rain' : ''}`;
+    return `<li class="drow${open ? ' open' : ''}">`
+      + `<button type="button" class="dbtn" data-i="${i}" aria-expanded="${open}" aria-label="${esc(aria)}" style="--o:${ink(r.conf)}">`
+      + `<span class="dn">${name}</span><span class="wx">${r.wx || ''}</span>`
+      + `<span class="lo">${T(r.lo)}°</span><span class="rng">${nm}${fc}</span><span class="hi">${T(r.hi)}°</span>`
+      + `<span class="rain${isNum(r.pop) && r.pop >= 0.5 ? ' wet' : ''}">${rain}</span></button>`
+      + (open ? dayDetail(r) : '') + '</li>';
+  }).join('');
+}
+
+function dayDetail(r) {
+  const parts = [];
+  if (r.n) parts.push(`Average ${T(r.n.hi)}° / ${T(r.n.lo)}°.`);
+  if (isNum(r.p10) && isNum(r.p90)) parts.push(`Likely high ${T(r.p10)}° to ${T(r.p90)}°.`);
+  parts.push(`${r.reach} of ${st.model.srcCount} sources.`);
+  const pad = (name) => name + ' ' + '.'.repeat(Math.max(2, 13 - name.length)) + ' ';
+  const lines = st.model.perSource(r.date).map((s) => {
+    const t = `${(T(s.hi) || '-').padStart(3)} / ${(T(s.lo) || '-').padEnd(3)}`;
+    const p = isNum(s.pop) ? pct(s.pop).padStart(5) : '     ';
+    const extra = s.n ? `   ${s.n} runs` : '';
+    return `${esc(pad(s.name))}<b>${t}</b>${p}${extra}`;
+  });
+  return `<div class="ddet"><p>${parts.join(' ')}</p>${lines.length ? `<div class="src">${lines.join('\n')}</div>` : ''}</div>`;
+}
+
+function renderSignals() {
+  const rows = st.model.rows;
+  const validHi = rows.filter(r => isNum(r.hi));
+  const validLo = rows.filter(r => isNum(r.lo));
+  const validRain = rows.filter(r => isNum(r.pop));
+  const hottest = validHi.reduce((a, r) => !a || r.hi > a.hi ? r : a, null);
+  const coolest = validLo.reduce((a, r) => !a || r.lo < a.lo ? r : a, null);
+  const wettest = validRain.reduce((a, r) => !a || r.pop > a.pop ? r : a, null);
+  const anomalies = rows.map(r => ({r, a: anomOf(r)})).filter(x => isNum(x.a));
+  const warmest = anomalies.reduce((a, x) => !a || x.a > a.a ? x : a, null);
+  const lines = [
+    ['peak high', hottest, hottest ? `${T(hottest.hi)}°` : 'unavailable', hottest ? label(hottest.date) : ''],
+    ['coldest low', coolest, coolest ? `${T(coolest.lo)}°` : 'unavailable', coolest ? label(coolest.date) : ''],
+    ['rain chance', wettest, wettest ? pct(wettest.pop) : 'unavailable', wettest ? label(wettest.date) : ''],
+    ['warm anomaly', warmest && warmest.r, warmest ? `${TD(warmest.a)}°` : 'unavailable', warmest ? `${label(warmest.r.date)} vs 30-year avg` : '']
+  ];
+  $('#signals').innerHTML = lines.map(([key, r, value, sub]) => `<div class="signal-row"><span class="signal-key">${key}</span><span class="signal-value">${value}<span class="signal-sub">${esc(sub)}</span></span></div>`).join('');
+}
+
+function renderWeeks() {
+  const all = st.model.rows;
+  const out = [];
+  for (let w = 1; w < 5; w++) {
+    const rs = all.slice(w * 7, w * 7 + 7).filter((r) => isNum(r.hi));
+    if (!rs.length) continue;
+    const hi = mean(rs.map((r) => r.hi)), lo = mean(rs.map((r) => r.lo));
+    const nh = rs.every((r) => r.n) ? mean(rs.map((r) => r.n.hi)) : null;
+    const wet = rs.reduce((a, r) => a + (r.pop || 0), 0);
+    const nwet = rs.every((r) => r.n) ? rs.reduce((a, r) => a + r.n.wet, 0) : null;
+    const c = mean(rs.map((r) => r.conf));
+    let rain = `${Math.round(wet)} wet`;
+    let rcls = '';
+    if (isNum(nwet)) {
+      if (wet >= nwet + 1 && wet >= nwet * 1.25) { rain = 'wetter'; rcls = 'wetter'; }
+      else if (wet <= nwet - 1 && wet <= nwet * 0.75) rain = 'drier';
+      else rain = 'typical';
+    }
+    const a = isNum(nh) ? hi - nh : null;
+    let bar = '';
+    if (isNum(a)) {
+      const w2 = Math.max(1.5, Math.min(50, Math.abs(a) / 6 * 50)).toFixed(1);
+      bar = a >= 0 ? `<i class="warm" style="left:50%;width:${w2}%"></i>` : `<i class="cool" style="right:50%;width:${w2}%"></i>`;
+    }
+    const range = rangeLabel(rs[0].date, rs[rs.length - 1].date);
+    const cw = confWord(c);
+    const aria = `${range}: highs ${isNum(a) ? TD(a) + ' degrees vs average' : T(hi)}, rain ${rain}, ${cw} confidence`;
+    out.push(`<li class="wrow" style="--o:${ink(c)}" aria-label="${esc(aria)}" title="${esc(range)}">`
+      + `<span class="wd">${label(rs[0].date)}</span>`
+      + `<span class="wa">${isNum(a) ? TD(a) + '°' : ''}</span>`
+      + `<span class="dv" aria-hidden="true">${bar}</span>`
+      + `<span class="whl">${T(hi)} / ${T(lo)}°</span>`
+      + `<span class="wr ${rcls}">${rain}</span>`
+      + `<span class="wc ${cw === 'low' ? 'low' : ''}">${cw}</span>`
+      + '</li>');
+  }
+  $('#weeks').innerHTML = out.join('');
+  const fade = all.find((r) => r.d >= 3 && r.conf < 0.3);
+  $('#wnote').textContent = 'Compared with the 30-year average for the same dates. Confidence is a rough signal from model spread and forecast lead time, not a probability.'
+    + (fade ? ` After ${label(addDays(fade.date, -1))}, read these as tendencies, not exact numbers.` : '');
+}
+
+function renderCal() {
+  const rows = st.model.rows;
+  const lead = (parseD(rows[0].date).getUTCDay() + 6) % 7;
+  let h = '';
+  for (let i = 0; i < lead; i++) h += '<div class="cell blank" aria-hidden="true"></div>';
+  rows.forEach((r, i) => {
+    const dn = parseD(r.date).getUTCDate();
+    const dl = i === 0 || dn === 1 ? label(r.date) : String(dn);
+    const p = isNum(r.pop) && r.pop >= 0.2 ? r.pop : 0;
+    const aria = `${dowOf(r.date)} ${label(r.date)}${i === 0 ? ', today' : ''}: high ${T(r.hi)}, low ${T(r.lo)}${p ? ', ' + pct(r.pop) + ' chance of rain' : ''}`;
+    h += `<button type="button" class="cell${i === 0 ? ' today' : ''}" data-i="${i}" aria-pressed="${st.sel === i}" aria-label="${esc(aria)}" style="--o:${inkCal(r.conf)};--rp:${p.toFixed(2)}">`
+      + `<span class="d">${dl}</span>`
+      + `<span class="hi v">${isNum(r.hi) ? T(r.hi) : '·'}</span>`
+      + `<span class="lo v">${T(r.lo)}</span>`
+      + `<span class="rn v${p >= 0.5 ? ' wet' : ''}">${p ? `<span class="rl">rain </span>${pct(p)}` : ''}</span>`
+      + '</button>';
+  });
+  const trail = (7 - ((lead + rows.length) % 7)) % 7;
+  for (let i = 0; i < trail; i++) h += '<div class="cell blank" aria-hidden="true"></div>';
+  $('#cal').innerHTML = h;
+}
+
+function readoutHTML(r) {
+  const name = r.d === 0 ? 'today' : `${dowOf(r.date)} ${label(r.date)}`;
+  const bits = [`<i>high</i>${T(r.hi)}°`, `<i>low</i>${T(r.lo)}°`];
+  if (isNum(r.pop)) bits.push(`<i>rain</i>${pct(r.pop)}`);
+  if (r.n) bits.push(`<i>average</i>${T(r.n.hi)}° / ${T(r.n.lo)}°`);
+  return `<b>${name}</b>` + bits.map((b) => `<span>${b}</span>`).join('');
+}
+
+function renderTrendReadout(hover) {
+  const k = hover != null ? hover : st.sel;
+  $('#readout2').innerHTML = k == null
+    ? '<span class="hint">Tap or hover the chart to read a date.</span>'
+    : readoutHTML(st.model.rows[k]);
+}
+
+function renderCalDetail() {
+  const el = $('#cdet');
+  const r = st.model.rows[st.sel];
+  el.className = 'cdet open';
+  const name = `${dowOf(r.date)} ${label(r.date)}`;
+  const when = r.d === 0 ? 'today' : r.d === 1 ? 'tomorrow' : `in ${r.d} days`;
+  const rainTxt = isNum(r.pop) ? `rain ${pct(r.pop)}` : '';
+
+  const kv = [];
+  if (r.n && isNum(r.hi)) {
+    const a = Math.round(cv(r.hi) - cv(r.n.hi));
+    kv.push(['vs average', a === 0 ? `right at the average high of ${T(r.n.hi)}°` : `${Math.abs(a)}° ${a > 0 ? 'warmer' : 'cooler'} than the average high of ${T(r.n.hi)}°`]);
+    kv.push(['average', `${T(r.n.hi)}° / ${T(r.n.lo)}°`]);
+  }
+  if (isNum(r.p10) && isNum(r.p90)) kv.push(['likely high', `${T(r.p10)}° to ${T(r.p90)}°`]);
+  if (isNum(r.pop) && r.pop >= 0.2 && isNum(r.rainIf)) kv.push(['rain', `${pct(r.pop)} chance, ${r.rainIf < 0.05 && st.unit !== 'c' ? 'light if it does' : 'about ' + P(r.rainIf) + ' if it does'}`]);
+  else if (isNum(r.pop)) kv.push(['rain', `${pct(r.pop)} chance, probably dry`]);
+  const cw = confWord(r.conf);
+  kv.push(['confidence', `${cw}, ${cw === 'high' ? 'the forecasts agree closely' : cw === 'medium' ? 'the forecasts roughly agree' : 'the forecasts disagree, treat it as a tendency'}`]);
+  const srcs = st.model.perSource(r.date);
+  const longOnly = srcs.length && srcs.every((s2) => s2.n);
+  kv.push(['sources', `${r.reach} of ${st.model.srcCount} reach this date${longOnly ? ', all long-range ensembles' : ''}`]);
+
+  const rowsTxt = srcs.map((s2) => {
+    const t = `${T(s2.hi) || '-'} / ${T(s2.lo) || '-'}`;
+    const p = isNum(s2.pop) ? pct(s2.pop) : '—';
+    const extra = s2.n ? `${s2.n} runs, high ${T(s2.r10)} to ${T(s2.r90)}` : '';
+    return `<div class="src-row"><span class="src-name">${esc(s2.name)}</span><span class="src-temp">${t}</span><span class="src-rain">${p}</span><span class="src-extra">${extra}</span></div>`;
+  });
+  const head = `<div class="src-row src-head"><span>source</span><span>high / low</span><span>rain</span><span></span></div>`;
+  // Clean outline-style ASCII weather icons inspired by classic weather pictograms.
+  const wet = isNum(r.pop) && r.pop >= 0.35;
+  const showery = isNum(r.pop) && r.pop >= 0.12;
+  const weatherArt = wet ? `       .-~~~~~~~~-.
+    .-'            '-.
+   /                  \\
+  |                    |
+   \\                  /
+    '-.____________.-'
+        /   /   /   /
+       /   /   /   /` : showery ? `       \\    |    /
+        \\   |   /
+      .-  \\ | /  -.
+    .'     .---.    '.
+   /      /     \\     \\
+  |      |       |     |
+   \\      \\_____/     /
+    '.___         __.'
+        /   /   /` : `           \\   |   /
+            \\  |  /
+         ----\\ | /----
+              .-.
+       -------(   )-------
+              '-'
+         ----/ | \\----
+            /  |  \\
+           /   |   \\`;
+  const weatherLabel = wet ? 'rainy' : showery ? 'partly cloudy' : 'sunny';
+
+  el.innerHTML = `<div class="cdet-top"><b>${name}</b><span class="ago">${when}</span></div>`
+    + `<div class="cdet-body">`
+    + `<div class="cdet-main"><div class="cdet-temp"><span class="h">${T(r.hi)}°</span><span class="l">${T(r.lo)}°</span>${rainTxt ? `<span class="r${r.pop >= 0.5 ? ' wet' : ''}">${rainTxt}</span>` : ''}</div><div class="cdet-text" style="margin-top:16px"><p><span class="hint">day range</span> &nbsp; ${Math.abs(cv(r.hi)-cv(r.lo)).toFixed(0)}° between high and low</p><p class="sub">${isNum(r.pop) ? `${pct(r.pop)} precipitation probability` : 'Precipitation probability unavailable'}</p><p class="sub">${r.reach} of ${st.model.srcCount} forecast sources contribute to this date</p></div></div>`
+    + `<aside class="cdet-side"><dl class="kv">${kv.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl></aside>`
+    + `</div>`
+    + `${rowsTxt.length ? `<div class="src">${head}\n${rowsTxt.join('\n')}</div>` : ''}`;
+}
+
+function setLine(i) {
+  const line = document.getElementById('selLine');
+  if (!line || !st.chartX) return;
+  if (i == null) { line.style.visibility = 'hidden'; return; }
+  const sx = st.chartX(i).toFixed(1);
+  line.setAttribute('x1', sx); line.setAttribute('x2', sx);
+  line.style.visibility = 'visible';
+}
+
+function renderChart() {
+  const rows = st.model.rows, el = $('#chart');
+  const W = Math.max(300, Math.round(el.clientWidth || 1000));
+  const H = W < 560 ? 200 : 240;
+  const m = { l: 34, r: 6, t: 8, b: 50 };
+  const pw = W - m.l - m.r, ph = H - m.t - m.b, n = rows.length;
+  const vals = [];
+  rows.forEach((r) => [r.hi, r.lo, r.p10, r.p90, r.n && r.n.hi, r.n && r.n.lo].forEach((v) => { if (isNum(v)) vals.push(cv(v)); }));
+  if (!vals.length) { el.innerHTML = ''; return; }
+  const step = st.unit === 'c' ? 5 : 10;
+  const lo = Math.floor((Math.min(...vals) - 1) / step) * step;
+  let hi = Math.ceil((Math.max(...vals) + 1) / step) * step;
+  if (hi - lo < step * 2) hi = lo + step * 2;
+  const x = (i) => m.l + (n > 1 ? i * pw / (n - 1) : pw / 2);
+  const yv = (v) => m.t + ph - (v - lo) / (hi - lo) * ph;
+  const y = (f) => yv(cv(f));
+  const f1 = (v) => v.toFixed(1);
+  const runs = (fn) => {
+    const out = []; let cur = [];
+    rows.forEach((r, i) => { if (fn(r)) cur.push(i); else if (cur.length) { out.push(cur); cur = []; } });
+    if (cur.length) out.push(cur);
+    return out;
+  };
+  let s = `<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}" role="group" tabindex="0" aria-label="Temperature trend for the next ${n} days. Use left and right arrow keys to inspect dates; Home and End jump to the first and last date.">`
+    + '<defs><pattern id="dotband" width="3" height="3" patternUnits="userSpaceOnUse"><circle cx="1.5" cy="1.5" r="0.85" fill="var(--ink)"/></pattern></defs>';
+  for (let v = lo; v <= hi; v += step) {
+    s += `<line class="g" x1="${m.l}" x2="${W - m.r}" y1="${f1(yv(v))}" y2="${f1(yv(v))}"/><text x="${m.l - 6}" y="${f1(yv(v) + 4)}" text-anchor="end">${v}</text>`;
+  }
+  const ry = m.t + ph + 10, rh = 14;
+  rows.forEach((r, i) => {
+    if (parseD(r.date).getUTCDay() !== 1) return;
+    s += `<line class="g" x1="${f1(x(i))}" x2="${f1(x(i))}" y1="${m.t}" y2="${ry + rh}"/><text x="${f1(x(i))}" y="${H - 6}" text-anchor="middle">${label(r.date)}</text>`;
+  });
+  runs((r) => isNum(r.p10) && isNum(r.p90)).forEach((run) => {
+    const top = run.map((i) => `${f1(x(i))},${f1(y(rows[i].p90))}`);
+    const bot = run.slice().reverse().map((i) => `${f1(x(i))},${f1(y(rows[i].p10))}`);
+    s += `<polygon class="band" points="${top.concat(bot).join(' ')}"/>`;
+  });
+  runs((r) => r.n).forEach((run) => {
+    s += `<polyline class="norm" points="${run.map((i) => `${f1(x(i))},${f1(y(rows[i].n.hi))}`).join(' ')}"/>`;
+    s += `<polyline class="norm" points="${run.map((i) => `${f1(x(i))},${f1(y(rows[i].n.lo))}`).join(' ')}"/>`;
+  });
+  for (let i = 1; i < n; i++) {
+    const a = rows[i - 1], b = rows[i];
+    const op = (0.22 + 0.78 * (a.conf + b.conf) / 2).toFixed(2);
+    if (isNum(a.hi) && isNum(b.hi)) s += `<line class="hi" x1="${f1(x(i - 1))}" y1="${f1(y(a.hi))}" x2="${f1(x(i))}" y2="${f1(y(b.hi))}" stroke-opacity="${op}"/>`;
+    if (isNum(a.lo) && isNum(b.lo)) s += `<line class="lo" x1="${f1(x(i - 1))}" y1="${f1(y(a.lo))}" x2="${f1(x(i))}" y2="${f1(y(b.lo))}" stroke-opacity="${op}"/>`;
+  }
+  const bw = Math.max(2, Math.min(8, pw / n * 0.42));
+  rows.forEach((r, i) => {
+    if (!isNum(r.pop) || r.pop < 0.05) return;
+    const h = Math.max(1, r.pop * rh);
+    s += `<rect class="rain" x="${f1(x(i) - bw / 2)}" y="${f1(ry + rh - h)}" width="${f1(bw)}" height="${f1(h)}" fill-opacity="${(0.25 + 0.75 * r.conf).toFixed(2)}"/>`;
+  });
+  s += `<line class="base" x1="${m.l}" x2="${W - m.r}" y1="${ry + rh}" y2="${ry + rh}"/>`;
+  s += `<text x="${m.l - 6}" y="${ry + rh}" text-anchor="end">rain</text>`;
+  s += `<text x="${m.l + 4}" y="${m.t + 10}">°${st.unit.toUpperCase()}</text>`;
+  const sx = f1(x(st.sel == null ? 0 : st.sel));
+  s += `<line class="sel" id="selLine" x1="${sx}" x2="${sx}" y1="${m.t}" y2="${ry + rh}" style="visibility:${st.sel == null ? 'hidden' : 'visible'}"/>`;
+  s += `<rect class="hit" x="${m.l - 4}" y="0" width="${pw + 8}" height="${ry + rh}"/>`;
+  el.innerHTML = s + '</svg>';
+
+  const svg = el.querySelector('svg');
+  const pick = (ev) => {
+    const rect = svg.getBoundingClientRect();
+    const px = (ev.clientX - rect.left) * (W / rect.width);
+    return clamp(Math.round((px - m.l) / (pw / Math.max(1, n - 1))), 0, n - 1);
+  };
+  svg.addEventListener('pointermove', (ev) => { if (ev.pointerType === 'mouse') { const i = pick(ev); renderTrendReadout(i); setLine(i); } });
+  svg.addEventListener('pointerleave', () => { renderTrendReadout(); setLine(st.sel); });
+  svg.addEventListener('click', (ev) => { const i = pick(ev); if (i !== st.sel) select(i); });
+  svg.addEventListener('keydown', (ev) => {
+    if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(ev.key)) return;
+    ev.preventDefault();
+    const current = st.sel == null ? 0 : st.sel;
+    const next = ev.key === 'Home' ? 0 : ev.key === 'End' ? n - 1
+      : clamp(current + (ev.key === 'ArrowRight' ? 1 : -1), 0, n - 1);
+    if (next !== st.sel) select(next);
+  });
+  st.chartX = x;
+}
+
+function renderSources() {
+  const pad = (name) => name + ' ' + '.'.repeat(Math.max(2, 16 - name.length)) + ' ';
+  const status = st.model.status;
+  $('#srclog').innerHTML = status.map((s) => {
+    let detail = s.detail || '';
+    if (s.ok && s.off && (TD(s.off.hi) !== '0' || TD(s.off.lo) !== '0')) detail += `  adjusted ${TD(s.off.hi)}° / ${TD(s.off.lo)}°`;
+    return `  ${esc(pad(s.name))}<b>${s.ok ? 'ok  ' : 'fail'}</b>${detail ? '  ' + esc(detail) : ''}`;
+  }).join('\n');
+  const okN = status.filter((s) => s.ok).length;
+  $('#srcsum').textContent = `${okN} of ${status.length} responded, updated ${st.model.updated}`;
+  const la = st.model.loc.lat.toFixed(4), lo = st.model.loc.lon.toFixed(4);
+  $('#cross').innerHTML = `Ensembles are shifted so their first week lines up with the higher-resolution models. Compare with the <a href="https://forecast.weather.gov/MapClick.php?lat=${la}&lon=${lo}" target="_blank" rel="noopener">NWS point forecast</a>, the <a href="https://www.cpc.ncep.noaa.gov/products/predictions/814day/" target="_blank" rel="noopener">CPC 8 to 14 day outlook</a>, or the <a href="https://www.cpc.ncep.noaa.gov/products/predictions/WK34/" target="_blank" rel="noopener">CPC week 3 to 4 outlook</a>.`;
+}
+
+function setStatus(mid, right) {
+  const m = document.getElementById('st-mid'), r = document.getElementById('st-r');
+  if (m) m.textContent = mid;
+  if (r) r.textContent = right || '';
+}
+
+function renderAll() {
+  if (!st.model) return;
+  const okN = st.model.status.filter((x) => x.ok).length;
+  setStatus(`${zipEl.value}  ${st.model.loc.name.toLowerCase()}, ${st.model.loc.region.toLowerCase()}`, `${okN}/${st.model.status.length} ok  ${st.model.updated}`);
+  renderHero();
+  renderWeek();
+  renderSignals();
+  renderWeeks();
+  renderCal();
+  renderCalDetail();
+  renderTrendReadout();
+  renderChart();
+  renderSources();
+}
+
+function select(i) {
+  if (!st.model || i == null || i === st.sel) return;
+  st.sel = i;
+  document.querySelectorAll('#cal .cell[data-i]').forEach((c) => c.setAttribute('aria-pressed', String(+c.dataset.i === st.sel)));
+  renderCalDetail();
+  renderTrendReadout();
+  setLine(st.sel);
+}
+
+/* ---------- prompt placement ---------- */
+const form = $('#ask');
+
+/* ---------- run ---------- */
+let runId = 0;
+
+async function run(zip) {
+  const my = ++runId;
+  autoZip = zip;
+  store.set('lc:last', zip);
+  try { const th=(location.hash||'').match(/~[0-9a-f]{6}-[0-9a-f]{6}-\d{3}$/i); history.replaceState(null, '', '#' + zip + (th ? th[0] : '')); } catch (e) {}
+  zipEl.value = zip;
+  moveCur();
+  body.classList.remove('idle', 'ready');
+  body.classList.add('loading');
+  // Keep the last successful forecast visible during refreshes and failed lookups.
+  const L = makeLog($('#log'));
+  L.clear();
+  L.add('loc', 'locating');
+  setStatus(`${zip}  locating`, '');
+
+  let loc;
+  try { loc = await locate(zip); }
+  catch (e) {
+    if (my !== runId) return;
+    L.set('loc', 'fail', e.network ? 'blocked or offline' : '');
+    L.msg(e.network ? BLOCKED : `No place found for ${zip}. Check the 5-digit zip and try again.`);
+    setStatus(`${zip}  ${e.network ? 'offline' : 'no match'}`, e.network ? 'check connection / retry' : 'check ZIP / retry');
+    body.classList.remove('loading');
+    if (st.model) body.classList.add('ready');
+    return;
+  }
+  if (my !== runId) return;
+  loc.zip = zip;
+  L.set('loc', 'ok', `${loc.name}, ${loc.region}`.toLowerCase());
+
+  const base = { latitude: loc.lat.toFixed(4), longitude: loc.lon.toFixed(4), timezone: 'auto', temperature_unit: 'fahrenheit', precipitation_unit: 'inch' };
+  const tasks = [];
+  let done = 0;
+  const tick = () => { done++; setStatus(`${zip}  loading`, `${done}/${tasks.length} sources`); };
+  const add = (key, name, fn, describe) => {
+    L.add(key, name);
+    tasks.push(fn().then(
+      (v) => { if (my === runId) { L.set(key, 'ok', describe(v)); tick(); } return { key, name, ok: true, v, detail: describe(v) }; },
+      (e) => { if (my === runId) { L.set(key, 'fail', e.message || 'error'); tick(); } return { key, name, ok: false, detail: e.message || 'error' }; }
+    ));
+  };
+
+  add('nws', 'nws', () => fetchNWS(loc.lat, loc.lon), (v) => `${v.span} days  office ${v.office.toLowerCase()}`);
+  DET.forEach((mdl) => add(mdl.key, mdl.name,
+    () => getJSON(qs(API.fc, { ...base, daily: 'temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,weather_code', forecast_days: 16, models: mdl.id }))
+      .then((j) => fromDaily(j, 'det', mdl)),
+    (v) => `${v.span} days`));
+  ENS.forEach((mdl) => add(mdl.key, mdl.name,
+    () => getJSON(qs(API.ens, { ...base, daily: 'temperature_2m_max,temperature_2m_min,precipitation_sum', forecast_days: mdl.days, models: mdl.id }))
+      .then((j) => fromDaily(j, 'ens', mdl)),
+    (v) => `${v.span} days  ${v.members} members`));
+  add('ec46', 'ecmwf ec46',
+    () => getJSON(qs(API.sea, { ...base, daily: 'temperature_2m_max,temperature_2m_min,precipitation_sum', forecast_days: DAYS + 1 }))
+      .then((j) => fromDaily(j, 'ens', { key: 'ec46', name: 'ecmwf ec46' })),
+    (v) => `${v.span} days  ${v.members} members`);
+
+  const nk = 'lc:norm:v1:' + loc.lat.toFixed(2) + ',' + loc.lon.toFixed(2);
+  const endY = new Date().getFullYear() - 1, startY = endY - 29;
+  add('norm', 'climate average', async () => {
+    const c = store.get(nk);
+    if (c && Array.isArray(c.n) && c.n.length === 365) return { n: c.n, cached: true };
+    const j = await getJSON(qs(API.arc, { ...base, start_date: `${startY}-01-01`, end_date: `${endY}-12-31`, daily: 'temperature_2m_max,temperature_2m_min,precipitation_sum' }), 30000);
+    const n = normalsFrom(j);
+    store.set(nk, { n });
+    return { n, cached: false };
+  }, (v) => v.cached ? '30 years  cached' : `30 years  ${startY} to ${endY}`);
+
+  const results = await Promise.all(tasks);
+  if (my !== runId) return;
+
+  const srcs = results.filter((r) => r.ok && r.key !== 'norm').map((r) => r.v);
+  const normR = results.find((r) => r.key === 'norm');
+  const norms = normR && normR.ok ? normR.v.n : null;
+  const timed = srcs.filter((s) => s.time && s.time.length);
+  if (!timed.length) {
+    L.msg(BLOCKED);
+    setStatus(`${zip}  unavailable`, 'retry or check connection');
+    body.classList.remove('loading');
+    if (st.model) body.classList.add('ready');
+    return;
+  }
+  const firsts = {};
+  timed.forEach((s) => { firsts[s.time[0]] = (firsts[s.time[0]] || 0) + 1; });
+  const start = Object.keys(firsts).sort((a, b) => firsts[b] - firsts[a])[0] || localToday();
+  const dates = Array.from({ length: DAYS }, (_, i) => addDays(start, i));
+
+  const model = assemble(dates, srcs, norms);
+  model.loc = loc;
+  model.status = results.map((r) => ({ name: r.name, ok: r.ok, detail: r.detail, off: r.ok && r.v && r.v.off }));
+  model.updated = new Date().toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).toLowerCase();
+  st.model = model;
+  st.sel = 0;
+  st.open = null;
+
+  body.classList.remove('loading');
+  body.classList.add('ready');
+  $('#out').hidden = false;
+  renderAll();
+}
+
+/* ---------- events ---------- */
+const zipEl = $('#zip');
+let autoZip = null;
+const curEl = document.querySelector('.cur');
+function moveCur() {
+  const n = typeof zipEl.selectionStart === 'number' && document.activeElement === zipEl ? zipEl.selectionStart : zipEl.value.length;
+  curEl.style.setProperty('--n', String(n));
+}
+['input', 'keyup', 'click', 'focus', 'blur', 'select'].forEach((ev) => zipEl.addEventListener(ev, () => requestAnimationFrame(moveCur)));
+zipEl.addEventListener('input', () => {
+  const v = zipEl.value.replace(/\D/g, '').slice(0, 5);
+  if (v !== zipEl.value) zipEl.value = v;
+  // A ZIP is queried only on explicit submit, matching the terminal-style [ enter ] control.
+  if (v.length < 5) autoZip = null;
+  zipEl.removeAttribute('aria-invalid');
+  moveCur();
+});
+form.addEventListener('submit', (e) => {
+  e.preventDefault();
+  const v = zipEl.value.replace(/\D/g, '');
+  if (/^\d{5}$/.test(v)) {
+    if (v !== autoZip || !st.model || st.model.loc.zip !== v || st.model.rows.length !== DAYS) run(v);
+  } else {
+    const L = makeLog($('#log'));
+    L.clear();
+    L.msg('Enter a 5-digit US ZIP code.');
+    zipEl.setAttribute('aria-invalid', 'true');
+    zipEl.focus();
+    setStatus('invalid input', 'enter 5 digits');
+  }
+});
+$('#cal').addEventListener('click', (e) => {
+  const c = e.target.closest('.cell[data-i]');
+  if (!c) return;
+  select(+c.dataset.i);
+  {
+    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    $('#cdet').scrollIntoView({ block: 'nearest', behavior: reduce ? 'auto' : 'smooth' });
+  }
+});
+$('#week').addEventListener('click', (e) => {
+  const b = e.target.closest('.dbtn');
+  if (!b) return;
+  const i = +b.dataset.i;
+  st.open = st.open === i ? null : i;
+  renderWeek();
+  const nb = document.querySelector(`#week .dbtn[data-i="${i}"]`);
+  if (nb) nb.focus();
+});
+document.querySelectorAll('.units button[data-u]').forEach((b) => b.addEventListener('click', () => {
+  st.unit = b.dataset.u;
+  store.set('lc:unit', st.unit);
+  document.querySelectorAll('.units button[data-u]').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.u === st.unit)));
+  renderAll();
+}));
+$('#home').addEventListener('click', (e) => {
+  e.preventDefault();
+  runId++;
+  st.model = null;
+  autoZip = null;
+  try { history.replaceState(null, '', location.pathname + location.search); } catch (er) {}
+  body.className = 'idle';
+  $('#out').hidden = true;
+  $('#log').innerHTML = '';
+  zipEl.value = '';
+  setStatus('type a zip code', '');
+  zipEl.focus();
+  moveCur();
+});
+document.addEventListener('keydown', (e) => {
+  if (e.key === '/' && document.activeElement !== zipEl) { e.preventDefault(); zipEl.focus(); zipEl.select(); }
+});
+let rt;
+window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if (st.model) renderChart(); }, 120); });
+
+// Theme controls: high-contrast derived text colors, in-page swatches, and shareable URL settings.
+const themeButton = document.getElementById('themeButton');
+const themePanel = document.getElementById('themePanel');
+const themeBg = document.getElementById('themeBg');
+const themeInk = document.getElementById('themeInk');
+const themeWeight = document.getElementById('themeWeight');
+const weightValue = document.getElementById('weightValue');
+const bgChip = document.getElementById('bgChip');
+const inkChip = document.getElementById('inkChip');
+const themes = {
+  mono: {bg:'#ffffff',ink:'#000000',weight:400},
+  dark: {bg:'#101419',ink:'#e7edf2',weight:400},
+  cream: {bg:'#f3ead7',ink:'#352c20',weight:400},
+  seafoam: {bg:'#d9eee5',ink:'#174d43',weight:400},
+  blueyellow: {bg:'#173b70',ink:'#ffe66d',weight:450},
+  plum: {bg:'#251d2d',ink:'#e6c9ff',weight:400}
+};
+const palette = ['#ffffff','#f3ead7','#d9eee5','#b9d5f0','#173b70','#101419','#251d2d','#000000','#352c20','#174d43','#ffe66d','#e6c9ff'];
+function currentZipFromHash(){ const m=(location.hash||'').match(/^#(\d{5})/); return m ? m[1] : ''; }
+function updateShareHash(bg, ink, weight){
+  const zip=currentZipFromHash();
+  const suffix=`~${bg.slice(1).toLowerCase()}-${ink.slice(1).toLowerCase()}-${weight}`;
+  try { history.replaceState(null,'',location.pathname+location.search+'#'+(zip||'')+suffix); } catch(e) {}
+}
+function validHex(v){ return /^#[0-9a-f]{6}$/i.test(v); }
+function rgb(hex){return [1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255).map(v=>v<=.04045?v/12.92:Math.pow((v+.055)/1.055,2.4));}
+function contrast(a,b){const l=c=>{const v=rgb(c);return .2126*v[0]+.7152*v[1]+.0722*v[2];};const x=l(a),y=l(b);return (Math.max(x,y)+.05)/(Math.min(x,y)+.05);}
+function accessibleInk(bg,ink){
+  if(contrast(bg,ink)>=4.5)return ink;
+  const black='#000000',white='#ffffff',target=contrast(bg,black)>=contrast(bg,white)?black:white;
+  let lo=0,hi=1,best=target;
+  for(let i=0;i<18;i++){const t=(lo+hi)/2;const c='#'+[1,3,5].map(k=>Math.round(parseInt(ink.slice(k,k+2),16)*(1-t)+parseInt(target.slice(k,k+2),16)*t).toString(16).padStart(2,'0')).join('');if(contrast(bg,c)>=4.5){best=c;hi=t;}else lo=t;}
+  return best;
+}
+function syncColorUI(bg,ink){
+  bgChip.style.background=bg; inkChip.style.background=ink;
+  document.querySelectorAll('#bgSwatches .color-swatch').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.color===bg.toLowerCase())));
+  document.querySelectorAll('#inkSwatches .color-swatch').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.color===ink.toLowerCase())));
+}
+function applyTheme(bg, ink, weight, name='custom', save=true, share=true) {
+  if(!validHex(bg)||!validHex(ink)) return;
+  bg=bg.toLowerCase(); ink=accessibleInk(bg,ink.toLowerCase()); weight=Math.max(200,Math.min(600,Number(weight)||400));
+  document.documentElement.style.setProperty('--paper', bg);
+  document.documentElement.style.setProperty('--ink', ink);
+  // Secondary text remains close to the chosen foreground, avoiding washed-out gray on saturated themes.
+  document.documentElement.style.setProperty('--ink-2','color-mix(in srgb,var(--ink) 88%,var(--paper))');
+  document.documentElement.style.setProperty('--ink-3','color-mix(in srgb,var(--ink) 72%,var(--paper))');
+  document.documentElement.style.setProperty('--base-weight', String(weight));
+  document.body.style.fontWeight=String(weight);
+  themeBg.value=bg; themeInk.value=ink; themeWeight.value=String(weight); weightValue.value=String(weight);
+  document.querySelectorAll('.theme-preset').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.theme===name)));
+  syncColorUI(bg,ink);
+  if(save){try{localStorage.setItem('lc:appearance',JSON.stringify({bg,ink,weight,name}));}catch(e){}}
+  if(share) updateShareHash(bg,ink,weight);
+}
+function makeSwatches(id, target){
+  const holder=document.getElementById(id);
+  palette.forEach(color=>{
+    const b=document.createElement('button'); b.type='button'; b.className='color-swatch'; b.style.setProperty('--swatch',color); b.dataset.color=color; b.setAttribute('aria-label',color); b.title=color;
+    b.addEventListener('click',()=>applyTheme(target==='bg'?color:themeBg.value,target==='ink'?color:themeInk.value,Number(themeWeight.value)));
+    holder.appendChild(b);
+  });
+}
+makeSwatches('bgSwatches','bg'); makeSwatches('inkSwatches','ink');
+function closeThemePanel(returnFocus=false){
+  if(themePanel.hidden)return;
+  themePanel.hidden=true;
+  themeButton.setAttribute('aria-expanded','false');
+  themeButton.textContent='theme +';
+  if(returnFocus)themeButton.focus();
+}
+function openThemePanel(){themePanel.hidden=false;themeButton.setAttribute('aria-expanded','true');themeButton.textContent='theme −';}
+themeButton.addEventListener('click',()=>{if(themePanel.hidden)openThemePanel();else closeThemePanel();});
+document.getElementById('closeTheme').addEventListener('click',()=>closeThemePanel(true));
+document.addEventListener('pointerdown',e=>{
+  if(!themePanel.hidden&&!themePanel.contains(e.target)&&!themeButton.contains(e.target))closeThemePanel();
+});
+document.querySelectorAll('.theme-preset').forEach(b=>b.addEventListener('click',()=>{const t=themes[b.dataset.theme];applyTheme(t.bg,t.ink,t.weight,b.dataset.theme);}));
+function editColor(which){const el=which==='bg'?themeBg:themeInk; if(validHex(el.value)) applyTheme(which==='bg'?el.value:themeBg.value,which==='ink'?el.value:themeInk.value,Number(themeWeight.value)); else el.setAttribute('aria-invalid','true');}
+[themeBg,themeInk].forEach((el,i)=>{el.addEventListener('change',()=>{editColor(i===0?'bg':'ink');el.removeAttribute('aria-invalid');});el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();editColor(i===0?'bg':'ink');}});});
+themeWeight.addEventListener('input',()=>applyTheme(themeBg.value,themeInk.value,Number(themeWeight.value)));
+document.getElementById('copyThemeUrl').addEventListener('click',async()=>{
+  const url=location.href;
+  try{await navigator.clipboard.writeText(url);document.getElementById('copyThemeUrl').textContent='copied';}
+  catch(e){const temp=document.createElement('textarea');temp.value=url;temp.style.position='fixed';temp.style.opacity='0';document.body.appendChild(temp);temp.select();try{document.execCommand('copy');document.getElementById('copyThemeUrl').textContent='copied';}catch(er){document.getElementById('copyThemeUrl').textContent='select URL';}temp.remove();}
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!themePanel.hidden)closeThemePanel(true);});
+// Restore explicit theme settings from the URL first, then local preference if no URL theme exists.
+const hashTheme=(location.hash||'').match(/~([0-9a-f]{6})-([0-9a-f]{6})-(\d{3})$/i);
+if(hashTheme){applyTheme('#'+hashTheme[1],'#'+hashTheme[2],Number(hashTheme[3]),'custom',false,false);}
+else {try{const saved=JSON.parse(localStorage.getItem('lc:appearance')||'null');if(saved&&validHex(saved.bg)&&validHex(saved.ink))applyTheme(saved.bg,saved.ink,Math.max(200,Math.min(600,Number(saved.weight)||400)),saved.name||'custom',false,true);}catch(e){}}
+document.querySelectorAll('.units button[data-u]').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.u === st.unit)));
+const hashZipMatch = (location.hash || '').match(/^#(\d{5})/);
+const fromHash = hashZipMatch ? hashZipMatch[1] : '';
+const first = /^\d{5}$/.test(fromHash) ? fromHash : store.get('lc:last');
+if (first && /^\d{5}$/.test(first)) run(first);
+else zipEl.focus();
+})();
+</script>
+</body>
+</html>

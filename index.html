@@ -751,6 +751,40 @@ footer{max-width:none;width:100%}
 .cdet-side .kv{grid-template-columns:minmax(12ch,auto) minmax(0,1fr)}
 .cdet-side .kv dt{white-space:nowrap}
 
+/* ---------- module boot / reveal ---------- */
+.mload{display:none}
+.out.booting details.module > :not(summary):not(.mload),
+.out.booting details.srcs > :not(summary):not(.mload){display:none}
+.out.booting .hero{opacity:.28;transition:opacity .2s}
+body.loading .out.booting:not([hidden]){opacity:1}
+.out.booting .mload{display:block;min-height:var(--boot-h,96px);padding:12px 0 4px;font-size:var(--s);color:var(--ink-2)}
+.ml-line{display:flex;gap:1ch;align-items:baseline;color:var(--ink);white-space:nowrap}
+.ml-prompt{color:var(--ink-3)}
+.ml-spin{display:inline-block;width:1ch;text-align:center}
+.ml-bar{position:relative;height:8px;width:min(100%,40ch);margin:10px 0 8px;
+  background:radial-gradient(circle,color-mix(in srgb,var(--ink) 22%,var(--paper)) .8px,transparent 1.2px) 0 50%/4px 8px repeat-x}
+.ml-bar i{position:absolute;left:0;top:0;bottom:0;width:calc(var(--p,0) * 100%);transition:width .35s steps(5,end);
+  background:radial-gradient(circle,var(--ink) 1.35px,transparent 1.75px) 0 50%/4px 8px repeat-x}
+.ml-meta{display:flex;align-items:center;gap:1.5ch}
+.ml-cur{display:inline-block;width:.62em;height:1.05em;background:var(--ink);animation:lc-blink 1s steps(1) infinite}
+@keyframes lc-blink{50%{opacity:0}}
+.out.revealing details.module{overflow:hidden}
+/* reveal: each module prints top to bottom in line-sized steps, staggered down the page */
+.out.revealing .hero{animation:lc-print .5s steps(8,end) both}
+.out.revealing details.module,
+.out.revealing details.srcs{animation:lc-print-box .7s steps(16,end) both;animation-delay:calc(var(--i,0) * 90ms)}
+.out.revealing details.module::after{content:"";position:absolute;left:0;right:0;height:1px;background:var(--ink);pointer-events:none;
+  animation:lc-head .7s steps(16,end) both;animation-delay:calc(var(--i,0) * 90ms)}
+@keyframes lc-print{from{clip-path:inset(0 0 100% 0)}to{clip-path:inset(0 0 0 0)}}
+@keyframes lc-print-box{from{clip-path:inset(0 0 calc(100% - var(--th,40px)) 0)}to{clip-path:inset(0 0 0 0)}}
+@keyframes lc-head{0%{top:var(--th,40px);opacity:.9}99%{top:calc(100% - 1px);opacity:.9}100%{top:calc(100% - 1px);opacity:0}}
+@media (prefers-reduced-motion:reduce){
+  .out.revealing details.module::after{display:none}
+  .out.revealing .hero,.out.revealing details.module,.out.revealing details.srcs{animation:none}
+  .ml-cur{animation:none}
+  .ml-bar i{transition:none}
+}
+
 </style>
 </head>
 <body class="idle">
@@ -1353,6 +1387,90 @@ function drawMap(loc) {
   el.innerHTML = `<svg viewBox="0 0 ${view} ${rows}" preserveAspectRatio="xMaxYMid meet" focusable="false"><path class="lm-land" d="${dots}"/>${mark}</svg>`;
 }
 
+
+/* ---------- module boot sequence ----------
+   While a forecast loads, every module shows a terminal-style loader with a real progress
+   count (sources answered / sources asked). When the data lands, modules "print" in from
+   top to bottom, one after another. */
+const BOOT_TASKS = [
+  ['.out>.month', 'build 35-day grid'],
+  ['.out>.cols>.module:nth-child(1)', 'pool daily forecasts'],
+  ['.out>.cols>.module:nth-child(3)', 'compare with 30-year average'],
+  ['.out>.cols>.module.signal', 'scan for signals'],
+  ['.out>.trend', 'plot temperature trend'],
+  ['#srcs', 'contact sources']
+];
+let bootTimer = null;
+function bootModules(on) {
+  const out = $('#out');
+  if (on) {
+    out.hidden = false;
+    out.classList.remove('revealing');
+    BOOT_TASKS.forEach(([sel, task]) => {
+      const m = document.querySelector(sel);
+      if (!m) return;
+      const sum = m.querySelector(':scope > summary');
+      const h = out.classList.contains('booting') ? null : Math.round(m.getBoundingClientRect().height - (sum ? sum.getBoundingClientRect().height : 0) - 30);
+      let l = m.querySelector(':scope > .mload');
+      if (!l) { l = document.createElement('div'); l.className = 'mload'; l.setAttribute('aria-hidden', 'true'); (sum || m.firstChild).after(l); }
+      if (h != null) l.style.setProperty('--boot-h', Math.max(72, Math.min(h, 420)) + 'px');
+      l.innerHTML = `<div class="ml-line"><span class="ml-prompt">$</span><span class="ml-task">${esc(task)}</span><span class="ml-spin">|</span></div>`
+        + `<div class="ml-bar"><i></i></div><div class="ml-meta"><span class="ml-count">waiting</span><span class="ml-cur"></span></div>`;
+    });
+    out.classList.add('booting');
+    if (!bootTimer && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const frames = ['|', '/', '-', '\\'];
+      let f = 0;
+      bootTimer = setInterval(() => { f = (f + 1) % 4; document.querySelectorAll('.mload .ml-spin').forEach((e) => { e.textContent = frames[f]; }); }, 90);
+    }
+  } else {
+    out.classList.remove('booting');
+    if (bootTimer) { clearInterval(bootTimer); bootTimer = null; }
+    document.querySelectorAll('.mload').forEach((e) => e.remove());
+    if (!st.model) out.hidden = true;
+  }
+}
+function restoreShownPlace() {
+  // after a failed search, put the place name and map back to the forecast still on screen
+  const loc = st.model && st.model.loc;
+  const full = loc ? [loc.name, loc.region].filter(Boolean).join(', ') : '';
+  $('#where').innerHTML = loc ? `<span title="${esc(full)}">${esc(full)}</span>` : '';
+  drawMap(loc || null);
+}
+function bootProgress(done, total) {
+  document.querySelectorAll('.mload').forEach((l) => {
+    l.style.setProperty('--p', total ? (done / total).toFixed(3) : 0);
+    const c = l.querySelector('.ml-count');
+    if (c) c.textContent = `${done}/${total} sources`;
+  });
+}
+function revealModules() {
+  const out = $('#out');
+  const my = runId;
+  document.querySelectorAll('.mload .ml-count').forEach((c) => { c.textContent = 'all sources in, rendering'; });
+  const go = () => {
+    if (my !== runId) return;              // a newer search started; let it run its own sequence
+    bootModules(false);                    // show the real content (not painted yet)
+    if (st.model) renderChart();           // the chart measures its width, so draw it now that it's visible
+    const order = ['.out>.hero', ...BOOT_TASKS.map((t) => t[0])];
+    order.forEach((sel, i) => {
+      const m = document.querySelector(sel);
+      if (!m) return;
+      m.style.setProperty('--i', i);
+      const sum = m.querySelector(':scope > summary');
+      if (sum) m.style.setProperty('--th', Math.round(sum.offsetTop + sum.offsetHeight + 4) + 'px');   // the title bar stays put while the body prints
+    });
+    out.classList.remove('revealing');
+    void out.offsetWidth;
+    out.classList.add('revealing');
+    clearTimeout(revealModules.t);
+    revealModules.t = setTimeout(() => out.classList.remove('revealing'), 1600);
+  };
+  const fonts = document.fonts && document.fonts.ready
+    ? Promise.race([document.fonts.ready, new Promise((r) => setTimeout(r, 1200))]) : Promise.resolve();
+  fonts.then(() => requestAnimationFrame(() => requestAnimationFrame(go)));
+}
+
 /* ---------- render ---------- */
 const ink = (c) => (0.55 + 0.45 * c).toFixed(2);
 const inkCal = (c) => (0.66 + 0.34 * c).toFixed(2);
@@ -1902,6 +2020,8 @@ async function run(query) {
     setStatus(`${query}  ${e.network ? 'offline' : 'no match'}`, e.network ? 'check connection / retry' : 'refine location / retry');
     body.classList.remove('loading');
     if (st.model) body.classList.add('ready');
+    bootModules(false);   // an earlier search may have been mid-boot when this one started
+    restoreShownPlace();
     return;
   }
   if (my !== runId) return;
@@ -1910,11 +2030,12 @@ async function run(query) {
   { const full = [loc.name, loc.region].filter(Boolean).join(', ');
     $('#where').innerHTML = `<span title="${esc(full)}">${esc(full)}</span>`; }
   drawMap(loc);
+  bootModules(true);
 
   const base = { latitude: loc.lat.toFixed(4), longitude: loc.lon.toFixed(4), timezone: 'auto', temperature_unit: 'fahrenheit', precipitation_unit: 'inch' };
   const tasks = [];
   let done = 0;
-  const tick = () => { done++; setStatus(`${query}  loading`, `${done}/${tasks.length} sources`); };
+  const tick = () => { done++; setStatus(`${query}  loading`, `${done}/${tasks.length} sources`); if (my === runId) bootProgress(done, tasks.length); };
   const add = (key, name, fn, describe) => {
     L.add(key, name);
     tasks.push(fn().then(
@@ -2008,6 +2129,8 @@ async function run(query) {
   if (!timed.length) {
     const limited = results.some((r) => !r.ok && /429|limit/i.test(r.detail || ''));
     L.msg(limited ? 'Open-Meteo\'s free daily request limit is used up for this connection, so forecasts can\'t load right now. It resets every day; try again later.' : BLOCKED);
+    bootModules(false);
+    restoreShownPlace();
     setStatus(`${query}  unavailable`, 'retry or check connection');
     body.classList.remove('loading');
     if (st.model) body.classList.add('ready');
@@ -2032,6 +2155,7 @@ async function run(query) {
   body.classList.add('ready');
   $('#out').hidden = false;
   renderAll();
+  revealModules();
 }
 
 /* ---------- events ---------- */
@@ -2072,6 +2196,7 @@ form.addEventListener('submit', (e) => {
   e.preventDefault();
   const v = zipEl.value.trim().replace(/\s+/g, ' ');
   if (v) {
+    if (body.classList.contains('loading') && v === autoZip) return;   // already loading this place
     if (v !== autoZip || !st.model || st.model.loc.query !== v || st.model.rows.length !== DAYS) run(v);
   } else {
     const L = makeLog($('#log'));

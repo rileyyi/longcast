@@ -90,7 +90,7 @@ main{max-width:1040px;margin:0 auto;padding:20px 32px 72px}
 #zip:focus{outline:none;box-shadow:inset 0 -2px 0 var(--ink)}
 .go{background:var(--ink);color:var(--paper);border:0;padding:3px 10px;font-size:var(--s);cursor:pointer}
 .ask .gt,.ask #zip{font-size:var(--xxl)}
-.ask #zip{width:8.4ch}
+.ask #zip{width:min(32ch,calc(100vw - 110px));max-width:100%;min-width:14ch}
 
 .ask{padding:120px 0 16px;transition:padding .3s ease}
 body:not(.idle) .ask{padding:28px 0 0}
@@ -112,9 +112,13 @@ body.loading .status .mode::after{content:' /';}
 .hero{margin-top:8px}
 .where{margin:0;font-size:var(--m);color:var(--ink-2)}
 .where span{margin-right:3ch;white-space:nowrap}
-.head{margin:26px 0 0;font-size:var(--xl);font-weight:300;line-height:1.2;letter-spacing:-.01em}
+.head{margin:14px 0 0;font-size:var(--xl);font-weight:300;line-height:1.2;letter-spacing:-.01em}
+.head.is-fallback{font-size:var(--m);font-weight:700;letter-spacing:0;margin-top:8px}
 .facts{display:flex;flex-wrap:wrap;gap:2px 28px;margin:10px 0 0;font-size:var(--m);color:var(--ink-2)}
 .facts span{white-space:nowrap}
+.facts .hero-day{display:block;white-space:normal;flex-basis:100%;color:var(--ink);line-height:1.55;margin-bottom:8px}
+.facts .hero-day strong{font-weight:600}
+.facts .trend-label{display:block;flex-basis:100%;font-size:var(--s);text-transform:uppercase;letter-spacing:.08em;color:var(--ink-3);margin-top:2px}
 .facts b{font-weight:600;color:var(--ink)}
 
 .cols{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:56px;margin-top:44px}
@@ -203,7 +207,12 @@ ul.list{list-style:none;margin:0;padding:0}
 .cell:hover:not(.blank){background:#f8f8f8}
 .cell[aria-pressed="true"]{background:var(--wash);box-shadow:inset 0 0 0 1px var(--ink)}
 .cell:focus-visible{outline-offset:-2px}
-.cell .d{font-size:var(--s);color:var(--ink-2);line-height:18px;padding:0 4px;margin-left:-4px;white-space:nowrap}
+.cell .dayhead{display:flex;align-items:center;justify-content:space-between;gap:3px;width:100%;min-width:0;line-height:24px}
+.cell .d{font-size:var(--s);color:var(--ink-2);padding:0 4px;margin-left:-4px;white-space:nowrap}
+.cell .wxmini{display:block;width:24px;height:24px;min-width:24px;flex:0 0 24px;color:var(--ink-2);opacity:.95;overflow:visible}
+.cell .wxmini svg{display:block;width:24px;height:24px;fill:none;stroke:currentColor;stroke-width:1.35;stroke-linecap:round;stroke-linejoin:round}
+.cell .wxmini .fill{fill:var(--paper);stroke:currentColor}
+.cell[aria-pressed="true"] .wxmini{color:var(--ink) !important}
 .cell.today .d{background:var(--ink);color:var(--paper)}
 .cell .v{opacity:var(--o,1)}
 .cell .hi{font-size:var(--l);font-weight:400;line-height:1.2;margin-top:4px}
@@ -236,6 +245,7 @@ ul.list{list-style:none;margin:0;padding:0}
   .cdet.open .cdet-main,.cdet.open .cdet-side{grid-column:1;grid-row:auto}
   .cdet.open>.src{display:block;width:100%;margin-top:16px;font-size:12px;line-height:1.75;white-space:normal;overflow:visible}
   .cdet-text p{font-size:14px;line-height:1.5}
+.cdet-text .selected-desc{font-size:15px;line-height:1.55;color:var(--ink);margin:0 0 12px}
   .cdet-side .kv{font-size:14px;grid-template-columns:minmax(0,.42fr) minmax(0,.58fr);gap:9px 12px}
   .cdet-top b{font-size:15px}
   .cdet-top .ago{font-size:12px}
@@ -612,7 +622,7 @@ footer{border-top:1px dashed var(--rule-fixed)}
 <body class="idle">
 <main>
   <header class="top" id="top">
-    <a class="mark" href="#" id="home">longcast</a><span class="tag" id="tag">35-day outlook</span>
+    <a class="mark" href="#" id="home">longcast</a>
     <div class="units" role="group" aria-label="Temperature unit">
       <button type="button" data-u="f" aria-pressed="true">°F</button>
       <button type="button" data-u="c" aria-pressed="false">°C</button>
@@ -640,10 +650,10 @@ footer{border-top:1px dashed var(--rule-fixed)}
   <section class="ask" id="askwrap">
     <form id="ask" autocomplete="off" novalidate aria-label="Find a weather outlook">
       <label for="zip" class="gt" aria-hidden="true">&gt;</label>
-      <span class="zipwrap"><input id="zip" name="zip" inputmode="numeric" maxlength="5" pattern="[0-9]{5}" autocomplete="postal-code" placeholder="zip code" aria-label="US ZIP code, five digits" aria-describedby="ziphelp" spellcheck="false" title="Press / to jump here"><span class="cur" aria-hidden="true"></span></span>
-      <button type="submit" class="go" aria-label="Get 35-day outlook">enter</button>
+      <span class="zipwrap"><input id="zip" name="location" type="text" inputmode="search" maxlength="120" autocomplete="off" placeholder="city, postal code, or coordinates" aria-label="Search any location worldwide by place name, postal code, or latitude and longitude" aria-describedby="ziphelp" spellcheck="false" title="Press / to jump here"><span class="cur" aria-hidden="true"></span></span>
+      <button type="submit" class="go" aria-label="Get 35-day outlook">search</button>
     </form>
-    <p class="intro" id="ziphelp">A 35-day outlook, comparing available forecasts with 30 years of local climate.</p>
+    <p class="intro" id="ziphelp">Search worldwide by city, region, country, postal code, or coordinates (latitude, longitude). Local climate context included.</p>
     <noscript><p class="intro" style="color:#000">This page needs JavaScript and network access. Download the file and open it in a web browser.</p></noscript>
     <div class="log" id="log" aria-live="polite"></div>
   </section>
@@ -651,11 +661,11 @@ footer{border-top:1px dashed var(--rule-fixed)}
   <section class="out" id="out" hidden>
     <div class="hero">
       <p class="where" id="where"></p>
-      <h1 class="head" id="head"></h1>
       <p class="facts" id="facts"></p>
+      <h1 class="head" id="head"></h1>
     </div>
 
-    <details class="module panel month" open><summary class="module-title" id="cal-title">calendar <small>next 35 days</small></summary>
+    <details class="module panel month" open><summary class="module-title" id="cal-title">calendar</summary>
       <div class="dow" aria-hidden="true"><span>mo</span><span>tu</span><span>we</span><span>th</span><span>fr</span><span>sa</span><span>su</span></div>
       <div class="cal" id="cal"></div>
       <div class="cdet" id="cdet" aria-live="polite"></div>
@@ -664,7 +674,7 @@ footer{border-top:1px dashed var(--rule-fixed)}
     <div class="cols">
       <details class="module panel" open>
         <summary class="module-title">this week</summary>
-        <div class="dhead" aria-hidden="true"><span></span><span></span><span class="r">low</span><span></span><span class="r">high</span><span class="r">rain</span></div>
+        <div class="dhead" aria-hidden="true"><span></span><span></span><span class="r">low</span><span></span><span class="r">high</span><span class="r">precip</span></div>
         <ul class="list" id="week"></ul>
         <p class="note"><i class="sw sw-fc"></i>forecast low to high <i class="sw sw-nm"></i>average range for that date. Tap a day to compare sources.</p>
       </details>
@@ -675,7 +685,7 @@ footer{border-top:1px dashed var(--rule-fixed)}
       </details>
       <details class="module panel" open>
         <summary class="module-title">weeks ahead</summary>
-        <div class="whead" aria-hidden="true"><span>week of</span><span class="r vs">vs average</span><span class="scale"><span>cooler</span><span>warmer</span></span><span class="r whl">high/low</span><span>rain</span><span class="r">confidence</span></div>
+        <div class="whead" aria-hidden="true"><span>week of</span><span class="r vs">vs average</span><span class="scale"><span>cooler</span><span>warmer</span></span><span class="r whl">high/low</span><span>precip</span><span class="r">confidence</span></div>
         <ul class="list" id="weeks"></ul>
         <p class="note" id="wnote"></p>
       </details>
@@ -685,7 +695,7 @@ footer{border-top:1px dashed var(--rule-fixed)}
       <summary class="module-title">temperature trend</summary>
       <p class="readout" id="readout2"></p>
       <div class="chart" id="chart"></div>
-      <p class="legend"><span><i class="l-fc"></i>forecast high and low</span><span><i class="l-band"></i>likely range of the high</span><span><i class="l-norm"></i>30-year average</span><span><i class="l-rain"></i>chance of rain</span></p>
+      <p class="legend"><span><i class="l-fc"></i>forecast high and low</span><span><i class="l-band"></i>likely range of the high</span><span><i class="l-norm"></i>30-year average</span><span><i class="l-rain"></i>chance of precipitation</span></p>
     </details>
 
     <details class="srcs" id="srcs" open>
@@ -709,7 +719,7 @@ footer{border-top:1px dashed var(--rule-fixed)}
     <p>Forecast data from <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a> (CC BY 4.0) and the <a href="https://www.weather.gov/" target="_blank" rel="noopener">National Weather Service</a>. Averages from ERA5 reanalysis via Open-Meteo.</p>
     <p>Long-range forecasts show tendencies, not promises. Not for safety-critical decisions.</p>
   </footer>
-  <div class="status" id="status" role="status" aria-live="polite" aria-atomic="true"><span class="mode">longcast</span><span id="st-mid">type a zip code</span><span class="r" id="st-r"></span></div>
+  <div class="status" id="status" role="status" aria-live="polite" aria-atomic="true"><span class="mode">longcast</span><span id="st-mid">search any location</span><span class="r" id="st-r"></span></div>
 </main>
 
 <script>
@@ -820,27 +830,64 @@ async function getJSON(url, ms = 15000) {
   } finally { clearTimeout(t); }
 }
 
-async function locate(zip) {
-  const ck = 'lc:zip:' + zip;
+async function locate(query) {
+  const q = String(query || '').trim().replace(/\s+/g, ' ');
+  if (!q) throw new Error('no match');
+  const ck = 'lc:place:' + q.toLowerCase();
   const cached = store.get(ck);
   if (cached) return cached;
-  let loc = null, netFails = 0;
-  try {
-    const j = await getJSON(API.zip + zip, 8000);
-    const p = j && j.places && j.places[0];
-    if (p) loc = { lat: +p.latitude, lon: +p.longitude, name: p['place name'], region: p['state abbreviation'], via: 'zippopotam.us' };
-  } catch (e) { if (e.network) netFails++; }
-  if (!loc) {
-    try {
-      const g = await getJSON(qs(API.geo, { name: zip, count: 10, country_code: 'US', language: 'en', format: 'json' }), 8000);
-      const hit = (g.results || []).find((r) => (r.postcodes || []).includes(zip));
-      if (hit) loc = { lat: hit.latitude, lon: hit.longitude, name: hit.name, region: hit.admin1 || '', via: 'open-meteo geocoding' };
-    } catch (e) { if (e.network) netFails++; else throw e; }
+
+  // Coordinates are the most direct, unambiguous global location input.
+  const coord = q.match(/^\s*(-?\d{1,2}(?:\.\d+)?)\s*[,;\s]\s*(-?\d{1,3}(?:\.\d+)?)\s*$/);
+  if (coord) {
+    const lat = Number(coord[1]), lon = Number(coord[2]);
+    if (lat >= -90 && lat <= 90 && lon >= -180 && lon <= 180) {
+      const loc = { lat, lon, name: `${lat.toFixed(4)}, ${lon.toFixed(4)}`, region: 'coordinates', query: q, via: 'coordinates' };
+      store.set(ck, loc); return loc;
+    }
+    throw new Error('coordinates out of range');
   }
-  if (!loc && netFails > 0) { const er = new Error('network'); er.network = true; throw er; }
-  if (!loc || !isNum(loc.lat) || !isNum(loc.lon)) throw new Error('no match');
-  store.set(ck, loc);
-  return loc;
+
+  let netFails = 0;
+  // Preserve the fast, reliable US ZIP lookup, but only for an exact ZIP input.
+  if (/^\d{5}$/.test(q)) {
+    try {
+      const j = await getJSON(API.zip + q, 8000);
+      const p = j && j.places && j.places[0];
+      if (p) {
+        const loc = { lat: +p.latitude, lon: +p.longitude, name: p['place name'], region: p['state abbreviation'] || p['state'] || 'United States', country: 'United States', query: q, via: 'zippopotam.us' };
+        store.set(ck, loc); return loc;
+      }
+    } catch (e) { if (e.network) netFails++; }
+  }
+
+  try {
+    const g = await getJSON(qs(API.geo, { name: q, count: 10, language: 'en', format: 'json' }), 10000);
+    const results = (g.results || []).filter(r => isNum(r.latitude) && isNum(r.longitude));
+    if (results.length) {
+      const norm = x => String(x || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+      const queryNorm = norm(q);
+      const postcodeQuery = /[0-9]/.test(q) && !/[a-z]{3,}/i.test(q);
+      results.sort((a, b) => {
+        const score = r => {
+          const name = norm(r.name), country = norm(r.country), admin = norm(r.admin1), postcodes = (r.postcodes || []).map(norm);
+          let n = 0;
+          if (name === queryNorm) n += 100;
+          if (postcodes.includes(queryNorm)) n += 120;
+          if (queryNorm.includes(',') && [country, admin, norm(r.admin2)].some(v => v && queryNorm.includes(v))) n += 30;
+          if (postcodeQuery && (r.feature_code || '').startsWith('PPL')) n -= 20;
+          if (r.population) n += Math.min(10, Math.log10(Math.max(1, r.population)));
+          return n;
+        };
+        return score(b) - score(a);
+      });
+      const hit = results[0];
+      const loc = { lat: hit.latitude, lon: hit.longitude, name: hit.name, region: [hit.admin1, hit.country].filter(Boolean).join(', '), country: hit.country || '', query: q, via: 'open-meteo geocoding' };
+      store.set(ck, loc); return loc;
+    }
+  } catch (e) { if (e.network) netFails++; else throw e; }
+  if (netFails > 0) { const er = new Error('network'); er.network = true; throw er; }
+  throw new Error('no match');
 }
 
 function fromDaily(j, kind, meta) {
@@ -1036,10 +1083,16 @@ function assemble(dates, srcs, norms) {
 }
 
 function wxWord(codes) {
-  const cat = (c) => c >= 95 ? 'storm' : (c >= 71 && c <= 77) || c === 85 || c === 86 ? 'snow'
-    : (c >= 61 && c <= 67) || (c >= 80 && c <= 82) ? 'rain' : c >= 51 && c <= 57 ? 'drizzle'
-    : c === 45 || c === 48 ? 'fog' : c === 3 ? 'cloudy' : c === 2 ? 'partly' : 'clear';
-  const rank = ['clear', 'partly', 'cloudy', 'fog', 'drizzle', 'rain', 'snow', 'storm'];
+  const cat = (c) => c === 96 || c === 99 ? 'hailstorm'
+    : c === 95 ? 'storm'
+    : c === 56 || c === 57 ? 'freezing drizzle'
+    : c === 66 || c === 67 ? 'freezing rain'
+    : (c >= 71 && c <= 77) || c === 85 || c === 86 ? 'snow'
+    : (c >= 61 && c <= 65) || (c >= 80 && c <= 82) ? 'rain'
+    : c >= 51 && c <= 55 ? 'drizzle'
+    : c === 45 || c === 48 ? 'fog'
+    : c === 3 ? 'cloudy' : c === 2 ? 'partly' : 'clear';
+  const rank = ['clear', 'partly', 'cloudy', 'fog', 'drizzle', 'freezing drizzle', 'rain', 'freezing rain', 'snow', 'storm', 'hailstorm'];
   const count = {};
   codes.forEach((c) => { const k = cat(c); count[k] = (count[k] || 0) + 1; });
   return Object.keys(count).sort((a, b) => count[b] - count[a] || rank.indexOf(b) - rank.indexOf(a))[0];
@@ -1071,23 +1124,41 @@ function renderHero() {
   const { rows, loc } = st.model;
   const valid = rows.map(anomOf).filter(isNum);
   const avg = valid.length >= 7 ? mean(valid) : null;
-  $('#head').textContent = avg == null ? `The next ${DAYS} days`
+  $('#head').textContent = avg == null ? 'Forecast outlook'
     : Math.round(avg) >= 2 ? 'Warmer than average' : Math.round(avg) <= -2 ? 'Cooler than average' : 'Close to average';
-  $('#where').innerHTML = [`${loc.name}, ${loc.region}`, `next ${DAYS} days`].map((t) => `<span>${esc(t)}</span>`).join('');
+  $('#head').classList.toggle('is-fallback', avg == null);
+  $('#where').innerHTML = `<span>${esc([loc.name, loc.region].filter(Boolean).join(', '))}</span>`;
 
-  $('#tag').textContent = `${DAYS}-day outlook`;
-  $('#cal-title small').textContent = `next ${DAYS} days`;
-  const f = [];
-  if (avg != null) {
-    const r = Math.round(st.unit === 'c' ? avg * 5 / 9 : avg);
-    f.push(r === 0 ? '<i>highs</i><b>at average</b>' : `<i>highs</i><b>${TD(avg)}°</b> vs average`);
-  }
-  const wet = Math.round(rows.reduce((a, r) => a + (r.pop || 0), 0));
-  const nwet = rows.every((r) => r.n) ? Math.round(rows.reduce((a, r) => a + r.n.wet, 0)) : null;
-  f.push(`<i>rainy days</i><b>${wet}</b>${nwet != null ? ` (average ${nwet})` : ''}`);
   const s = stretch(rows);
-  if (s) f.push(`<i>${s.word}</i><b>${s.range}</b>`);
-  $('#facts').innerHTML = f.map((x) => `<span>${x}</span>`).join('');
+  const hottest = rows.filter(r => isNum(r.hi)).reduce((a,r) => !a || r.hi > a.hi ? r : a, null);
+  const coldest = rows.filter(r => isNum(r.lo)).reduce((a,r) => !a || r.lo < a.lo ? r : a, null);
+  const trend = [];
+  if (avg != null) trend.push(`<span><i>highs</i><b>${Math.round(avg) === 0 ? 'at average' : `${TD(avg)}° vs average`}</b></span>`);
+  if (hottest) trend.push(`<span><i>warmest date</i><b>${esc(label(hottest.date))} · ${T(hottest.hi)}°</b></span>`);
+  if (coldest) trend.push(`<span><i>coldest date</i><b>${esc(label(coldest.date))} · ${T(coldest.lo)}°</b></span>`);
+  if (s) trend.push(`<span><i>${s.word} stretch</i><b>${s.range}</b></span>`);
+  $('#facts').innerHTML = `<span class="hero-day" id="hero-day"></span><span class="trend-label">overall trend</span>${trend.join('')}`;
+  renderHeroDay();
+}
+
+function dayDescription(r) {
+  const labels = { clear: 'Clear', partly: 'Partly cloudy', cloudy: 'Cloudy', fog: 'Foggy', drizzle: 'Drizzle', 'freezing drizzle': 'Freezing drizzle', rain: 'Rain', 'freezing rain': 'Freezing rain', snow: 'Snow', storm: 'Thunderstorms', hailstorm: 'Thunderstorms with possible hail' };
+  const wx = labels[r.wx];
+  const high = isNum(r.hi) ? `high near ${T(r.hi)}°` : 'high unavailable';
+  const low = isNum(r.lo) ? `low near ${T(r.lo)}°` : 'low unavailable';
+  const type = ['drizzle', 'freezing drizzle', 'rain', 'freezing rain', 'snow', 'storm', 'hailstorm'].includes(r.wx) ? r.wx : 'precip';
+  const precip = isNum(r.pop) ? `${pct(r.pop)} chance of ${type}` : '';
+  const weather = wx ? `${wx} conditions. ` : '';
+  return `${weather}With a ${high} and ${low}.${precip ? ` ${precip}.` : ''}`;
+}
+
+function renderHeroDay() {
+  const el = $('#hero-day');
+  if (!el || !st.model) return;
+  const r = st.model.rows[st.sel == null ? 0 : st.sel];
+  if (!r) return;
+  const name = r.d === 0 ? 'Today' : `${dowOf(r.date)} ${label(r.date)}`;
+  el.innerHTML = `<strong>${esc(name)}:</strong> ${esc(dayDescription(r))}`;
 }
 
 function renderWeek() {
@@ -1104,7 +1175,7 @@ function renderWeek() {
     const nm = r.n ? `<i class="nm" style="left:${pos(r.n.lo)}%;width:${wid(r.n.lo, r.n.hi)}%"></i>` : '';
     const fc = isNum(r.hi) && isNum(r.lo) ? `<i class="fc" style="left:${pos(r.lo)}%;width:${wid(r.lo, r.hi)}%"></i>` : '';
     const rain = isNum(r.pop) && r.pop >= 0.2 ? pct(r.pop) : '';
-    const aria = `${i === 0 ? 'today' : dowOf(r.date) + ' ' + label(r.date)}: high ${T(r.hi)}, low ${T(r.lo)}${rain ? ', ' + rain + ' chance of rain' : ''}`;
+    const aria = `${i === 0 ? 'today' : dowOf(r.date) + ' ' + label(r.date)}: high ${T(r.hi)}, low ${T(r.lo)}${rain ? ', ' + rain + ' chance of precipitation' : ''}`;
     return `<li class="drow${open ? ' open' : ''}">`
       + `<button type="button" class="dbtn" data-i="${i}" aria-expanded="${open}" aria-label="${esc(aria)}" style="--o:${ink(r.conf)}">`
       + `<span class="dn">${name}</span><span class="wx">${r.wx || ''}</span>`
@@ -1142,7 +1213,7 @@ function renderSignals() {
   const lines = [
     ['peak high', hottest, hottest ? `${T(hottest.hi)}°` : 'unavailable', hottest ? label(hottest.date) : ''],
     ['coldest low', coolest, coolest ? `${T(coolest.lo)}°` : 'unavailable', coolest ? label(coolest.date) : ''],
-    ['rain chance', wettest, wettest ? pct(wettest.pop) : 'unavailable', wettest ? label(wettest.date) : ''],
+    ['precipitation chance', wettest, wettest ? pct(wettest.pop) : 'unavailable', wettest ? label(wettest.date) : ''],
     ['warm anomaly', warmest && warmest.r, warmest ? `${TD(warmest.a)}°` : 'unavailable', warmest ? `${label(warmest.r.date)} vs 30-year avg` : '']
   ];
   $('#signals').innerHTML = lines.map(([key, r, value, sub]) => `<div class="signal-row"><span class="signal-key">${key}</span><span class="signal-value">${value}<span class="signal-sub">${esc(sub)}</span></span></div>`).join('');
@@ -1174,7 +1245,7 @@ function renderWeeks() {
     }
     const range = rangeLabel(rs[0].date, rs[rs.length - 1].date);
     const cw = confWord(c);
-    const aria = `${range}: highs ${isNum(a) ? TD(a) + ' degrees vs average' : T(hi)}, rain ${rain}, ${cw} confidence`;
+    const aria = `${range}: highs ${isNum(a) ? TD(a) + ' degrees vs average' : T(hi)}, precipitation ${rain}, ${cw} confidence`;
     out.push(`<li class="wrow" style="--o:${ink(c)}" aria-label="${esc(aria)}" title="${esc(range)}">`
       + `<span class="wd">${label(rs[0].date)}</span>`
       + `<span class="wa">${isNum(a) ? TD(a) + '°' : ''}</span>`
@@ -1190,6 +1261,37 @@ function renderWeeks() {
     + (fade ? ` After ${label(addDays(fade.date, -1))}, read these as tendencies, not exact numbers.` : '');
 }
 
+function tinyWx(r) {
+  // Minimal, near-square weather line art. If model codes are missing or mixed,
+  // Without a weather code, avoid guessing rain or snow from precipitation totals alone.
+  let wx = r.wx;
+  if (!wx || wx === 'variable' || wx === 'unknown' || wx === 'mixed') {
+    const p = isNum(r.pop) ? r.pop : 0;
+    const amount = isNum(r.rainIf) ? r.rainIf : 0;
+    if (p >= 0.35) wx = 'partly';
+    else if (p >= 0.18) wx = 'partly';
+    else wx = 'clear';
+  }
+  if (wx === 'freezing drizzle') wx = 'drizzle';
+  if (wx === 'freezing rain') wx = 'rain';
+  if (wx === 'hailstorm') wx = 'storm';
+  const icons = {
+    clear: `<circle cx="12" cy="12" r="4"/><path d="M12 2.5v2.2M12 19.3v2.2M2.5 12h2.2M19.3 12h2.2M5.3 5.3l1.6 1.6M17.1 17.1l1.6 1.6M18.7 5.3l-1.6 1.6M6.9 17.1l-1.6 1.6"/>`,
+    partly: `<circle cx="8" cy="8" r="3.1"/><path d="M8 2.1v1.5M8 12.4v1.5M2.1 8h1.5M12.4 8h1.5M3.8 3.8l1.1 1.1M11.1 11.1l1.1 1.1"/><path d="M7 18.5h11.1a3.1 3.1 0 0 0 .2-6.2 5.2 5.2 0 0 0-9.8-1.1A3.7 3.7 0 0 0 7 18.5Z"/>`,
+    cloudy: `<path d="M6.5 18.2h11a3.4 3.4 0 0 0 .1-6.8 5.3 5.3 0 0 0-10-1.1 3.9 3.9 0 0 0-1.1 7.9Z"/>`,
+    fog: `<path d="M5 8.5h13M3 12h18M5 15.5h13M7 19h10"/>`,
+    drizzle: `<path d="M6.5 14.5h11a3.2 3.2 0 0 0 .1-6.4 5.1 5.1 0 0 0-9.7-1 3.7 3.7 0 0 0-1.4 7.4Z"/><path d="M8 17.2l-.7 1.5M13 17.2l-.7 1.5M18 17.2l-.7 1.5"/>`,
+    rain: `<path d="M6.5 13.5h11a3.2 3.2 0 0 0 .1-6.4 5.1 5.1 0 0 0-9.7-1 3.7 3.7 0 0 0-1.4 7.4Z"/><path d="m8 16-1 2.5M13 16l-1 2.5M18 16l-1 2.5"/>`,
+    snow: `<path d="M6.5 12.5h11a3.2 3.2 0 0 0 .1-6.4 5.1 5.1 0 0 0-9.7-1 3.7 3.7 0 0 0-1.4 7.4Z"/><path d="M8 16v4M6.3 17l3.4 2M9.7 17l-3.4 2M16 16v4M14.3 17l3.4 2M17.7 17l-3.4 2"/>`,
+    storm: `<path d="M6.5 13.5h11a3.2 3.2 0 0 0 .1-6.4 5.1 5.1 0 0 0-9.7-1 3.7 3.7 0 0 0-1.4 7.4Z"/><path d="m13 14-3 4h2l-1 3 4-5h-2l1-2"/>`
+  };
+  return `<svg viewBox="0 0 24 24" focusable="false" aria-hidden="true"><g>${icons[wx] || icons.clear}</g></svg>`;
+}
+function precipTypeLabel(r) {
+  const labels = { rain: 'rain', drizzle: 'drizzle', 'freezing rain': 'freezing rain', 'freezing drizzle': 'freezing drizzle', snow: 'snow', storm: 'thunderstorms', hailstorm: 'hail' };
+  return labels[r.wx] || 'precip';
+}
+
 function renderCal() {
   const rows = st.model.rows;
   const lead = (parseD(rows[0].date).getUTCDay() + 6) % 7;
@@ -1199,12 +1301,12 @@ function renderCal() {
     const dn = parseD(r.date).getUTCDate();
     const dl = i === 0 || dn === 1 ? label(r.date) : String(dn);
     const p = isNum(r.pop) && r.pop >= 0.2 ? r.pop : 0;
-    const aria = `${dowOf(r.date)} ${label(r.date)}${i === 0 ? ', today' : ''}: high ${T(r.hi)}, low ${T(r.lo)}${p ? ', ' + pct(r.pop) + ' chance of rain' : ''}`;
+    const aria = `${dowOf(r.date)} ${label(r.date)}${i === 0 ? ', today' : ''}: high ${T(r.hi)}, low ${T(r.lo)}${p ? ', ' + pct(r.pop) + ' chance of ' + precipTypeLabel(r) : ''}`;
     h += `<button type="button" class="cell${i === 0 ? ' today' : ''}" data-i="${i}" aria-pressed="${st.sel === i}" aria-label="${esc(aria)}" style="--o:${inkCal(r.conf)};--rp:${p.toFixed(2)}">`
-      + `<span class="d">${dl}</span>`
+      + `<span class="dayhead"><span class="d">${dl}</span><span class="wxmini" aria-hidden="true">${tinyWx(r)}</span></span>`
       + `<span class="hi v">${isNum(r.hi) ? T(r.hi) : '·'}</span>`
       + `<span class="lo v">${T(r.lo)}</span>`
-      + `<span class="rn v${p >= 0.5 ? ' wet' : ''}">${p ? `<span class="rl">rain </span>${pct(p)}` : ''}</span>`
+      + `<span class="rn v${p >= 0.5 ? ' wet' : ''}">${p ? `<span class="rl">${esc(precipTypeLabel(r))} </span>${pct(p)}` : ''}</span>`
       + '</button>';
   });
   const trail = (7 - ((lead + rows.length) % 7)) % 7;
@@ -1215,7 +1317,7 @@ function renderCal() {
 function readoutHTML(r) {
   const name = r.d === 0 ? 'today' : `${dowOf(r.date)} ${label(r.date)}`;
   const bits = [`<i>high</i>${T(r.hi)}°`, `<i>low</i>${T(r.lo)}°`];
-  if (isNum(r.pop)) bits.push(`<i>rain</i>${pct(r.pop)}`);
+  if (isNum(r.pop)) bits.push(`<i>precip</i>${pct(r.pop)}`);
   if (r.n) bits.push(`<i>average</i>${T(r.n.hi)}° / ${T(r.n.lo)}°`);
   return `<b>${name}</b>` + bits.map((b) => `<span>${b}</span>`).join('');
 }
@@ -1233,7 +1335,7 @@ function renderCalDetail() {
   el.className = 'cdet open';
   const name = `${dowOf(r.date)} ${label(r.date)}`;
   const when = r.d === 0 ? 'today' : r.d === 1 ? 'tomorrow' : `in ${r.d} days`;
-  const rainTxt = isNum(r.pop) ? `rain ${pct(r.pop)}` : '';
+  const rainTxt = isNum(r.pop) ? `precip ${pct(r.pop)}` : '';
 
   const kv = [];
   if (r.n && isNum(r.hi)) {
@@ -1242,8 +1344,8 @@ function renderCalDetail() {
     kv.push(['average', `${T(r.n.hi)}° / ${T(r.n.lo)}°`]);
   }
   if (isNum(r.p10) && isNum(r.p90)) kv.push(['likely high', `${T(r.p10)}° to ${T(r.p90)}°`]);
-  if (isNum(r.pop) && r.pop >= 0.2 && isNum(r.rainIf)) kv.push(['rain', `${pct(r.pop)} chance, ${r.rainIf < 0.05 && st.unit !== 'c' ? 'light if it does' : 'about ' + P(r.rainIf) + ' if it does'}`]);
-  else if (isNum(r.pop)) kv.push(['rain', `${pct(r.pop)} chance, probably dry`]);
+  if (isNum(r.pop) && r.pop >= 0.2 && isNum(r.rainIf)) kv.push(['precip', `${pct(r.pop)} chance, ${r.rainIf < 0.05 && st.unit !== 'c' ? 'light if it does' : 'about ' + P(r.rainIf) + ' if it does'}`]);
+  else if (isNum(r.pop)) kv.push(['precip', `${pct(r.pop)} chance, probably dry`]);
   const cw = confWord(r.conf);
   kv.push(['confidence', `${cw}, ${cw === 'high' ? 'the forecasts agree closely' : cw === 'medium' ? 'the forecasts roughly agree' : 'the forecasts disagree, treat it as a tendency'}`]);
   const srcs = st.model.perSource(r.date);
@@ -1256,7 +1358,7 @@ function renderCalDetail() {
     const extra = s2.n ? `<span class="src-runs">${s2.n} runs, </span><span class="src-range">high ${T(s2.r10)} to ${T(s2.r90)}</span>` : '';
     return `<div class="src-row"><span class="src-name">${esc(s2.name)}</span><span class="src-temp">${t}</span><span class="src-rain">${p}</span><span class="src-extra">${extra}</span></div>`;
   });
-  const head = `<div class="src-row src-head"><span>source</span><span>high / low</span><span>rain</span><span></span></div>`;
+  const head = `<div class="src-row src-head"><span>source</span><span>high / low</span><span>precip</span><span></span></div>`;
   // Clean outline-style ASCII weather icons inspired by classic weather pictograms.
   const wet = isNum(r.pop) && r.pop >= 0.35;
   const showery = isNum(r.pop) && r.pop >= 0.12;
@@ -1288,7 +1390,7 @@ function renderCalDetail() {
 
   el.innerHTML = `<div class="cdet-top"><b>${name}</b><span class="ago">${when}</span></div>`
     + `<div class="cdet-body">`
-    + `<div class="cdet-main"><div class="cdet-temp"><span class="h">${T(r.hi)}°</span><span class="l">${T(r.lo)}°</span>${rainTxt ? `<span class="r${r.pop >= 0.5 ? ' wet' : ''}">${rainTxt}</span>` : ''}</div><div class="cdet-text" style="margin-top:16px"><p><span class="hint">day range</span> &nbsp; ${Math.abs(cv(r.hi)-cv(r.lo)).toFixed(0)}° between high and low</p><p class="sub">${isNum(r.pop) ? `${pct(r.pop)} precipitation probability` : 'Precipitation probability unavailable'}</p><p class="sub">${r.reach} of ${st.model.srcCount} forecast sources contribute to this date</p></div></div>`
+    + `<div class="cdet-main"><div class="cdet-temp"><span class="h">${T(r.hi)}°</span><span class="l">${T(r.lo)}°</span>${rainTxt ? `<span class="r${r.pop >= 0.5 ? ' wet' : ''}">${rainTxt}</span>` : ''}</div><div class="cdet-text" style="margin-top:16px"><p class="selected-desc">${esc(dayDescription(r))}</p><p><span class="hint">day range</span> &nbsp; ${Math.abs(cv(r.hi)-cv(r.lo)).toFixed(0)}° between high and low</p><p class="sub">${isNum(r.pop) ? `${pct(r.pop)} precipitation probability` : 'Precipitation probability unavailable'}</p><p class="sub">${r.reach} of ${st.model.srcCount} forecast sources contribute to this date</p></div></div>`
     + `<aside class="cdet-side"><dl class="kv">${kv.map(([k, v]) => `<dt>${k}</dt><dd>${v}</dd>`).join('')}</dl></aside>`
     + `</div>`
     + `${rowsTxt.length ? `<div class="src">${head}\n${rowsTxt.join('\n')}</div>` : ''}`;
@@ -1358,7 +1460,7 @@ function renderChart() {
     s += `<rect class="rain" x="${f1(x(i) - bw / 2)}" y="${f1(ry + rh - h)}" width="${f1(bw)}" height="${f1(h)}" fill-opacity="${(0.25 + 0.75 * r.conf).toFixed(2)}"/>`;
   });
   s += `<line class="base" x1="${m.l}" x2="${W - m.r}" y1="${ry + rh}" y2="${ry + rh}"/>`;
-  s += `<text x="${m.l - 6}" y="${ry + rh}" text-anchor="end">rain</text>`;
+  s += `<text x="${m.l - 6}" y="${ry + rh}" text-anchor="end">precip</text>`;
   s += `<text x="${m.l + 4}" y="${m.t + 10}">°${st.unit.toUpperCase()}</text>`;
   const sx = f1(x(st.sel == null ? 0 : st.sel));
   s += `<line class="sel" id="selLine" x1="${sx}" x2="${sx}" y1="${m.t}" y2="${ry + rh}" style="visibility:${st.sel == null ? 'hidden' : 'visible'}"/>`;
@@ -1425,6 +1527,7 @@ function select(i) {
   st.sel = i;
   document.querySelectorAll('#cal .cell[data-i]').forEach((c) => c.setAttribute('aria-pressed', String(+c.dataset.i === st.sel)));
   renderCalDetail();
+  renderHeroDay();
   renderTrendReadout();
   setLine(st.sel);
 }
@@ -1435,12 +1538,13 @@ const form = $('#ask');
 /* ---------- run ---------- */
 let runId = 0;
 
-async function run(zip) {
+async function run(query) {
   const my = ++runId;
-  autoZip = zip;
-  store.set('lc:last', zip);
-  try { const th=(location.hash||'').match(/~[0-9a-f]{6}-[0-9a-f]{6}-\d{3}$/i); history.replaceState(null, '', '#' + zip + (th ? th[0] : '')); } catch (e) {}
-  zipEl.value = zip;
+  query = String(query || '').trim().replace(/\s+/g, ' ');
+  autoZip = query;
+  store.set('lc:last', query);
+  try { const th=(location.hash||'').match(/~[0-9a-f]{6}-[0-9a-f]{6}-\d{3}$/i); history.replaceState(null, '', '#' + encodeURIComponent(query) + (th ? th[0] : '')); } catch (e) {}
+  zipEl.value = query;
   moveCur();
   body.classList.remove('idle', 'ready');
   body.classList.add('loading');
@@ -1448,27 +1552,27 @@ async function run(zip) {
   const L = makeLog($('#log'));
   L.clear();
   L.add('loc', 'locating');
-  setStatus(`${zip}  locating`, '');
+  setStatus(`${query}  locating`, '');
 
   let loc;
-  try { loc = await locate(zip); }
+  try { loc = await locate(query); }
   catch (e) {
     if (my !== runId) return;
     L.set('loc', 'fail', e.network ? 'blocked or offline' : '');
-    L.msg(e.network ? BLOCKED : `No place found for ${zip}. Check the 5-digit zip and try again.`);
-    setStatus(`${zip}  ${e.network ? 'offline' : 'no match'}`, e.network ? 'check connection / retry' : 'check ZIP / retry');
+    L.msg(e.network ? BLOCKED : `No place found for “${query}”. Try a more specific place, include the country, or enter latitude, longitude.`);
+    setStatus(`${query}  ${e.network ? 'offline' : 'no match'}`, e.network ? 'check connection / retry' : 'refine location / retry');
     body.classList.remove('loading');
     if (st.model) body.classList.add('ready');
     return;
   }
   if (my !== runId) return;
-  loc.zip = zip;
+  loc.query = query;
   L.set('loc', 'ok', `${loc.name}, ${loc.region}`.toLowerCase());
 
   const base = { latitude: loc.lat.toFixed(4), longitude: loc.lon.toFixed(4), timezone: 'auto', temperature_unit: 'fahrenheit', precipitation_unit: 'inch' };
   const tasks = [];
   let done = 0;
-  const tick = () => { done++; setStatus(`${zip}  loading`, `${done}/${tasks.length} sources`); };
+  const tick = () => { done++; setStatus(`${query}  loading`, `${done}/${tasks.length} sources`); };
   const add = (key, name, fn, describe) => {
     L.add(key, name);
     tasks.push(fn().then(
@@ -1511,7 +1615,7 @@ async function run(zip) {
   const timed = srcs.filter((s) => s.time && s.time.length);
   if (!timed.length) {
     L.msg(BLOCKED);
-    setStatus(`${zip}  unavailable`, 'retry or check connection');
+    setStatus(`${query}  unavailable`, 'retry or check connection');
     body.classList.remove('loading');
     if (st.model) body.classList.add('ready');
     return;
@@ -1545,35 +1649,29 @@ function moveCur() {
 }
 ['input', 'keyup', 'click', 'focus', 'blur', 'select'].forEach((ev) => zipEl.addEventListener(ev, () => requestAnimationFrame(moveCur)));
 zipEl.addEventListener('input', () => {
-  const v = zipEl.value.replace(/\D/g, '').slice(0, 5);
-  if (v !== zipEl.value) zipEl.value = v;
-  // A ZIP is queried only on explicit submit, matching the terminal-style [ enter ] control.
-  if (v.length < 5) autoZip = null;
+  const v = zipEl.value;
+  if (v.trim() !== autoZip) autoZip = null;
   zipEl.removeAttribute('aria-invalid');
   moveCur();
 });
 form.addEventListener('submit', (e) => {
   e.preventDefault();
-  const v = zipEl.value.replace(/\D/g, '');
-  if (/^\d{5}$/.test(v)) {
-    if (v !== autoZip || !st.model || st.model.loc.zip !== v || st.model.rows.length !== DAYS) run(v);
+  const v = zipEl.value.trim().replace(/\s+/g, ' ');
+  if (v) {
+    if (v !== autoZip || !st.model || st.model.loc.query !== v || st.model.rows.length !== DAYS) run(v);
   } else {
     const L = makeLog($('#log'));
     L.clear();
-    L.msg('Enter a 5-digit US ZIP code.');
+    L.msg('Enter a city, region, country, postal code, or latitude and longitude.');
     zipEl.setAttribute('aria-invalid', 'true');
     zipEl.focus();
-    setStatus('invalid input', 'enter 5 digits');
+    setStatus('location needed', 'enter a place');
   }
 });
 $('#cal').addEventListener('click', (e) => {
   const c = e.target.closest('.cell[data-i]');
   if (!c) return;
   select(+c.dataset.i);
-  {
-    const reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    $('#cdet').scrollIntoView({ block: 'nearest', behavior: reduce ? 'auto' : 'smooth' });
-  }
 });
 $('#week').addEventListener('click', (e) => {
   const b = e.target.closest('.dbtn');
@@ -1600,7 +1698,7 @@ $('#home').addEventListener('click', (e) => {
   $('#out').hidden = true;
   $('#log').innerHTML = '';
   zipEl.value = '';
-  setStatus('type a zip code', '');
+  setStatus('search any location', '');
   zipEl.focus();
   moveCur();
 });
@@ -1628,11 +1726,11 @@ const themes = {
   plum: {bg:'#251d2d',ink:'#e6c9ff',weight:400}
 };
 const palette = ['#ffffff','#f3ead7','#d9eee5','#b9d5f0','#173b70','#101419','#251d2d','#000000','#352c20','#174d43','#ffe66d','#e6c9ff'];
-function currentZipFromHash(){ const m=(location.hash||'').match(/^#(\d{5})/); return m ? m[1] : ''; }
+function currentLocationFromHash(){ const raw=(location.hash||'').slice(1).replace(/~[0-9a-f]{6}-[0-9a-f]{6}-\d{3}$/i,''); try{return decodeURIComponent(raw);}catch(e){return raw;} }
 function updateShareHash(bg, ink, weight){
-  const zip=currentZipFromHash();
+  const place=currentLocationFromHash();
   const suffix=`~${bg.slice(1).toLowerCase()}-${ink.slice(1).toLowerCase()}-${weight}`;
-  try { history.replaceState(null,'',location.pathname+location.search+'#'+(zip||'')+suffix); } catch(e) {}
+  try { history.replaceState(null,'',location.pathname+location.search+'#'+(place?encodeURIComponent(place):'')+suffix); } catch(e) {}
 }
 function validHex(v){ return /^#[0-9a-f]{6}$/i.test(v); }
 function rgb(hex){return [1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255).map(v=>v<=.04045?v/12.92:Math.pow((v+.055)/1.055,2.4));}
@@ -1702,10 +1800,9 @@ const hashTheme=(location.hash||'').match(/~([0-9a-f]{6})-([0-9a-f]{6})-(\d{3})$
 if(hashTheme){applyTheme('#'+hashTheme[1],'#'+hashTheme[2],Number(hashTheme[3]),'custom',false,false);}
 else {try{const saved=JSON.parse(localStorage.getItem('lc:appearance')||'null');if(saved&&validHex(saved.bg)&&validHex(saved.ink))applyTheme(saved.bg,saved.ink,Math.max(200,Math.min(600,Number(saved.weight)||400)),saved.name||'custom',false,true);}catch(e){}}
 document.querySelectorAll('.units button[data-u]').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.u === st.unit)));
-const hashZipMatch = (location.hash || '').match(/^#(\d{5})/);
-const fromHash = hashZipMatch ? hashZipMatch[1] : '';
-const first = /^\d{5}$/.test(fromHash) ? fromHash : store.get('lc:last');
-if (first && /^\d{5}$/.test(first)) run(first);
+const fromHash = currentLocationFromHash();
+const first = fromHash || store.get('lc:last');
+if (first && String(first).trim()) run(first);
 else zipEl.focus();
 })();
 </script>

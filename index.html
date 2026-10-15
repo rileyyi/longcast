@@ -2197,6 +2197,8 @@ form.addEventListener('submit', (e) => {
   e.preventDefault();
   const v = zipEl.value.trim().replace(/\s+/g, ' ');
   if (v) {
+    zipEl.blur();                         // drop the cursor and put the on-screen keyboard away
+    window.scrollTo(0, 0);                // stay at the top (phones can shift the page while the keyboard is up)
     if (body.classList.contains('loading') && v === autoZip) return;   // already loading this place
     if (v !== autoZip || !st.model || st.model.loc.query !== v || st.model.rows.length !== DAYS) run(v);
   } else {

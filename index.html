@@ -386,10 +386,6 @@ footer p{margin:0 0 4px}
 .cell{border-bottom:1px dashed var(--rule-fixed)}
 
 /* calendar: today in inverse like cal(1), selected day fully inverse */
-.cell[aria-pressed="true"]{background:var(--sel-bg,#000) !important;color:var(--sel-ink,#fff) !important;box-shadow:none !important}
-.cell[aria-pressed="true"] *,.cell[aria-pressed="true"] .d,.cell[aria-pressed="true"] .lo,.cell[aria-pressed="true"] .rn,.cell[aria-pressed="true"] .hi,.cell.today[aria-pressed="true"] .d{color:var(--sel-ink,#fff) !important;background-color:transparent !important}
-.cell[aria-pressed="true"] .wxmini{color:var(--sel-ink,#fff) !important}
-.cell[aria-pressed="true"] .v{opacity:1 !important}
 .cell::before{display:none !important}
 
 .cell:hover:not(.blank):not([aria-pressed="true"]){background:var(--hover)}
@@ -622,8 +618,8 @@ footer{border-top:1px dashed var(--rule-fixed)}
    drops under the date instead of spilling into the next day when there is no room */
 .cal{container-type:inline-size;container-name:cal}
 .cal .cell{--cw:calc(100cqi / 7);
-  padding-left:clamp(3px, calc(var(--cw) * .07), 8px);
-  padding-right:clamp(4px, calc(var(--cw) * .1), 10px)}
+  padding-left:calc(clamp(3px, calc(var(--cw) * .07), 8px) + 3px);
+  padding-right:calc(clamp(4px, calc(var(--cw) * .1), 10px) + 3px)}
 .cal .cell .dayhead{flex-wrap:wrap;align-items:center;row-gap:2px;
   column-gap:clamp(2px, calc(var(--cw) * .05), 6px);line-height:normal;min-width:0}
 .cal .cell .d{--chip:clamp(1px, calc(var(--cw) * .035), 4px);
@@ -785,6 +781,15 @@ body.loading .out.booting:not([hidden]){opacity:1}
   .ml-cur{animation:none}
   .ml-bar i{transition:none}
 }
+
+/* selected day: no color change, just a dot-matrix frame in the theme's ink */
+.cell[aria-pressed="true"]{background:transparent !important;box-shadow:none !important}
+.cell[aria-pressed="true"] .wxmini{color:inherit !important}
+.cell[aria-pressed="true"]::after{content:"";position:absolute;inset:1px;pointer-events:none;
+  background-image:radial-gradient(circle,var(--ink) .9px,transparent 1.25px),radial-gradient(circle,var(--ink) .9px,transparent 1.25px),
+    radial-gradient(circle,var(--ink) .9px,transparent 1.25px),radial-gradient(circle,var(--ink) .9px,transparent 1.25px);
+  background-size:4px 4px;background-repeat:repeat-x,repeat-x,repeat-y,repeat-y;
+  background-position:0 0,0 100%,0 0,100% 0}
 
 </style>
 </head>
@@ -2286,38 +2291,6 @@ function accessibleInk(bg,ink){
   for(let i=0;i<18;i++){const t=(lo+hi)/2;const c='#'+[1,3,5].map(k=>Math.round(parseInt(ink.slice(k,k+2),16)*(1-t)+parseInt(target.slice(k,k+2),16)*t).toString(16).padStart(2,'0')).join('');if(contrast(bg,c)>=4.5){best=c;hi=t;}else lo=t;}
   return best;
 }
-/* Selected-day highlight: the theme background, darkened (same hue and saturation) until white
-   text reads clearly on it. Very dark themes can't get darker in a visible way, so they get a
-   slightly lighter shade instead. */
-function hexToHsl(hex){
-  const [r,g,b]=[1,3,5].map(i=>parseInt(hex.slice(i,i+2),16)/255);
-  const mx=Math.max(r,g,b), mn=Math.min(r,g,b), l=(mx+mn)/2, d=mx-mn;
-  let h=0, s2=0;
-  if(d){ s2=d/(1-Math.abs(2*l-1)); h=mx===r?((g-b)/d)%6:mx===g?(b-r)/d+2:(r-g)/d+4; h*=60; if(h<0)h+=360; }
-  return [h,s2,l];
-}
-function hslToHex(h,s2,l){
-  const c=(1-Math.abs(2*l-1))*s2, x=c*(1-Math.abs((h/60)%2-1)), m=l-c/2;
-  const [r,g,b]=h<60?[c,x,0]:h<120?[x,c,0]:h<180?[0,c,x]:h<240?[0,x,c]:h<300?[x,0,c]:[c,0,x];
-  return '#'+[r,g,b].map(v=>Math.round((v+m)*255).toString(16).padStart(2,'0')).join('');
-}
-function selectedShade(bg){
-  const [h,s2,l]=hexToHsl(bg), white='#ffffff';
-  const sd=Math.min(s2,0.75);                  // pastel themes would turn neon when darkened; keep them muted
-  for(let L=l; L>=0.04; L-=0.01){            // darken until white text is comfortable and the cell stands out
-    const c=hslToHex(h,sd,L);
-    if(contrast(c,white)>=6 && contrast(c,bg)>=1.35) return c;
-  }
-  for(let L=l; L<=0.6; L+=0.01){             // very dark themes: step lighter instead
-    const c=hslToHex(h,Math.min(1,s2*1.1),L);
-    if(contrast(c,bg)>=1.45 && contrast(c,white)>=4.5) return c;
-  }
-  return hslToHex(h,s2,Math.max(0.04,l-0.08));
-}
-function setSelectedColors(bg){
-  document.documentElement.style.setProperty('--sel-bg', selectedShade(bg));
-  document.documentElement.style.setProperty('--sel-ink', '#ffffff');
-}
 function syncColorUI(bg,ink){
   bgChip.style.background=bg; inkChip.style.background=ink;
   document.querySelectorAll('#bgSwatches .color-swatch').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.color===bg.toLowerCase())));
@@ -2332,7 +2305,6 @@ function applyTheme(bg, ink, weight, name='custom', save=true, share=true) {
   document.documentElement.style.setProperty('--ink-2','color-mix(in srgb,var(--ink) 88%,var(--paper))');
   document.documentElement.style.setProperty('--ink-3','color-mix(in srgb,var(--ink) 72%,var(--paper))');
   document.documentElement.style.setProperty('--base-weight', String(weight));
-  setSelectedColors(bg);
   document.body.style.fontWeight=String(weight);
   themeBg.value=bg; themeInk.value=ink; themeWeight.value=String(weight); weightValue.value=String(weight);
   document.querySelectorAll('.theme-preset').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.theme===name)));
@@ -2374,7 +2346,6 @@ document.getElementById('copyThemeUrl').addEventListener('click',async()=>{
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!themePanel.hidden)closeThemePanel(true);});
 // Restore explicit theme settings from the URL first, then local preference if no URL theme exists.
 const hashTheme=(location.hash||'').match(/~([0-9a-f]{6})-([0-9a-f]{6})-(\d{3})$/i);
-{ const p=getComputedStyle(document.documentElement).getPropertyValue('--paper').trim(); setSelectedColors(validHex(p)?p:'#ffffff'); }
 if(hashTheme){applyTheme('#'+hashTheme[1],'#'+hashTheme[2],Number(hashTheme[3]),'custom',false,false);}
 else {try{const saved=JSON.parse(localStorage.getItem('lc:appearance')||'null');if(saved&&validHex(saved.bg)&&validHex(saved.ink))applyTheme(saved.bg,saved.ink,Math.max(200,Math.min(600,Number(saved.weight)||400)),saved.name||'custom',false,true);}catch(e){}}
 document.querySelectorAll('.units button[data-u]').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.u === st.unit)));

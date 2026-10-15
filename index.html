@@ -791,6 +791,10 @@ body.loading .out.booting:not([hidden]){opacity:1}
   background-size:4px 4px;background-repeat:repeat-x,repeat-x,repeat-y,repeat-y;
   background-position:0 0,0 100%,0 0,100% 0}
 
+/* the selected-day text block keeps one height for every date (set from the longest one) */
+.out .hero{position:relative}
+.hero-sel{display:flow-root}
+
 </style>
 </head>
 <body class="idle">
@@ -841,8 +845,10 @@ body.loading .out.booting:not([hidden]){opacity:1}
   <section class="out" id="out" hidden>
     <div class="hero">
       <p class="facts" id="facts"></p>
-      <h1 class="head" id="head"></h1>
-      <p class="hero-day" id="hero-day"></p>
+      <div class="hero-sel" id="heroSel">
+        <h1 class="head" id="head"></h1>
+        <p class="hero-day" id="hero-day"></p>
+      </div>
     </div>
 
     <details class="module panel month" open=""><summary class="module-title" id="cal-title">calendar</summary>
@@ -1542,6 +1548,7 @@ function renderHero() {
 
   $('#facts').innerHTML = `<span class="trend-label">overall trend</span>${trend.join('')}`;
   renderHeroDay();
+  reserveHeroDay();
 }
 
 const FULLDOW = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
@@ -1576,16 +1583,48 @@ function dayDescription(r) {
   return `${weather}With a ${high} and ${low}.${precip ? ` ${precip}.` : ''}`;
 }
 
+function heroDayText(r, i) {
+  const name = r.d === 0 ? 'today' : `${dowOf(r.date)} ${label(r.date)}`;
+  const cmp = compareToPrev(r, i);
+  return [cmp ? `${name}: ${cmp}` : `${name}: high ${T(r.hi)}°, low ${T(r.lo)}°`, dayDescription(r)];
+}
 function renderHeroDay() {
   const el = $('#hero-day');
   if (!el || !st.model) return;
-  const r = st.model.rows[st.sel == null ? 0 : st.sel];
-  if (!r) return;
   const i = st.sel == null ? 0 : st.sel;
-  const name = r.d === 0 ? 'today' : `${dowOf(r.date)} ${label(r.date)}`;
-  const cmp = compareToPrev(r, i);
-  $('#head').textContent = cmp ? `${name}: ${cmp}` : `${name}: high ${T(r.hi)}°, low ${T(r.lo)}°`;
-  el.textContent = dayDescription(r);
+  const r = st.model.rows[i];
+  if (!r) return;
+  const [head, desc] = heroDayText(r, i);
+  $('#head').textContent = head;
+  el.textContent = desc;
+  const box = document.getElementById('heroSel');
+  if (box && box.style.height && box.scrollHeight > box.clientHeight + 1) reserveHeroDay();   // e.g. the font changed after measuring
+}
+/* Reserve room for the longest day description at the current width, so picking a date
+   never makes the text wrap onto a new line and push the page down. */
+function reserveHeroDay() {
+  const box = document.getElementById('heroSel');
+  if (!box || !st.model) return;
+  const width = box.getBoundingClientRect().width;      // exact, fractional width so text wraps exactly as it will on screen
+  if (!width) return;
+  const probe = box.cloneNode(true);
+  probe.removeAttribute('id');
+  probe.querySelectorAll('[id]').forEach((e) => e.removeAttribute('id'));
+  probe.setAttribute('aria-hidden', 'true');
+  probe.style.cssText = `position:absolute;left:0;top:0;width:${width}px;height:auto;min-height:0;visibility:hidden;pointer-events:none`;
+  box.parentNode.appendChild(probe);
+  const [h, d] = probe.children;
+  let max = 0;
+  st.model.rows.forEach((r, i) => {
+    const [head, desc] = heroDayText(r, i);
+    h.textContent = head; d.textContent = desc;
+    max = Math.max(max, probe.getBoundingClientRect().height);
+  });
+  probe.remove();
+  // A fixed whole-pixel height (not a minimum): text that is a fraction of a pixel taller or
+  // shorter can't nudge the page, because the box itself never changes size between dates.
+  box.style.minHeight = '';
+  box.style.height = Math.ceil(max) + 'px';
 }
 
 function renderWeek() {
@@ -2259,7 +2298,9 @@ document.addEventListener('keydown', (e) => {
   if (e.key === '/' && document.activeElement !== zipEl) { e.preventDefault(); zipEl.focus(); zipEl.select(); }
 });
 let rt;
-window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if (st.model) renderChart(); }, 120); });
+window.addEventListener('resize', () => { clearTimeout(rt); rt = setTimeout(() => { if (st.model) { renderChart(); reserveHeroDay(); } }, 120); });
+if (document.fonts && document.fonts.ready) document.fonts.ready.then(() => { if (st.model) reserveHeroDay(); });
+if (document.fonts && document.fonts.addEventListener) document.fonts.addEventListener('loadingdone', () => { if (st.model) reserveHeroDay(); });
 
 // Theme controls: high-contrast derived text colors, in-page swatches, and shareable URL settings.
 const themeButton = document.getElementById('themeButton');

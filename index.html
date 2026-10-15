@@ -826,7 +826,7 @@ body.loading .out.booting:not([hidden]){opacity:1}
     <div class="askmain">
     <form id="ask" autocomplete="off" novalidate="" aria-label="Find a weather outlook">
       <label for="zip" class="gt" aria-hidden="true">&gt;</label>
-      <span class="zipwrap"><input id="zip" name="location" type="text" inputmode="search" enterkeyhint="search" maxlength="120" autocomplete="off" placeholder="city, postal code, or coordinates" aria-label="Search any location worldwide by place name, postal code, or latitude and longitude" aria-describedby="ziphelp" spellcheck="false" title="Press / to jump here"><span class="cur" aria-hidden="true" style="--n: 5;"></span></span>
+      <span class="zipwrap"><input id="zip" name="location" type="text" inputmode="search" enterkeyhint="search" maxlength="120" autocomplete="off" placeholder="city, postal code, or coordinates" aria-label="Search any location worldwide by place name, postal code, or latitude and longitude" aria-describedby="ziphelp" spellcheck="false" title="Press / to jump here"><span class="cur" aria-hidden="true"></span></span>
       <button type="submit" class="go" aria-label="Get 35-day outlook">search</button>
     </form>
     <p class="where" id="where"></p>
@@ -2187,11 +2187,15 @@ let fitZip = () => {};
 let autoZip = null;
 const curEl = document.querySelector('.cur');
 function moveCur() {
-  const n = typeof zipEl.selectionStart === 'number' && document.activeElement === zipEl ? zipEl.selectionStart : zipEl.value.length;
+  // empty input: always under the first letter, right after the >
+  const n = !zipEl.value ? 0
+    : typeof zipEl.selectionStart === 'number' && document.activeElement === zipEl ? zipEl.selectionStart : zipEl.value.length;
   curEl.style.setProperty('--n', String(n));
-  curEl.style.setProperty('--sx', (zipEl.scrollLeft || 0) + 'px');   // follow the text when it scrolls
+  curEl.style.setProperty('--sx', (zipEl.value ? zipEl.scrollLeft || 0 : 0) + 'px');   // follow the text when it scrolls
 }
-['input', 'keyup', 'click', 'focus', 'blur', 'select', 'scroll'].forEach((ev) => zipEl.addEventListener(ev, () => requestAnimationFrame(moveCur)));
+['input', 'keyup', 'click', 'focus', 'blur', 'select', 'scroll'].forEach((ev) => zipEl.addEventListener(ev, () => { moveCur(); requestAnimationFrame(moveCur); }));
+['touchend', 'pointerup'].forEach((ev) => zipEl.addEventListener(ev, () => setTimeout(moveCur, 0)));   // phones place the caret after the tap
+moveCur();
 zipEl.addEventListener('input', () => {
   const v = zipEl.value;
   if (v.trim() !== autoZip) autoZip = null;

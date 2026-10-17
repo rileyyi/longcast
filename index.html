@@ -2027,7 +2027,7 @@ function renderAll() {
   if (!st.model) return;
   const okN = st.model.status.filter((x) => x.ok).length;
   const placeTxt = st.model.loc.via === 'coordinates' ? '' : [st.model.loc.name, st.model.loc.region].filter(Boolean).join(', ').toLowerCase();
-  setStatus(`${zipEl.value}${placeTxt ? '  ' + placeTxt : ''}`, `${okN}/${st.model.status.length} sources ok  checked at ${st.model.updated}`);
+  setStatus(`${zipEl.value}${placeTxt ? '  ' + placeTxt : ''}`, `| ${okN}/${st.model.status.length} sources ok | checked ${st.model.updated} |`);
   renderHero();
   renderWeek();
   renderSignals();
@@ -2242,7 +2242,9 @@ function buildModel(results, loc, fetchedAt) {
    it's under an hour old and from today; otherwise the app fetches a fresh one. */
 const SNAP_KEY = 'lc:snap:v1';
 const FRESH_MS = 60 * 60 * 1000;
+let persistAsked = false;
 function saveSnapshot(query, loc, results) {
+  if (!persistAsked && navigator.storage && navigator.storage.persist) { persistAsked = true; navigator.storage.persist().catch(() => {}); }
   try { localStorage.setItem(SNAP_KEY, JSON.stringify({ v: 1, query, loc, savedAt: Date.now(), day: localToday(), results })); }
   catch (e) { try { localStorage.removeItem(SNAP_KEY); } catch (er) {} }   // storage full or blocked: just skip caching
 }
@@ -2464,8 +2466,10 @@ document.getElementById('copyThemeUrl').addEventListener('click',async()=>{
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!themePanel.hidden)closeThemePanel(true);});
 // Restore explicit theme settings from the URL first, then local preference if no URL theme exists.
+const IS_APP = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
 const hashTheme=(location.hash||'').match(/~([0-9a-f]{6})-([0-9a-f]{6})-(\d{3})$/i);
-if(hashTheme){applyTheme('#'+hashTheme[1],'#'+hashTheme[2],Number(hashTheme[3]),'custom',false,false);}
+const savedTheme=(()=>{try{return JSON.parse(localStorage.getItem('lc:appearance')||'null');}catch(e){return null;}})();
+if(hashTheme && !(IS_APP && savedTheme)){applyTheme('#'+hashTheme[1],'#'+hashTheme[2],Number(hashTheme[3]),'custom',false,false);}
 else {try{const saved=JSON.parse(localStorage.getItem('lc:appearance')||'null');if(saved&&validHex(saved.bg)&&validHex(saved.ink))applyTheme(saved.bg,saved.ink,Math.max(200,Math.min(600,Number(saved.weight)||400)),saved.name||'custom',false,true);}catch(e){}}
 document.querySelectorAll('.units button[data-u]').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.u === st.unit)));
 drawMap(null);
@@ -2477,7 +2481,8 @@ drawMap(null);
   if (window.ResizeObserver) new ResizeObserver(size).observe(main); else window.addEventListener('resize', size);
 })();
 const fromHash = currentLocationFromHash();
-const first = fromHash || store.get('lc:last');
+const lastPlace = store.get('lc:last');
+const first = IS_APP ? (lastPlace || fromHash) : (fromHash || lastPlace);
 if (first && String(first).trim()) {
   const sn = store.get(SNAP_KEY);
   if (!(sn && sn.query === String(first).trim().replace(/\s+/g, ' ') && snapshotFresh(sn) && showSnapshot(sn))) run(first);

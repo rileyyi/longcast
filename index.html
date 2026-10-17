@@ -2069,6 +2069,14 @@ async function run(query) {
   query = String(query || '').trim().replace(/\s+/g, ' ');
   autoZip = query;
   store.set('lc:last', query);
+  
+  // Save location to Android native disk bridge if available
+  try {
+    if (window.LongCastStorage && typeof window.LongCastStorage.saveLocation === 'function') {
+      window.LongCastStorage.saveLocation(query);
+    }
+  } catch (e) {}
+
   try { const th=(location.hash||'').match(/~[0-9a-f]{6}-[0-9a-f]{6}-\d{3}$/i); history.replaceState(null, '', '#' + encodeURIComponent(query) + (th ? th[0] : '')); } catch (e) {}
   zipEl.value = query;
   moveCur();
@@ -2456,7 +2464,7 @@ document.addEventListener('pointerdown',e=>{
   if(!themePanel.hidden&&!themePanel.contains(e.target)&&!themeButton.contains(e.target))closeThemePanel();
 });
 document.querySelectorAll('.theme-preset').forEach(b=>b.addEventListener('click',()=>{const t=themes[b.dataset.theme];applyTheme(t.bg,t.ink,t.weight,b.dataset.theme);}));
-function editColor(which){const el=which==='bg'?themeBg:themeInk; if(validHex(el.value)) applyTheme(which==='bg'?el.value:themeBg.value,which==='ink'?el.value:themeInk.value,Number(themeWeight.value)); else el.setAttribute('aria-invalid','true');}
+function editColor(which){const el=which==='bg'?themeBg:themeInk; if(validHex(el.value)) applyTheme(which==='bg'?el.value:themeBg.value,which==='ink'?el.value:themeBg.value,Number(themeWeight.value)); else el.setAttribute('aria-invalid','true');}
 [themeBg,themeInk].forEach((el,i)=>{el.addEventListener('change',()=>{editColor(i===0?'bg':'ink');el.removeAttribute('aria-invalid');});el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();editColor(i===0?'bg':'ink');}});});
 themeWeight.addEventListener('input',()=>applyTheme(themeBg.value,themeInk.value,Number(themeWeight.value)));
 document.getElementById('copyThemeUrl').addEventListener('click',async()=>{
@@ -2481,7 +2489,16 @@ drawMap(null);
   if (window.ResizeObserver) new ResizeObserver(size).observe(main); else window.addEventListener('resize', size);
 })();
 const fromHash = currentLocationFromHash();
-const lastPlace = store.get('lc:last');
+
+// Check native Android LongCastStorage bridge first, then fallback
+let nativeLast = '';
+try {
+  if (window.LongCastStorage && typeof window.LongCastStorage.getLocation === 'function') {
+    nativeLast = window.LongCastStorage.getLocation();
+  }
+} catch (e) {}
+
+const lastPlace = nativeLast || store.get('lc:last');
 const first = IS_APP ? (lastPlace || fromHash) : (fromHash || lastPlace);
 if (first && String(first).trim()) {
   const sn = store.get(SNAP_KEY);

@@ -818,9 +818,18 @@ main>footer{margin-bottom:40px}
   main>.status{padding-bottom:6px}
 }
 
+/* Phone status bar guard. Inside an edge-to-edge Android app the page runs under the clock and
+   battery icons; this solid band in the page's own background stays fixed over that strip so
+   scrolled content never shows through. In a browser the inset is 0, so it has no size. */
+.topguard{position:fixed;left:0;right:0;top:0;height:env(safe-area-inset-top,0px);background:var(--paper);z-index:1000;pointer-events:none}
+
+/* the locator map is clickable: pick a spot to forecast it */
+.locmap svg{cursor:crosshair}
+
 </style>
 </head>
 <body class="idle">
+<div class="topguard" aria-hidden="true"></div>
 <main>
   <header class="top" id="top">
     <a class="mark" href="#" id="home">longcast</a>
@@ -858,7 +867,7 @@ main>footer{margin-bottom:40px}
     </form>
     <p class="where" id="where"></p>
     </div>
-    <div class="locmap" id="locmap" aria-hidden="true"></div>
+    <div class="locmap" id="locmap" aria-hidden="true" title="Click the map to forecast that spot"></div>
     </div>
     <p class="intro" id="ziphelp">Search worldwide by city, region, country, postal code, or coordinates (latitude, longitude). Local climate context included.</p>
     <noscript><p class="intro" style="color:#000">longcast needs JavaScript turned on to load forecasts.</p></noscript>
@@ -963,9 +972,32 @@ const body = document.body;
 const BLOCKED = 'The weather services could not be reached. Check your connection and try again in a minute. If you opened this inside another app, open it in your browser instead.';
 
 /* ---------- storage (per-browser conveniences only) ---------- */
+/* Saved data. In a browser this is the browser's local storage (no permission needed).
+   Inside the Android app, the app can also provide window.LongcastStorage, which saves straight
+   to the phone (SharedPreferences), so the last place survives even an immediate force quit.
+   Browsers don't have it, so there it's simply skipped. */
+const NATIVE = (() => { try { const n = window.LongcastStorage; return n && typeof n.getItem === 'function' ? n : null; } catch (e) { return null; } })();
+const rawStore = {
+  get(k) {
+    let v = null;
+    try { v = localStorage.getItem(k); } catch (e) {}
+    if ((v == null || v === '') && NATIVE) { try { v = NATIVE.getItem(k); } catch (e) {} }
+    return v == null || v === '' || v === 'null' ? null : v;
+  },
+  set(k, v) {
+    let ok = false;
+    try { localStorage.setItem(k, v); ok = true; } catch (e) {}
+    if (NATIVE) { try { NATIVE.setItem(k, v); ok = true; } catch (e) {} }
+    return ok;
+  },
+  remove(k) {
+    try { localStorage.removeItem(k); } catch (e) {}
+    if (NATIVE) { try { NATIVE.removeItem(k); } catch (e) {} }
+  }
+};
 const store = {
-  get(k) { try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; } catch (e) { return null; } },
-  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} }
+  get(k) { const v = rawStore.get(k); if (v == null) return null; try { return JSON.parse(v); } catch (e) { return null; } },
+  set(k, v) { rawStore.set(k, JSON.stringify(v)); }
 };
 
 const st = { unit: store.get('lc:unit') === 'c' ? 'c' : 'f', model: null, sel: 0, open: null };
@@ -1186,8 +1218,17 @@ function fromDaily(j, kind, meta) {
   return src;
 }
 
+// The National Weather Service only forecasts the US and its territories.
+const NWS_AREAS = [[24, 50, -125, -66], [51, 72, -180, -129], [51, 56, 172, 180], [18, 23, -161, -154],
+  [17, 19, -68, -64], [13, 21, 144, 146], [-15, -11, -171, -168]];
+function inNwsArea(lat, lon) { return NWS_AREAS.some(([a, b, c, d]) => lat >= a && lat <= b && lon >= c && lon <= d); }
 async function fetchNWS(lat, lon) {
-  const p = await getJSON(API.nws + lat.toFixed(4) + ',' + lon.toFixed(4), 10000);
+  let p;
+  try { p = await getJSON(API.nws + lat.toFixed(4) + ',' + lon.toFixed(4), 10000); }
+  catch (e) {
+    if (/http 404/.test(e.message || '')) { const er = new Error('no NWS forecast here'); er.skip = true; throw er; }   // near the US but outside its grid
+    throw e;
+  }
   const url = p && p.properties && p.properties.forecast;
   if (!url) throw new Error('outside nws coverage');
   const f = await getJSON(url, 10000);
@@ -1240,7 +1281,7 @@ function makeLog(el) {
     el.innerHTML = lines.map((l) => {
       if (l.status === 'msg') return `  <span class="err">${esc(l.detail)}</span>`;
       if (l.status === 'wait') return `  ${esc(pad(l.name))}<span class="wait" aria-label="loading"></span>`;
-      const s = l.status === 'ok' ? '<b>ok</b>  ' : '<b>fail</b>';
+      const s = l.status === 'ok' ? '<b>ok</b>  ' : l.status === 'skip' ? '<b>skip</b>' : '<b>fail</b>';
       return `  ${esc(pad(l.name))}${s}${l.detail ? '  ' + esc(l.detail) : ''}`;
     }).join('\n');
   };
@@ -1393,6 +1434,7 @@ const landCells = (() => {
   return out;
 })();
 let mapLoc = null;
+let mapView = { start: 0, view: LANDMAP.cols, vx: 0 };
 function drawMap(loc) {
   if (loc !== undefined) mapLoc = loc;
   loc = mapLoc;
@@ -1420,6 +1462,7 @@ function drawMap(loc) {
       + `<circle class="lm-ring" cx="${cx}" cy="${cy}" r="1.5"/><circle class="lm-dot" cx="${cx}" cy="${cy}" r=".72"/>`;
   }
   const vx = hasLoc && view % 2 === 0 ? 0.5 : 0;   // half-cell shift so the crosshair is exactly mid-map
+  mapView = { start, view, vx };
   el.innerHTML = `<svg viewBox="${vx} 0 ${view} ${rows}" preserveAspectRatio="xMaxYMid meet" focusable="false"><path class="lm-land" d="${dots}"/>${mark}</svg>`;
 }
 
@@ -1596,21 +1639,40 @@ function compareToPrev(r, i) {
   return t;
 }
 
+// Liquid amount in inches (°F) or mm (°C). Snow also gets a rough depth: about 10x the water.
+function precipAmount(inch, type) {
+  const base = P(inch);
+  if (!/snow/.test(type || '')) return base;
+  const depth = st.unit === 'c' ? `${Math.max(1, Math.round(inch * 25.4))} cm` : `${Math.max(0.5, Math.round(inch * 10 * 2) / 2)} in`;
+  return `${base} of water, roughly ${depth} of snow`;
+}
 function dayDescription(r) {
   const labels = { clear: 'Clear', partly: 'Partly cloudy', cloudy: 'Cloudy', fog: 'Foggy', drizzle: 'Drizzle', 'freezing drizzle': 'Freezing drizzle', rain: 'Rain', 'freezing rain': 'Freezing rain', snow: 'Snow', storm: 'Thunderstorms', hailstorm: 'Thunderstorms with possible hail' };
   const wx = labels[r.wx];
   const high = isNum(r.hi) ? `high near ${T(r.hi)}°` : 'high unavailable';
   const low = isNum(r.lo) ? `low near ${T(r.lo)}°` : 'low unavailable';
   const type = ['drizzle', 'freezing drizzle', 'rain', 'freezing rain', 'snow', 'storm', 'hailstorm'].includes(r.wx) ? r.wx : 'precip';
-  const precip = isNum(r.pop) ? `${pct(r.pop)} chance of ${type}` : '';
+  let precip = isNum(r.pop) ? `${pct(r.pop)} chance of ${type}` : '';
+  if (precip && r.pop >= 0.2 && isNum(r.rainIf) && r.rainIf > 0) precip += `, about ${precipAmount(r.rainIf, type)} if it does`;
   const weather = wx ? `${wx} conditions. ` : '';
   return `${weather}With a ${high} and ${low}.${precip ? ` ${precip}.` : ''}`;
 }
 
+// What's falling right now, from the current weather code (or a nonzero precipitation reading).
+function nowWord(now) {
+  if (!now) return '';
+  const w = isNum(now.code) ? wxWord([now.code]) : null;
+  const words = { drizzle: 'drizzling', 'freezing drizzle': 'freezing drizzle', rain: 'raining', 'freezing rain': 'freezing rain', snow: 'snowing', storm: 'storming', hailstorm: 'hail' };
+  if (w && words[w]) return words[w];
+  return now.precip > 0 ? 'precipitating' : '';
+}
 function heroDayText(r, i) {
   const name = r.d === 0 ? 'today' : `${dowOf(r.date)} ${label(r.date)}`;
   const cmp = compareToPrev(r, i);
-  return [cmp ? `${name}: ${cmp}` : `${name}: high ${T(r.hi)}°, low ${T(r.lo)}°`, dayDescription(r)];
+  const now = r.d === 0 && st.model && st.model.now;
+  const cur = now ? `currently ${T(now.temp)}°${nowWord(now) ? ' and ' + nowWord(now) : ''}` : '';
+  const rest = cmp || `high ${T(r.hi)}°, low ${T(r.lo)}°`;
+  return [`${name}: ${cur ? cur + ', ' : ''}${rest}`, dayDescription(r)];
 }
 function renderHeroDay() {
   const el = $('#hero-day');
@@ -1880,6 +1942,10 @@ function renderCalDetail() {
   const rainTxt = isNum(r.pop) ? `precip ${pct(r.pop)}` : '';
 
   const kv = [];
+  if (r.d === 0 && st.model.now) {
+    const w = nowWord(st.model.now);
+    kv.push(['currently', `${T(st.model.now.temp)}°${w ? ', ' + w : ''}`]);
+  }
   if (r.n && isNum(r.hi)) {
     const a = Math.round(cv(r.hi) - cv(r.n.hi));
     kv.push(['vs average', a === 0 ? 'right at average' : `${Math.abs(a)}° ${a > 0 ? 'warmer' : 'cooler'}`]);
@@ -2009,10 +2075,10 @@ function renderSources() {
   $('#srclog').innerHTML = status.map((s) => {
     let detail = s.detail || '';
     if (s.ok && s.off && (TD(s.off.hi) !== '0' || TD(s.off.lo) !== '0')) detail += `  adjusted ${TD(s.off.hi)}° / ${TD(s.off.lo)}°`;
-    return `  ${esc(pad(s.name))}<b>${s.ok ? 'ok  ' : 'fail'}</b>${detail ? '  ' + esc(detail) : ''}`;
+    return `  ${esc(pad(s.name))}<b>${s.ok ? 'ok  ' : s.skipped ? 'skip' : 'fail'}</b>${detail ? '  ' + esc(detail) : ''}`;
   }).join('\n');
-  const okN = status.filter((s) => s.ok).length;
-  $('#srcsum').textContent = `${okN} of ${status.length} responded, updated ${st.model.updated}`;
+  const okN = status.filter((s) => s.ok).length, asked = status.filter((s) => !s.skipped).length;
+  $('#srcsum').textContent = `${okN} of ${asked} responded, updated ${st.model.updated}`;
   const la = st.model.loc.lat.toFixed(4), lo = st.model.loc.lon.toFixed(4);
   $('#cross').innerHTML = `Ensembles are shifted so their first week lines up with the higher-resolution models. Compare with the <a href="https://forecast.weather.gov/MapClick.php?lat=${la}&lon=${lo}" target="_blank" rel="noopener">NWS point forecast</a>, the <a href="https://www.cpc.ncep.noaa.gov/products/predictions/814day/" target="_blank" rel="noopener">CPC 8 to 14 day outlook</a>, or the <a href="https://www.cpc.ncep.noaa.gov/products/predictions/WK34/" target="_blank" rel="noopener">CPC week 3 to 4 outlook</a>.`;
 }
@@ -2026,8 +2092,9 @@ function setStatus(mid, right) {
 function renderAll() {
   if (!st.model) return;
   const okN = st.model.status.filter((x) => x.ok).length;
+  const askedN = st.model.status.filter((x) => !x.skipped).length;
   const placeTxt = st.model.loc.via === 'coordinates' ? '' : [st.model.loc.name, st.model.loc.region].filter(Boolean).join(', ').toLowerCase();
-  setStatus(`${zipEl.value}${placeTxt ? '  ' + placeTxt : ''}`, `| ${okN}/${st.model.status.length} sources ok | checked ${st.model.updated} |`);
+  setStatus(`${zipEl.value}${placeTxt ? '  ' + placeTxt : ''}`, `${okN}/${askedN} sources ok  checked at ${st.model.updated}`);
   renderHero();
   renderWeek();
   renderSignals();
@@ -2069,14 +2136,6 @@ async function run(query) {
   query = String(query || '').trim().replace(/\s+/g, ' ');
   autoZip = query;
   store.set('lc:last', query);
-  
-  // Save location to Android native disk bridge if available
-  try {
-    if (window.LongCastStorage && typeof window.LongCastStorage.saveLocation === 'function') {
-      window.LongCastStorage.saveLocation(query);
-    }
-  } catch (e) {}
-
   try { const th=(location.hash||'').match(/~[0-9a-f]{6}-[0-9a-f]{6}-\d{3}$/i); history.replaceState(null, '', '#' + encodeURIComponent(query) + (th ? th[0] : '')); } catch (e) {}
   zipEl.value = query;
   moveCur();
@@ -2117,17 +2176,19 @@ async function run(query) {
     L.add(key, name);
     tasks.push(fn().then(
       (v) => { if (my === runId) { L.set(key, 'ok', describe(v)); tick(); } return { key, name, ok: true, v, detail: describe(v) }; },
-      (e) => { if (my === runId) { L.set(key, 'fail', e.message || 'error'); tick(); } return { key, name, ok: false, detail: e.message || 'error' }; }
+      (e) => { if (my === runId) { L.set(key, e.skip ? 'skip' : 'fail', e.message || 'error'); tick(); } return { key, name, ok: false, skipped: !!e.skip, detail: e.message || 'error' }; }
     ));
   };
 
-  add('nws', 'nws', () => fetchNWS(loc.lat, loc.lon), (v) => `${v.span} days  office ${v.office.toLowerCase()}`);
-  add('yday', 'yesterday', () => getJSON(qs(API.fc, { ...base, daily: 'temperature_2m_max,temperature_2m_min,precipitation_sum,weather_code', past_days: 1, forecast_days: 1 }))
+  add('nws', 'nws', () => inNwsArea(loc.lat, loc.lon) ? fetchNWS(loc.lat, loc.lon)
+    : Promise.reject(Object.assign(new Error('US only'), { skip: true })), (v) => `${v.span} days  office ${v.office.toLowerCase()}`);
+  add('yday', 'now', () => getJSON(qs(API.fc, { ...base, daily: 'temperature_2m_max,temperature_2m_min,precipitation_sum,weather_code', current: 'temperature_2m,precipitation,weather_code', past_days: 1, forecast_days: 1 }))
     .then((j) => {
-      const d = j && j.daily;
+      const d = j && j.daily, c = j && j.current;
       if (!d || !d.time || !isNum(d.temperature_2m_max[0])) throw new Error('no data');
-      return { date: d.time[0], hi: d.temperature_2m_max[0], lo: d.temperature_2m_min[0], rain: d.precipitation_sum[0], pop: null, wx: isNum(d.weather_code[0]) ? wxWord([d.weather_code[0]]) : null };
-    }), () => 'for comparison with today');
+      const now = c && isNum(c.temperature_2m) ? { temp: c.temperature_2m, precip: isNum(c.precipitation) ? c.precipitation : 0, code: isNum(c.weather_code) ? c.weather_code : null, date: String(c.time || '').slice(0, 10) } : null;
+      return { date: d.time[0], hi: d.temperature_2m_max[0], lo: d.temperature_2m_min[0], rain: d.precipitation_sum[0], pop: null, wx: isNum(d.weather_code[0]) ? wxWord([d.weather_code[0]]) : null, now };
+    }), (v) => v.now ? 'current conditions and yesterday' : 'yesterday');
   DET.forEach((mdl) => add(mdl.key, mdl.name,
     () => getJSON(qs(API.fc, { ...base, daily: 'temperature_2m_max,temperature_2m_min,precipitation_sum,precipitation_probability_max,weather_code', forecast_days: 16, models: mdl.id }))
       .then((j) => fromDaily(j, 'det', mdl)),
@@ -2236,9 +2297,10 @@ function buildModel(results, loc, fetchedAt) {
   const dates = Array.from({ length: DAYS }, (_, i) => addDays(start, i));
   const model = assemble(dates, srcs, norms);
   model.loc = loc;
-  model.status = results.map((r) => ({ name: r.name, ok: r.ok, detail: r.detail, off: r.ok && r.v && r.v.off }));
+  model.status = results.map((r) => ({ name: r.name, ok: r.ok, skipped: !!r.skipped, detail: r.detail, off: r.ok && r.v && r.v.off }));
   const yd = results.find((r) => r.key === 'yday');
   model.yday = yd && yd.ok && yd.v && yd.v.date === addDays(dates[0], -1) ? yd.v : null;
+  model.now = yd && yd.ok && yd.v && yd.v.now && yd.v.now.date === dates[0] ? yd.v.now : null;
   model.fetchedAt = fetchedAt;
   model.updated = new Date(fetchedAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }).toLowerCase();
   return model;
@@ -2250,11 +2312,8 @@ function buildModel(results, loc, fetchedAt) {
    it's under an hour old and from today; otherwise the app fetches a fresh one. */
 const SNAP_KEY = 'lc:snap:v1';
 const FRESH_MS = 60 * 60 * 1000;
-let persistAsked = false;
 function saveSnapshot(query, loc, results) {
-  if (!persistAsked && navigator.storage && navigator.storage.persist) { persistAsked = true; navigator.storage.persist().catch(() => {}); }
-  try { localStorage.setItem(SNAP_KEY, JSON.stringify({ v: 1, query, loc, savedAt: Date.now(), day: localToday(), results })); }
-  catch (e) { try { localStorage.removeItem(SNAP_KEY); } catch (er) {} }   // storage full or blocked: just skip caching
+  if (!rawStore.set(SNAP_KEY, JSON.stringify({ v: 1, query, loc, savedAt: Date.now(), day: localToday(), results }))) rawStore.remove(SNAP_KEY);   // storage full or blocked: just skip caching
 }
 function snapshotFresh(sn) { return !!(sn && sn.savedAt && Date.now() - sn.savedAt < FRESH_MS && sn.day === localToday()); }
 function showSnapshot(sn) {
@@ -2366,7 +2425,7 @@ $('#home').addEventListener('click', (e) => {
   runId++;
   st.model = null;
   autoZip = null;
-  try { localStorage.removeItem('lc:last'); localStorage.removeItem(SNAP_KEY); } catch (er) {}   // forget the recent location
+  rawStore.remove('lc:last'); rawStore.remove(SNAP_KEY);   // forget the recent location
   try { history.replaceState(null, '', location.pathname + location.search); } catch (er) {}
   body.className = 'idle';
   $('#out').hidden = true;
@@ -2425,6 +2484,11 @@ function syncColorUI(bg,ink){
   document.querySelectorAll('#bgSwatches .color-swatch').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.color===bg.toLowerCase())));
   document.querySelectorAll('#inkSwatches .color-swatch').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.color===ink.toLowerCase())));
 }
+// Android app only: tells it the top band color (page background) and the bottom bar color (the
+// status line, drawn in the text color) so it can pick dark or light system icons for each.
+function syncSystemBars(bg, ink) {
+  try { if (window.LongcastUI && typeof window.LongcastUI.setSystemBars === 'function') window.LongcastUI.setSystemBars(bg, ink); } catch (e) {}
+}
 function applyTheme(bg, ink, weight, name='custom', save=true, share=true) {
   if(!validHex(bg)||!validHex(ink)) return;
   bg=bg.toLowerCase(); ink=accessibleInk(bg,ink.toLowerCase()); weight=Math.max(200,Math.min(600,Number(weight)||400));
@@ -2434,11 +2498,12 @@ function applyTheme(bg, ink, weight, name='custom', save=true, share=true) {
   document.documentElement.style.setProperty('--ink-2','color-mix(in srgb,var(--ink) 88%,var(--paper))');
   document.documentElement.style.setProperty('--ink-3','color-mix(in srgb,var(--ink) 72%,var(--paper))');
   document.documentElement.style.setProperty('--base-weight', String(weight));
+  syncSystemBars(bg, ink);
   document.body.style.fontWeight=String(weight);
   themeBg.value=bg; themeInk.value=ink; themeWeight.value=String(weight); weightValue.value=String(weight);
   document.querySelectorAll('.theme-preset').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.theme===name)));
   syncColorUI(bg,ink);
-  if(save){try{localStorage.setItem('lc:appearance',JSON.stringify({bg,ink,weight,name}));}catch(e){}}
+  if(save){rawStore.set('lc:appearance',JSON.stringify({bg,ink,weight,name}));}
   if(share) updateShareHash(bg,ink,weight);
 }
 function makeSwatches(id, target){
@@ -2464,7 +2529,7 @@ document.addEventListener('pointerdown',e=>{
   if(!themePanel.hidden&&!themePanel.contains(e.target)&&!themeButton.contains(e.target))closeThemePanel();
 });
 document.querySelectorAll('.theme-preset').forEach(b=>b.addEventListener('click',()=>{const t=themes[b.dataset.theme];applyTheme(t.bg,t.ink,t.weight,b.dataset.theme);}));
-function editColor(which){const el=which==='bg'?themeBg:themeInk; if(validHex(el.value)) applyTheme(which==='bg'?el.value:themeBg.value,which==='ink'?el.value:themeBg.value,Number(themeWeight.value)); else el.setAttribute('aria-invalid','true');}
+function editColor(which){const el=which==='bg'?themeBg:themeInk; if(validHex(el.value)) applyTheme(which==='bg'?el.value:themeBg.value,which==='ink'?el.value:themeInk.value,Number(themeWeight.value)); else el.setAttribute('aria-invalid','true');}
 [themeBg,themeInk].forEach((el,i)=>{el.addEventListener('change',()=>{editColor(i===0?'bg':'ink');el.removeAttribute('aria-invalid');});el.addEventListener('keydown',e=>{if(e.key==='Enter'){e.preventDefault();editColor(i===0?'bg':'ink');}});});
 themeWeight.addEventListener('input',()=>applyTheme(themeBg.value,themeInk.value,Number(themeWeight.value)));
 document.getElementById('copyThemeUrl').addEventListener('click',async()=>{
@@ -2474,13 +2539,30 @@ document.getElementById('copyThemeUrl').addEventListener('click',async()=>{
 });
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!themePanel.hidden)closeThemePanel(true);});
 // Restore explicit theme settings from the URL first, then local preference if no URL theme exists.
+{ const cs = getComputedStyle(document.documentElement);
+  syncSystemBars((cs.getPropertyValue('--paper') || '#ffffff').trim(), (cs.getPropertyValue('--ink') || '#000000').trim()); }
 const IS_APP = (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) || window.navigator.standalone === true;
 const hashTheme=(location.hash||'').match(/~([0-9a-f]{6})-([0-9a-f]{6})-(\d{3})$/i);
-const savedTheme=(()=>{try{return JSON.parse(localStorage.getItem('lc:appearance')||'null');}catch(e){return null;}})();
+const savedTheme=store.get('lc:appearance');
 if(hashTheme && !(IS_APP && savedTheme)){applyTheme('#'+hashTheme[1],'#'+hashTheme[2],Number(hashTheme[3]),'custom',false,false);}
-else {try{const saved=JSON.parse(localStorage.getItem('lc:appearance')||'null');if(saved&&validHex(saved.bg)&&validHex(saved.ink))applyTheme(saved.bg,saved.ink,Math.max(200,Math.min(600,Number(saved.weight)||400)),saved.name||'custom',false,true);}catch(e){}}
+else {try{const saved=savedTheme;if(saved&&validHex(saved.bg)&&validHex(saved.ink))applyTheme(saved.bg,saved.ink,Math.max(200,Math.min(600,Number(saved.weight)||400)),saved.name||'custom',false,true);}catch(e){}}
 document.querySelectorAll('.units button[data-u]').forEach((x) => x.setAttribute('aria-pressed', String(x.dataset.u === st.unit)));
 drawMap(null);
+// Click or tap anywhere on the map to get the forecast for that spot; the map then recenters on it.
+document.getElementById('locmap').addEventListener('click', (ev) => {
+  const svg = ev.currentTarget.querySelector('svg');
+  if (!svg) return;
+  const { cols, rows, step, top } = LANDMAP;
+  const r = svg.getBoundingClientRect();
+  const vbW = mapView.view, vbH = rows;
+  const scale = Math.min(r.width / vbW, r.height / vbH);
+  const offX = r.width - vbW * scale, offY = (r.height - vbH * scale) / 2;   // matches preserveAspectRatio xMaxYMid
+  const x = mapView.vx + (ev.clientX - r.left - offX) / scale, y = (ev.clientY - r.top - offY) / scale;
+  if (y < 0 || y > vbH || x < mapView.vx || x > mapView.vx + vbW) return;
+  const lon = (((mapView.start + x) % cols + cols) % cols) * step - 180;
+  const lat = clamp(top - y * step, -89.9, 89.9);
+  run(`${lat.toFixed(3)}, ${lon.toFixed(3)}`);
+});
 (() => {
   const main = document.querySelector('.askmain'), map = document.getElementById('locmap');
   if (!main || !map) return;
@@ -2489,16 +2571,7 @@ drawMap(null);
   if (window.ResizeObserver) new ResizeObserver(size).observe(main); else window.addEventListener('resize', size);
 })();
 const fromHash = currentLocationFromHash();
-
-// Check native Android LongCastStorage bridge first, then fallback
-let nativeLast = '';
-try {
-  if (window.LongCastStorage && typeof window.LongCastStorage.getLocation === 'function') {
-    nativeLast = window.LongCastStorage.getLocation();
-  }
-} catch (e) {}
-
-const lastPlace = nativeLast || store.get('lc:last');
+const lastPlace = store.get('lc:last');
 const first = IS_APP ? (lastPlace || fromHash) : (fromHash || lastPlace);
 if (first && String(first).trim()) {
   const sn = store.get(SNAP_KEY);
